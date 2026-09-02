@@ -1,5 +1,22 @@
 body {
     color: whitesmoke;
-    background-color: #1a1a1a;
-    font-family: "Montserrat", sans-serif;
+    background-color: #000000;
+    font-family: "Jura", sans-serif;
+}
+
+a {
+    text-decoration: none;
+    color: whitesmoke;
+    font-family: "Jura", sans-serif;
+}
+
+
+
+.design img {
+    transition-duration: 0.5s;
+}
+
+.design img:hover {
+    transform: scale(1.02);
+    border: 2px solid whitesmoke;
 }
