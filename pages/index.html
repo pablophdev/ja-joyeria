@@ -1,0 +1,46 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head>     
+    <meta charset="UTF-8">     
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">     
+    <title>Mi Tienda</title> 
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head> 
+<body>      
+
+    <!-- Contenedor vacío donde aparecerá el navbar -->
+    <div id="navbar-placeholder"></div>
+    <div class = "justify-content-end d-flex gap-3 p-2">
+        <a class = "text-decoration-none" href="/pages/tienda/login.html">Iniciar Sesión</a>
+        <a class = "text-decoration-none" href="/pages/tienda/registro.html">Registrarse</a>
+    </div>
+
+    <div class="row align-items-center m-0"> 
+    <!-- Columna del texto -->
+    <div class="col-12 col-md-6 p-4">
+        <h1>JA Accesorios</h1>
+        <p>lore ipsum dolor sit amet aslkjdask askjdasdgfjkadsgjkagjbasdjgkhasdjkgbnasdjkgnadskljgnaskdankljsdngjddsgfkjdasglksdajglskadgsdklgjasdlgkjgdalkaksl asdjaslk</p> 
+        <button class="btn text-body btn-light">Ver Productos</button>
+    </div>
+
+    <!-- Columna de la imagen -->
+    <div class="col-12 col-md-6 p-0">
+        <img class="w-100" style="height: 450px; object-fit: cover; border-radius: 100px;" src="/img/grilzindex.jpg" alt="">
+    </div>
+    </div>
+
+    
+
+    <!-- Script para importar el Navbar -->
+    <script>
+        fetch('/components/navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-placeholder').innerHTML = data;
+            })
+            .catch(error => console.error('Error cargando el navbar:', error));
+    </script>
+    <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+</body> 
+</html>
