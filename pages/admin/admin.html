@@ -4,42 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
 </head>
 <body class="bg-light">
 
 <div class="d-flex">
+  <div id="sidebar-container" class="h-100 flex-shrink-0"></div>
 
-  <!-- Sidebar -->
-  <div class="d-flex flex-column justify-content-between bg-white border-end vh-100" style="width: 220px;">
-    <div>
-      <div class="d-flex align-items-center gap-2 p-3 border-bottom">
-        <span class="border rounded-circle" style="width: 24px; height: 24px;"></span>
-        <span class="fw-semibold">Company</span>
-      </div>
-      <div class="list-group list-group-flush">
-        <a href="#" class="list-group-item list-group-item-action list-group-item-primary">Dashboard</a>
-        <a href="#" class="list-group-item list-group-item-action">Ordenes</a>
-        <a href="#" class="list-group-item list-group-item-action">Inventario</a>
-        <a href="#" class="list-group-item list-group-item-action">Reportes</a>
-        <a href="#" class="list-group-item list-group-item-action">Empleados</a>
-        <a href="#" class="list-group-item list-group-item-action">Customers</a>
-      </div>
-    </div>
-
-    <div>
-      <div class="list-group list-group-flush">
-        <a href="#" class="list-group-item list-group-item-action">Settings</a>
-        <a href="#" class="list-group-item list-group-item-action">Profile</a>
-        <a href="#" class="list-group-item list-group-item-action">Search</a>
-        <a href="#" class="list-group-item list-group-item-action">Help</a>
-      </div>
-      <div class="d-flex align-items-center gap-2 p-3 border-top">
-        <span class="rounded-circle bg-secondary" style="width: 28px; height: 28px;"></span>
-        <span>Perfil</span>
-      </div>
-    </div>
-  </div>
 
   <!-- Main content -->
   <div class="flex-fill">
@@ -54,5 +25,14 @@
 
 </div>
 
+<script>
+  fetch('/components/sidebar-admin.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('sidebar-container').innerHTML = data;
+    })
+    .catch(error => console.error('Error al cargar el sidebar:', error));
+</script>
+<script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
