@@ -561,7 +561,7 @@ ol {
 
 .hero__slider.owl-carousel .owl-nav button {
 	font-size: 36px;
-	color: #333333;
+	color: #ffffff;
 	position: absolute;
 	left: 75px;
 	top: 50%;
@@ -595,7 +595,7 @@ ol {
 }
 
 .hero__text h2 {
-	color: rgb(24, 21, 21);
+	color: rgb(253, 253, 253);
 	font-size: 48px;
 	font-weight: 700;
 	line-height: 58px;
@@ -618,6 +618,7 @@ ol {
 	-webkit-transition: all, 0.9s;
 	-o-transition: all, 0.9s;
 	transition: all, 0.9s;
+	color: whitesmoke;
 }
 
 .hero__text .primary-btn {
