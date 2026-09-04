@@ -316,11 +316,11 @@ ol {
 -----------------------*/
 
 .header {
-	background: #ffffff;
+	background: #000000;
 }
 
 .header__top {
-	background: #111111;
+	background: #ffffff;
 	padding: 10px 0;
 }
 
@@ -339,7 +339,7 @@ ol {
 }
 
 .header__top__links a {
-	color: #ffffff;
+	color: #000000;
 	font-size: 13px;
 	text-transform: uppercase;
 	letter-spacing: 2px;
@@ -450,7 +450,7 @@ ol {
 	left: 0;
 	top: 56px;
 	width: 150px;
-	background: #111111;
+	background: #000000;
 	text-align: left;
 	padding: 5px 0;
 	z-index: 9;
@@ -480,7 +480,7 @@ ol {
 
 .header__menu ul li a {
 	font-size: 18px;
-	color: #111111;
+	color: whitesmoke;
 	display: block;
 	font-weight: 600;
 	position: relative;
@@ -493,7 +493,7 @@ ol {
 	bottom: 0;
 	width: 100%;
 	height: 2px;
-	background: #e53637;
+	background: #ffffff;
 	content: "";
 	-webkit-transition: all, 0.5s;
 	-o-transition: all, 0.5s;
@@ -515,7 +515,7 @@ ol {
 }
 
 .header__nav__option a span {
-	color: #0d0d0d;
+	color: #fffcfc;
 	font-size: 11px;
 	position: absolute;
 	left: 5px;
@@ -526,15 +526,6 @@ ol {
 	margin-right: 0;
 }
 
-.header__nav__option .price {
-	font-size: 15px;
-	color: #111111;
-	font-weight: 700;
-	display: inline-block;
-	margin-left: -20px;
-	position: relative;
-	top: 3px;
-}
 
 .offcanvas-menu-wrapper {
 	display: none;
@@ -589,7 +580,7 @@ ol {
 }
 
 .hero__text h6 {
-	color: #e53637;
+	color: whitesmoke;
 	font-size: 14px;
 	font-weight: 700;
 	text-transform: uppercase;
@@ -604,7 +595,7 @@ ol {
 }
 
 .hero__text h2 {
-	color: #111111;
+	color: rgb(24, 21, 21);
 	font-size: 48px;
 	font-weight: 700;
 	line-height: 58px;
@@ -651,7 +642,7 @@ ol {
 
 .hero__social a {
 	font-size: 16px;
-	color: #3d3d3d;
+	color: whitesmoke;
 	display: inline-block;
 	margin-right: 32px;
 }
@@ -666,6 +657,10 @@ ol {
 
 .blog {
 	padding-bottom: 55px;
+}
+
+.banner {
+	background: #000000;
 }
 
 .banner__item {
@@ -710,7 +705,7 @@ ol {
 }
 
 .banner__item__text h2 {
-	color: #111111;
+	color: whitesmoke;
 	font-weight: 700;
 	line-height: 46px;
 	margin-bottom: 10px;
@@ -875,6 +870,9 @@ ol {
 
 .instagram {
 	padding-bottom: 0;
+	background: #000000;
+	border-top: 1px solid #e5e5e5;
+	border-bottom: 1px solid #e5e5e5;
 }
 
 .instagram__pic__item {
@@ -889,19 +887,16 @@ ol {
 }
 
 .instagram__text h2 {
-	color: #111111;
+	color: whitesmoke;
 	font-weight: 700;
 	margin-bottom: 30px;
 }
 
 .instagram__text p {
 	margin-bottom: 65px;
+	color: whitesmoke;
 }
 
-.instagram__text h3 {
-	color: #e53637;
-	font-weight: 700;
-}
 
 /*---------------------
   Product
@@ -910,6 +905,9 @@ ol {
 .product {
 	padding-top: 0;
 	padding-bottom: 60px;
+	background: #000000;
+	border-top: 1px solid #e5e5e5c2;
+	border-bottom: 1px solid #e5e5e5d0;
 }
 
 .filter__controls {
@@ -918,7 +916,7 @@ ol {
 }
 
 .filter__controls li {
-	color: #b7b7b7;
+	color: whitesmoke;
 	font-size: 24px;
 	font-weight: 700;
 	list-style: none;
@@ -932,7 +930,7 @@ ol {
 }
 
 .filter__controls li.active {
-	color: #111111;
+	color: #969494;
 }
 
 .product__item {
@@ -1056,7 +1054,7 @@ ol {
 
 .product__item__text a {
 	font-size: 15px;
-	color: #e53637;
+	color: whitesmoke;
 	font-weight: 700;
 	position: absolute;
 	left: 0;
@@ -1069,7 +1067,7 @@ ol {
 }
 
 .product__item__text h6 {
-	color: #111111;
+	color: whitesmoke;
 	font-size: 15px;
 	font-weight: 600;
 	margin-bottom: 5px;
@@ -1089,7 +1087,7 @@ ol {
 }
 
 .product__item__text h5 {
-	color: #0d0d0d;
+	color: #ada5a5;
 	font-weight: 700;
 }
 
@@ -3469,7 +3467,6 @@ ol {
 		width: 35px;
 		line-height: 35px;
 		text-align: center;
-		border: 1px solid #111111;
 		border-radius: 2px;
 		cursor: pointer;
 		position: absolute;
