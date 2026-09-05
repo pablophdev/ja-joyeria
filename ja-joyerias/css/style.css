@@ -2740,6 +2740,7 @@ ol {
 
 .blog {
 	padding-bottom: 55px;
+	background-color: #000000;
 }
 
 .latest {
@@ -2752,7 +2753,7 @@ ol {
 
 .blog__item:hover a::after {
 	width: 40px;
-	background: #e53637;
+	background: #000000;
 }
 
 .blog__item:hover .blog__item__text {
