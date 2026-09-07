@@ -1,5 +1,3 @@
-
-
 const form = document.querySelector("#loginForm");
 const email = document.querySelector("#emailLogin");
 const password = document.querySelector("#passwordLogin");
