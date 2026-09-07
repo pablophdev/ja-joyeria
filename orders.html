@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Male_Fashion Template - Orders">
+    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Pedidos | Panel de Administrador</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@300..700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap & Icons nativos del template -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+</head>
+
+<body class="bg-light">
+
+    <div class="container-fluid p-0">
+        <div class="row no-gutters min-vh-100">
+
+            <!-- Sidebar -->
+            <aside class="col-xl-2 col-lg-3 col-md-4 bg-white border-right d-flex flex-column justify-content-between p-3">
+                <div>
+                    <!-- Brand -->
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <a href="./index.html" class="d-flex align-items-center text-dark text-decoration-none">
+                            <img src="./img/logo.jpg" alt="Logo" width="36" height="36" class="rounded-circle mr-2 border">
+                            <span class="h6 font-weight-bold mb-0">JA Joyerías</span>
+                        </a>
+                    </div>
+
+                    <!-- Menú Principal -->
+                    <nav class="nav flex-column mb-4">
+                        <a class="nav-link text-secondary px-2 py-2" href="./admin.html">
+                            <i class="fa fa-th-large mr-2"></i> Dashboard
+                        </a>
+                        <a class="nav-link text-primary font-weight-bold px-2 py-2" href="./orders.html">
+                            <i class="fa fa-shopping-bag mr-2"></i> Orders
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-2" href="#">
+                            <i class="fa fa-archive mr-2"></i> Inventory
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-2" href="#">
+                            <i class="fa fa-file-text-o mr-2"></i> Reports
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-2" href="#">
+                            <i class="fa fa-users mr-2"></i> Employees
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-2" href="#">
+                            <i class="fa fa-user-circle-o mr-2"></i> Customers
+                        </a>
+                    </nav>
+
+                    <!-- Menú Inferior -->
+                    <hr>
+                    <nav class="nav flex-column">
+                        <a class="nav-link text-secondary px-2 py-1 small" href="#">
+                            <i class="fa fa-cog mr-2"></i> Settings
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-1 small" href="#">
+                            <i class="fa fa-id-badge mr-2"></i> Profile
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-1 small" href="#">
+                            <i class="fa fa-search mr-2"></i> Search
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-1 small" href="#">
+                            <i class="fa fa-question-circle mr-2"></i> Help
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Perfil / Logout -->
+                <div class="border-top pt-3 mt-4 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-user-circle fa-2x text-secondary mr-2"></i>
+                        <span class="font-weight-bold small text-dark">Profile</span>
+                    </div>
+                    <a href="./login.html" class="text-secondary small" title="Cerrar sesión">
+                        <i class="fa fa-sign-out"></i>
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="col-xl-10 col-lg-9 col-md-8 d-flex flex-column">
+
+                <!-- Header Superior -->
+                <div class="d-flex justify-content-between align-items-center bg-white border-bottom px-4 py-3">
+                    <div>
+                        <h3 class="font-weight-bold text-dark mb-0">Gestión de Pedidos</h3>
+                        <small class="text-muted">Revisión y seguimiento de ventas realizadas</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <a href="./shop.html" class="btn btn-outline-dark btn-sm mr-3 font-weight-bold">
+                            <i class="fa fa-eye mr-1"></i> Ver Tienda
+                        </a>
+                        <a href="#" class="text-dark">
+                            <i class="fa fa-bell-o fa-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Contenido de Órdenes -->
+                <div class="p-4 flex-grow-1">
+
+                    <!-- Métricas Rápidas -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                            <div class="card border shadow-sm">
+                                <div class="card-body py-3">
+                                    <span class="text-muted small font-weight-bold text-uppercase">Total Pedidos</span>
+                                    <h4 class="font-weight-bold mb-0 mt-1">128</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                            <div class="card border shadow-sm">
+                                <div class="card-body py-3">
+                                    <span class="text-muted small font-weight-bold text-uppercase">Pendientes</span>
+                                    <h4 class="font-weight-bold text-warning mb-0 mt-1">14</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                            <div class="card border shadow-sm">
+                                <div class="card-body py-3">
+                                    <span class="text-muted small font-weight-bold text-uppercase">Enviados</span>
+                                    <h4 class="font-weight-bold text-info mb-0 mt-1">42</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                            <div class="card border shadow-sm">
+                                <div class="card-body py-3">
+                                    <span class="text-muted small font-weight-bold text-uppercase">Completados</span>
+                                    <h4 class="font-weight-bold text-success mb-0 mt-1">72</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Pedidos -->
+                    <div class="card border shadow-sm">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                            <h6 class="font-weight-bold mb-0 text-dark">Listado de Órdenes Recientes</h6>
+                            <div class="d-flex">
+                                <input type="text" class="form-control form-control-sm mr-2" placeholder="Buscar orden o cliente...">
+                                <button class="btn btn-dark btn-sm font-weight-bold">Filtrar</button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="thead-light small text-uppercase font-weight-bold">
+                                    <tr>
+                                        <th>ID Orden</th>
+                                        <th>Cliente</th>
+                                        <th>Productos</th>
+                                        <th>Fecha</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-weight-bold">#ORD-1042</td>
+                                        <td>
+                                            <div class="font-weight-bold text-dark">Carlos Mendoza</div>
+                                            <small class="text-muted">carlos.m@example.com</small>
+                                        </td>
+                                        <td>Grillz Custom Silver Star & Heart (x1)</td>
+                                        <td>07/09/2026</td>
+                                        <td class="font-weight-bold">$90.990</td>
+                                        <td>
+                                            <span class="badge badge-warning text-dark px-2 py-1 font-weight-bold">Pendiente</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-outline-dark btn-sm mr-1" title="Ver detalle">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-warning btn-sm text-dark font-weight-bold" title="Actualizar estado">
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">#ORD-1041</td>
+                                        <td>
+                                            <div class="font-weight-bold text-dark">Valentina Rojas</div>
+                                            <small class="text-muted">v.rojas@example.com</small>
+                                        </td>
+                                        <td>Cadena Eslabón Cubano Oro Rosa (x1)</td>
+                                        <td>06/09/2026</td>
+                                        <td class="font-weight-bold">$105.990</td>
+                                        <td>
+                                            <span class="badge badge-info text-white px-2 py-1 font-weight-bold">Enviado</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-outline-dark btn-sm mr-1" title="Ver detalle">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-warning btn-sm text-dark font-weight-bold" title="Actualizar estado">
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">#ORD-1040</td>
+                                        <td>
+                                            <div class="font-weight-bold text-dark">Matías Silva</div>
+                                            <small class="text-muted">matias.s@example.com</small>
+                                        </td>
+                                        <td>Cadena Corona Real (x1)</td>
+                                        <td>05/09/2026</td>
+                                        <td class="font-weight-bold">$219.990</td>
+                                        <td>
+                                            <span class="badge badge-success px-2 py-1 font-weight-bold">Completado</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-outline-dark btn-sm mr-1" title="Ver detalle">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-warning btn-sm text-dark font-weight-bold" title="Actualizar estado">
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">#ORD-1039</td>
+                                        <td>
+                                            <div class="font-weight-bold text-dark">Daniela Fuentes</div>
+                                            <small class="text-muted">daniela.f@example.com</small>
+                                        </td>
+                                        <td>Anillo Halo Zafiro Azul (x1)</td>
+                                        <td>04/09/2026</td>
+                                        <td class="font-weight-bold">$95.990</td>
+                                        <td>
+                                            <span class="badge badge-success px-2 py-1 font-weight-bold">Completado</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-outline-dark btn-sm mr-1" title="Ver detalle">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-warning btn-sm text-dark font-weight-bold" title="Actualizar estado">
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginación -->
+                        <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+                            <span class="small text-muted">Mostrando 4 de 128 pedidos</span>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+                                    <li class="page-item active"><a class="page-link bg-dark border-dark" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link text-dark" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link text-dark" href="#">3</a></li>
+                                    <li class="page-item"><a class="page-link text-dark" href="#">Siguiente</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+
+        </div>
+    </div>
+
+    <!-- Plugins nativos -->
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
