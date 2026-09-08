@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Male_Fashion Template - Edit User">
+    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Editar Usuario | Panel de Administrador</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@300..700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap & Icons nativos del template -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+</head>
+
+<body class="bg-light">
+
+    <div class="container-fluid p-0">
+        <div class="row no-gutters min-vh-100">
+
+            <!-- Sidebar -->
+            <aside class="col-xl-2 col-lg-3 col-md-4 bg-white border-right d-flex flex-column justify-content-between p-3">
+                <div>
+                    <!-- Brand -->
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <a href="./index.html" class="d-flex align-items-center text-dark text-decoration-none">
+                            <img src="./img/logo.jpg" alt="Logo" width="36" height="36" class="rounded-circle mr-2 border">
+                            <span class="h6 font-weight-bold mb-0">JA Joyerías</span>
+                        </a>
+                    </div>
+
+                    <!-- Menú Principal -->
+                    <nav class="nav flex-column mb-4">
+                        <a class="nav-link text-secondary px-2 py-2" href="./admin.html">
+                            <i class="fa fa-th-large mr-2"></i> Dashboard
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-2" href="./orders.html">
+                            <i class="fa fa-shopping-bag mr-2"></i> Ordenes
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-2" href="#">
+                            <i class="fa fa-archive mr-2"></i> Inventario
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-2" href="#">
+                            <i class="fa fa-file-text-o mr-2"></i> Reportes
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-2" href="#">
+                            <i class="fa fa-users mr-2"></i> Emlpeados
+                        </a>
+                        <a class="nav-link text-primary font-weight-bold px-2 py-2" href="./users.html">
+                            <i class="fa fa-user-circle-o mr-2"></i> Customers
+                        </a>
+                    </nav>
+
+                    <!-- Menú Inferior -->
+                    <hr>
+                    <nav class="nav flex-column">
+                        <a class="nav-link text-secondary px-2 py-1 small" href="#">
+                            <i class="fa fa-cog mr-2"></i> Configuracion
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-1 small" href="#">
+                            <i class="fa fa-id-badge mr-2"></i> Perfil
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-1 small" href="#">
+                            <i class="fa fa-search mr-2"></i> Buscar
+                        </a>
+                        <a class="nav-link text-secondary px-2 py-1 small" href="#">
+                            <i class="fa fa-question-circle mr-2"></i> Ayuda
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Perfil / Logout -->
+                <div class="border-top pt-3 mt-4 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-user-circle fa-2x text-secondary mr-2"></i>
+                        <span class="font-weight-bold small text-dark">Perfil</span>
+                    </div>
+                    <a href="./login.html" class="text-secondary small" title="Cerrar sesión">
+                        <i class="fa fa-sign-out"></i>
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="col-xl-10 col-lg-9 col-md-8 d-flex flex-column">
+
+                <!-- Header Superior -->
+                <div class="d-flex justify-content-between align-items-center bg-white border-bottom px-4 py-3">
+                    <div>
+                        <h3 class="font-weight-bold text-dark mb-0">Editar Usuario</h3>
+                        <small class="text-muted">Modificación de credenciales, roles y permisos de la cuenta</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <a href="./users.html" class="btn btn-outline-secondary btn-sm mr-3 font-weight-bold">
+                            <i class="fa fa-arrow-left mr-1"></i> Volver a Usuarios
+                        </a>
+                        <a href="#" class="text-dark">
+                            <i class="fa fa-bell-o fa-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Formulario de Edición -->
+                <div class="p-4 flex-grow-1">
+                    <div class="card border shadow-sm">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                            <h6 class="font-weight-bold mb-0 text-dark">Expediente: #USR-002</h6>
+                            <span class="badge badge-success px-2 py-1 font-weight-bold">Cuenta Activa</span>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <form action="#" method="POST">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label font-weight-bold small text-dark">Nombre Completo</label>
+                                        <input type="text" class="form-control" value="Carlos Mendoza" required>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label font-weight-bold small text-dark">RUT / Identificación</label>
+                                        <input type="text" class="form-control" value="18.943.201-5" required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label font-weight-bold small text-dark">Correo Electrónico</label>
+                                        <input type="email" class="form-control" value="carlos.m@example.com" required>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label font-weight-bold small text-dark">Teléfono de Contacto</label>
+                                        <input type="tel" class="form-control" value="+56 9 8765 4321">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label font-weight-bold small text-dark">Nueva Contraseña <span class="text-muted font-weight-normal">(dejar en blanco si no cambia)</span></label>
+                                        <input type="password" class="form-control" placeholder="••••••••">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label font-weight-bold small text-dark">Confirmar Nueva Contraseña</label>
+                                        <input type="password" class="form-control" placeholder="••••••••">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label font-weight-bold small text-dark">Rol en el Sistema</label>
+                                        <select class="form-control" required>
+                                            <option value="cliente" selected>Cliente</option>
+                                            <option value="empleado">Empleado / Ventas</option>
+                                            <option value="admin">Administrador</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label font-weight-bold small text-dark">Estado de la Cuenta</label>
+                                        <select class="form-control" required>
+                                            <option value="activo" selected>Activo</option>
+                                            <option value="pendiente">Pendiente de verificación</option>
+                                            <option value="inactivo">Inactivo / Bloqueado</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <button type="button" class="btn btn-outline-danger btn-sm font-weight-bold">
+                                        <i class="fa fa-trash mr-1"></i> Eliminar Usuario
+                                    </button>
+
+                                    <div>
+                                        <a href="./users.html" class="btn btn-outline-secondary font-weight-bold mr-2 px-4 py-2">
+                                            Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-warning font-weight-bold text-dark px-4 py-2 shadow-sm">
+                                            <i class="fa fa-refresh mr-1"></i> Actualizar Cambios
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+        </div>
+    </div>
+
+    <!-- Plugins nativos -->
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
