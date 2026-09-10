@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
         let error = document.getElementById("mensaje-error");
 
         let regexLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+        let regexArroba = /@/;
         let regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (nombre == "") {
@@ -20,6 +21,9 @@ document.addEventListener("DOMContentLoaded", function() {
             error.style.display = "block";
         } else if (email == "") {
             error.innerHTML = "El email esta vacio";
+            error.style.display = "block";
+        } else if (regexArroba.test(email) == false) {
+            error.innerHTML = "El email debe tener una arroba (@)";
             error.style.display = "block";
         } else if (regexEmail.test(email) == false) {
             error.innerHTML = "El correo no es valido";
