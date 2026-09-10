@@ -1,168 +1,222 @@
-const CART_STORAGE_KEY = 'ja_joyerias_cart';
+var arregloCarrito = [];
 
-function getCart() {
-    const cart = localStorage.getItem(CART_STORAGE_KEY);
-    return cart ? JSON.parse(cart) : [];
-}
-
-function saveCart(cart) {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-}
-
-function formatPrice(value) {
-    return '$' + Number(value).toLocaleString('es-CL');
-}
-
-function parsePrice(priceText) {
-    return parseInt(priceText.replace(/[^0-9]/g, ''), 10) || 0;
-}
-
-function addToCart(product) {
-    const cart = getCart();
-    const existingIndex = cart.findIndex(item => item.name === product.name);
-
-    if (existingIndex > -1) {
-        cart[existingIndex].quantity += product.quantity;
+function cargarCarrito() {
+    var datos = localStorage.getItem('ja_joyerias_cart');
+    if (datos != null) {
+        arregloCarrito = JSON.parse(datos);
     } else {
-        cart.push(product);
+        arregloCarrito = [];
+    }
+}
+
+function guardarEnLocalStorage() {
+    var stringDatos = JSON.stringify(arregloCarrito);
+    localStorage.setItem('ja_joyerias_cart', stringDatos);
+}
+
+function convertirAPrecioChileno(monto) {
+    return '$' + Number(monto).toLocaleString('es-CL');
+}
+
+function sacarNumeroDeTexto(texto) {
+    var res = '';
+    for (var i = 0; i < texto.length; i++) {
+        if (texto[i] >= '0' && texto[i] <= '9') {
+            res = res + texto[i];
+        }
+    }
+    if (res == '') {
+        return 0;
+    }
+    return parseInt(res);
+}
+
+function agregarProducto(nombre, precio, imagen, cant) {
+    cargarCarrito();
+    
+    var yaExiste = false;
+    var posicion = -1;
+
+    for (var i = 0; i < arregloCarrito.length; i++) {
+        if (arregloCarrito[i].name == nombre) {
+            yaExiste = true;
+            posicion = i;
+            break;
+        }
     }
 
-    saveCart(cart);
-    alert(`"${product.name}" agregado al carrito.`);
+    if (yaExiste == true) {
+        arregloCarrito[posicion].quantity = arregloCarrito[posicion].quantity + cant;
+    } else {
+        var nuevoProd = {
+            name: nombre,
+            price: precio,
+            img: imagen,
+            quantity: cant
+        };
+        arregloCarrito.push(nuevoProd);
+    }
+
+    guardarEnLocalStorage();
+    alert('"' + nombre + '" agregado al carrito.');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+window.onload = function() {
 
-    document.querySelectorAll('.product__item .add-cart').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            const productCard = button.closest('.product__item');
-            const name = productCard.querySelector('.product__item__text h6').innerText.trim();
-            const priceText = productCard.querySelector('.product__item__text h5').innerText.trim();
-            const price = parsePrice(priceText);
+    var botonesLista = document.querySelectorAll('.product__item .add-cart');
+    for (var i = 0; i < botonesLista.length; i++) {
+        botonesLista[i].onclick = function(evento) {
+            evento.preventDefault();
 
-            const picElem = productCard.querySelector('.product__item__pic');
-            let img = picElem.getAttribute('data-setbg') || '';
-            if (!img && picElem.style.backgroundImage) {
-                img = picElem.style.backgroundImage.replace(/url\(["']?/, '').replace(/["']?\)/, '');
+            var card = this.closest('.product__item');
+            var h6 = card.querySelector('.product__item__text h6');
+            var h5 = card.querySelector('.product__item__text h5');
+            
+            var nombreProd = h6.innerText.trim();
+            var precioProd = sacarNumeroDeTexto(h5.innerText.trim());
+
+            var fotoDiv = card.querySelector('.product__item__pic');
+            var foto = '';
+
+            if (fotoDiv.getAttribute('data-setbg')) {
+                foto = fotoDiv.getAttribute('data-setbg');
+            } else {
+                if (fotoDiv.style.backgroundImage) {
+                    var bg = fotoDiv.style.backgroundImage;
+                    foto = bg.replace('url("', '').replace('")', '').replace('url(\'', '').replace('\')', '');
+                }
             }
 
-            addToCart({
-                name,
-                price,
-                img,
-                quantity: 1
-            });
-        });
-    });
-
-    const detailBtn = document.querySelector('.product__details__cart__option .primary-btn');
-    if (detailBtn) {
-        detailBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const container = detailBtn.closest('.shop__details__text');
-            const name = container.querySelector('h4').innerText.trim();
-            const priceText = container.querySelector('h3').innerText.trim();
-            const price = parsePrice(priceText);
-
-            const qtyInput = container.querySelector('.pro-qty input') || container.querySelector('input');
-            const quantity = parseInt(qtyInput ? qtyInput.value : 1, 10) || 1;
-
-            const picElem = document.querySelector('.shop__details__pic__item img');
-            const img = picElem ? picElem.getAttribute('src') : '';
-
-            addToCart({
-                name,
-                price,
-                img,
-                quantity
-            });
-        });
+            agregarProducto(nombreProd, precioProd, foto, 1);
+        };
     }
 
-    const cartTableBody = document.querySelector('.shopping__cart__table tbody');
-    if (cartTableBody) {
-        renderCartView();
+    var botonDetalle = document.querySelector('.product__details__cart__option .primary-btn');
+    if (botonDetalle != null) {
+        botonDetalle.onclick = function(evento) {
+            evento.preventDefault();
+
+            var divDetalle = this.closest('.shop__details__text');
+            var nombreDetalle = divDetalle.querySelector('h4').innerText.trim();
+            var precioDetalle = sacarNumeroDeTexto(divDetalle.querySelector('h3').innerText.trim());
+
+            var inputCant = divDetalle.querySelector('.pro-qty input');
+            if (inputCant == null) {
+                inputCant = divDetalle.querySelector('input');
+            }
+
+            var cantidadProd = 1;
+            if (inputCant != null) {
+                var valor = parseInt(inputCant.value);
+                if (valor > 0) {
+                    cantidadProd = valor;
+                }
+            }
+
+            var fotoImg = document.querySelector('.shop__details__pic__item img');
+            var rutaFoto = '';
+            if (fotoImg != null) {
+                rutaFoto = fotoImg.getAttribute('src');
+            }
+
+            agregarProducto(nombreDetalle, precioDetalle, rutaFoto, cantidadProd);
+        };
     }
-});
 
+    var tablaCarrito = document.querySelector('.shopping__cart__table tbody');
+    if (tablaCarrito != null) {
+        mostrarTabla();
+    }
+};
 
-function renderCartView() {
-    const cart = getCart();
-    const tbody = document.querySelector('.shopping__cart__table tbody');
-    const subtotalElem = document.querySelector('.cart__total ul li:first-child span');
-    const totalElem = document.querySelector('.cart__total ul li:last-child span');
+function mostrarTabla() {
+    cargarCarrito();
+    var tabla = document.querySelector('.shopping__cart__table tbody');
+    var spanSubtotal = document.querySelector('.cart__total ul li:first-child span');
+    var spanTotal = document.querySelector('.cart__total ul li:last-child span');
 
-    tbody.innerHTML = '';
+    tabla.innerHTML = '';
 
-    if (cart.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="4" class="text-center py-5">
-                    <h5>Tu carrito está vacío.</h5>
-                </td>
-            </tr>
-        `;
-        if (subtotalElem) subtotalElem.innerText = '$0';
-        if (totalElem) totalElem.innerText = '$0';
+    if (arregloCarrito.length == 0) {
+        tabla.innerHTML = '<tr><td colspan="4" class="text-center py-5"><h5>Tu carrito está vacío.</h5></td></tr>';
+        if (spanSubtotal != null) {
+            spanSubtotal.innerText = '$0';
+        }
+        if (spanTotal != null) {
+            spanTotal.innerText = '$0';
+        }
         return;
     }
 
-    let overallTotal = 0;
+    var totalAPagar = 0;
 
-    cart.forEach((item, index) => {
-        const itemSubtotal = item.price * item.quantity;
-        overallTotal += itemSubtotal;
+    for (var i = 0; i < arregloCarrito.length; i++) {
+        var p = arregloCarrito[i];
+        var totalPorFila = p.price * p.quantity;
+        totalAPagar = totalAPagar + totalPorFila;
 
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="product__cart__item">
-                <div class="product__cart__item__pic">
-                    <img src="${item.img || 'img/shopping-cart/cart-1.jpg'}" width="80" height="80" style="object-fit: cover;" alt="${item.name}">
-                </div>
-                <div class="product__cart__item__text">
-                    <h6>${item.name}</h6>
-                    <h5>${formatPrice(item.price)}</h5>
-                </div>
-            </td>
-            <td class="quantity__item">
-                <div class="quantity">
-                    <div class="pro-qty-2">
-                        <input type="number" min="1" value="${item.quantity}" data-index="${index}" class="cart-qty-input" style="width: 60px; text-align: center;">
-                    </div>
-                </div>
-            </td>
-            <td class="cart__price">${formatPrice(itemSubtotal)}</td>
-            <td class="cart__close">
-                <i class="fa fa-close" data-index="${index}" style="cursor: pointer;"></i>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
+        var imgFinal = 'img/shopping-cart/cart-1.jpg';
+        if (p.img != '' && p.img != null) {
+            imgFinal = p.img;
+        }
 
-    if (subtotalElem) subtotalElem.innerText = formatPrice(overallTotal);
-    if (totalElem) totalElem.innerText = formatPrice(overallTotal);
+        var tr = document.createElement('tr');
+        var contenidoHtml = '';
+        contenidoHtml = contenidoHtml + '<td class="product__cart__item">';
+        contenidoHtml = contenidoHtml + '  <div class="product__cart__item__pic">';
+        contenidoHtml = contenidoHtml + '    <img src="' + imgFinal + '" width="80" height="80" style="object-fit: cover;" alt="' + p.name + '">';
+        contenidoHtml = contenidoHtml + '  </div>';
+        contenidoHtml = contenidoHtml + '  <div class="product__cart__item__text">';
+        contenidoHtml = contenidoHtml + '    <h6>' + p.name + '</h6>';
+        contenidoHtml = contenidoHtml + '    <h5>' + convertirAPrecioChileno(p.price) + '</h5>';
+        contenidoHtml = contenidoHtml + '  </div>';
+        contenidoHtml = contenidoHtml + '</td>';
+        contenidoHtml = contenidoHtml + '<td class="quantity__item">';
+        contenidoHtml = contenidoHtml + '  <div class="quantity">';
+        contenidoHtml = contenidoHtml + '    <div class="pro-qty-2">';
+        contenidoHtml = contenidoHtml + '      <input type="number" min="1" value="' + p.quantity + '" data-pos="' + i + '" class="cart-qty-input" style="width: 60px; text-align: center;">';
+        contenidoHtml = contenidoHtml + '    </div>';
+        contenidoHtml = contenidoHtml + '  </div>';
+        contenidoHtml = contenidoHtml + '</td>';
+        contenidoHtml = contenidoHtml + '<td class="cart__price">' + convertirAPrecioChileno(totalPorFila) + '</td>';
+        contenidoHtml = contenidoHtml + '<td class="cart__close">';
+        contenidoHtml = contenidoHtml + '  <i class="fa fa-close" data-pos="' + i + '" style="cursor: pointer;"></i>';
+        contenidoHtml = contenidoHtml + '</td>';
 
-    document.querySelectorAll('.cart-qty-input').forEach(input => {
-        input.addEventListener('change', (e) => {
-            const idx = e.target.getAttribute('data-index');
-            let newQty = parseInt(e.target.value, 10);
-            if (isNaN(newQty) || newQty < 1) newQty = 1;
+        tr.innerHTML = contenidoHtml;
+        tabla.appendChild(tr);
+    }
 
-            const currentCart = getCart();
-            currentCart[idx].quantity = newQty;
-            saveCart(currentCart);
-            renderCartView();
-        });
-    });
+    if (spanSubtotal != null) {
+        spanSubtotal.innerText = convertirAPrecioChileno(totalAPagar);
+    }
+    if (spanTotal != null) {
+        spanTotal.innerText = convertirAPrecioChileno(totalAPagar);
+    }
 
-    document.querySelectorAll('.cart__close i').forEach(icon => {
-        icon.addEventListener('click', (e) => {
-            const idx = e.target.getAttribute('data-index');
-            const currentCart = getCart();
-            currentCart.splice(idx, 1);
-            saveCart(currentCart);
-            renderCartView();
-        });
-    });
+    var inputs = document.querySelectorAll('.cart-qty-input');
+    for (var a = 0; a < inputs.length; a++) {
+        inputs[a].onchange = function(e) {
+            var pos = this.getAttribute('data-pos');
+            var valorNuevo = parseInt(this.value);
+
+            if (isNaN(valorNuevo) || valorNuevo < 1) {
+                valorNuevo = 1;
+            }
+
+            arregloCarrito[pos].quantity = valorNuevo;
+            guardarEnLocalStorage();
+            mostrarTabla();
+        };
+    }
+
+    var cruces = document.querySelectorAll('.cart__close i');
+    for (var b = 0; b < cruces.length; b++) {
+        cruces[b].onclick = function(e) {
+            var posBorrar = this.getAttribute('data-pos');
+            arregloCarrito.splice(posBorrar, 1);
+            guardarEnLocalStorage();
+            mostrarTabla();
+        };
+    }
 }
