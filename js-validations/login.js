@@ -1,76 +1,73 @@
-const form = document.querySelector("#loginForm");
-const email = document.querySelector("#emailLogin");
-const password = document.querySelector("#passwordLogin");
-const errorMessage = document.getElementById("errorMessage");
-
-form.addEventListener("submit", function(event) {
-    event.preventDefault();
-    errorMessage.textContent = "";
-
-    //trae lista de usuarios
-    let users = getFromLocalStorage('listaUsuarios');
+// Esperar a que la página cargue completamente
+document.addEventListener("DOMContentLoaded", function() {
+    var formularioLogin = document.getElementById("loginForm");
     
-    //si no hay crea una lista vacia
-    if (users === null) {
-        users = [];
-    } else if (!Array.isArray(users)) {
-        users = [users];
+    // Verificar que estamos en la página de login
+    if (formularioLogin) {
+        formularioLogin.addEventListener("submit", function(evento) {
+            evento.preventDefault(); // Evitar que la página se recargue
+
+            var correoIngresado = document.getElementById("emailLogin").value.trim().toLowerCase();
+            var passwordIngresada = document.getElementById("passwordLogin").value.trim();
+            var mensajeError = document.getElementById("errorMessage");
+
+            mensajeError.innerHTML = ""; 
+
+            var textoUsuarios = localStorage.getItem("listaUsuarios");
+            var arregloUsuarios = [];
+
+            if (textoUsuarios !== null) {
+                arregloUsuarios = JSON.parse(textoUsuarios);
+            } else {
+                mensajeError.innerHTML = "No hay usuarios registrados todavía.";
+                mensajeError.style.color = "red";
+                return;
+            }
+
+            var usuarioEncontrado = false;
+            var rolDelUsuario = "";
+            var datosDelUsuario = null;
+
+            for (var i = 0; i < arregloUsuarios.length; i++) {
+                var usuarioActual = arregloUsuarios[i];
+                var correoGuardado = usuarioActual.email.toLowerCase();
+
+                if (correoGuardado === correoIngresado) {
+                    if (usuarioActual.password === passwordIngresada) {
+                        usuarioEncontrado = true;
+                        rolDelUsuario = usuarioActual.rol;
+                        datosDelUsuario = usuarioActual;
+                    }
+                }
+            }
+
+            if (usuarioEncontrado === true) {
+                
+                var textoSesion = JSON.stringify(datosDelUsuario);
+                localStorage.setItem("sessionActivas", textoSesion);
+
+                if (rolDelUsuario === "admin" || 
+                    correoIngresado.includes("@duoc.cl") || 
+                    correoIngresado.includes("@profesor.duoc.cl") || 
+                    correoIngresado.includes("@duocprofesor.cl")) {
+                    
+                    window.location.href = "admin.html";
+                } else {
+                    window.location.href = "index.html";
+                }
+                
+            } else {
+                mensajeError.innerHTML = "Usuario o contraseña incorrectos.";
+                mensajeError.style.color = "red";
+            }
+        });
     }
 
-    //limpia espacios y convierte minusculas
-    let correoIngresado = email.value.trim().toLowerCase();
-    let passIngresado = password.value.trim();
-
-    //busca al usuario
-    let user = null;
-    for (let i = 0; i < users.length; i++) {
-        let correoGuardado = users[i].email.toLowerCase();
-        if (correoGuardado === correoIngresado && users[i].password === passIngresado) {
-            user = users[i];
-        }
-    }
-
-    if (user === null) {
-        errorMessage.textContent = 'Usuario o contraseña inválidos.';
-        errorMessage.style.color = "#e53637";
-    } else {
-        //guarda la sesion
-        guardarEnLocalStorage('sessionActivas', user);
-        
-        //segun rol dirige a admin o a index
-        if (correoIngresado.endsWith('@profesor.duoc.cl') || 
-            correoIngresado.endsWith('@duoc.cl') || 
-            correoIngresado.endsWith('@duocprofesor.cl') || 
-            user.rol === 'admin') {
-            window.location.href = 'admin.html';
-        } else {
-            window.location.href = 'index.html';
-        }
+    var btnLogout = document.getElementById("btnLogout");
+    if (btnLogout) {
+        btnLogout.addEventListener("click", function() {
+            localStorage.removeItem("sessionActivas");
+            window.location.href = "index.html";
+        });
     }
 });
-
-const btnLogout = document.querySelector("#btnLogout");
-
-if (btnLogout) {
-    btnLogout.addEventListener("click", cerrarSesion);
-}
-
-function guardarEnLocalStorage(nombreItem, info) {
-    let stringDatos = JSON.stringify(info);
-    localStorage.setItem(nombreItem, stringDatos);
-}
-
-function getFromLocalStorage(nombreItem)  {
-    let datos = localStorage.getItem(nombreItem);
-    if (!datos) return null;
-    try {
-        return JSON.parse(datos);
-    } catch (e) {
-        return null;
-    }
-}
-
-function cerrarSesion() {
-    localStorage.removeItem('sessionActivas');
-    window.location.href = 'index.html';
-}
