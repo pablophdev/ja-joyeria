@@ -1,11 +1,9 @@
-// Esperar a que la página cargue completamente
 document.addEventListener("DOMContentLoaded", function() {
     var formularioLogin = document.getElementById("loginForm");
     
-    // Verificar que estamos en la página de login
     if (formularioLogin) {
         formularioLogin.addEventListener("submit", function(evento) {
-            evento.preventDefault(); // Evitar que la página se recargue
+            evento.preventDefault();
 
             var correoIngresado = document.getElementById("emailLogin").value.trim().toLowerCase();
             var passwordIngresada = document.getElementById("passwordLogin").value.trim();

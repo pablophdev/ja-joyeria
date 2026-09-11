@@ -1,13 +1,10 @@
-// Esperar a que la página cargue completamente
 document.addEventListener("DOMContentLoaded", function() {
     var formulario = document.getElementById("registerForm");
 
-    // Verificar que estamos en la página de registro
     if (formulario) {
         formulario.addEventListener("submit", function(evento) {
-            evento.preventDefault(); // Evitar que la página se recargue
+            evento.preventDefault();
 
-            // 1. Obtener todos los valores de las cajas de texto
             var nombre = document.getElementById("nombreRegistro").value.trim();
             var run = document.getElementById("runRegistro").value.trim();
             var email = document.getElementById("correoRegistro").value.trim().toLowerCase();
