@@ -7,21 +7,21 @@ form.addEventListener("submit", function(event) {
     event.preventDefault();
     errorMessage.textContent = "";
 
-    // Traer la lista completa de usuarios
+    //trae lista de usuarios
     let users = getFromLocalStorage('listaUsuarios');
     
-    // Si no hay usuarios guardados, creamos un arreglo vacío
+    //si no hay crea una lista vacia
     if (users === null) {
         users = [];
     } else if (!Array.isArray(users)) {
         users = [users];
     }
 
-    // Limpiamos los espacios y pasamos el correo a minúsculas
+    //limpia espacios y convierte minusculas
     let correoIngresado = email.value.trim().toLowerCase();
     let passIngresado = password.value.trim();
 
-    // Buscar al usuario con un ciclo for
+    //busca al usuario
     let user = null;
     for (let i = 0; i < users.length; i++) {
         let correoGuardado = users[i].email.toLowerCase();
@@ -34,10 +34,10 @@ form.addEventListener("submit", function(event) {
         errorMessage.textContent = 'Usuario o contraseña inválidos.';
         errorMessage.style.color = "#e53637";
     } else {
-        // Guardamos la sesión
+        //guarda la sesion
         guardarEnLocalStorage('sessionActivas', user);
         
-        // Redirigir dependiendo del correo o si tiene el rol de admin guardado
+        //segun rol dirige a admin o a index
         if (correoIngresado.endsWith('@profesor.duoc.cl') || 
             correoIngresado.endsWith('@duoc.cl') || 
             correoIngresado.endsWith('@duocprofesor.cl') || 
@@ -55,7 +55,6 @@ if (btnLogout) {
     btnLogout.addEventListener("click", cerrarSesion);
 }
 
-/* utils */
 function guardarEnLocalStorage(nombreItem, info) {
     let stringDatos = JSON.stringify(info);
     localStorage.setItem(nombreItem, stringDatos);

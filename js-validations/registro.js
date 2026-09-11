@@ -65,7 +65,7 @@ form.addEventListener("submit", function(event) {
         }
     }
 
-    // Convertimos el correo a minúsculas y le quitamos espacios extra para evitar errores
+    //pasar a minisculas y sin espacio
     let correoIngresado = email.value.trim().toLowerCase();
     let correoConfirmar = confirmarEmail.value.trim().toLowerCase();
 
@@ -77,7 +77,7 @@ form.addEventListener("submit", function(event) {
     if (!correoIngresado.endsWith("@gmail.com") && 
         !correoIngresado.endsWith("@duoc.cl") && 
         !correoIngresado.endsWith("@profesor.duoc.cl") &&
-        !correoIngresado.endsWith("@duocprofesor.cl")) { // Agregado para que no falle en tus pruebas
+        !correoIngresado.endsWith("@duocprofesor.cl")) {
         formularioValido = false;
         mensajesError += "El correo debe ser de dominio: @gmail.com, @duoc.cl o @profesor.duoc.cl. <br>";
     }
@@ -142,7 +142,7 @@ form.addEventListener("submit", function(event) {
 
     if (formularioValido) {
         
-        // Determinar el rol según el correo ingresado
+        //asigna rol
         let rol = 'user';
         if (correoIngresado.endsWith('@profesor.duoc.cl') || 
             correoIngresado.endsWith('@duoc.cl') || 
