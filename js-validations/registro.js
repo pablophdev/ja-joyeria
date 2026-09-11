@@ -1,5 +1,6 @@
 const form = document.querySelector("#registerForm");
 const nombre = document.querySelector("#nombreRegistro");
+const run = document.querySelector("#runRegistro");
 const email = document.querySelector("#correoRegistro");
 const confirmarEmail = document.querySelector("#confirmarCorreoRegistro");
 const password = document.querySelector("#passwordRegistro");
@@ -16,86 +17,95 @@ form.addEventListener("submit", function(event) {
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const regexPassword = /^.{6,}$/;
     const regexTelefono = /^[0-9]{8,12}$/;
+    const regexRun = /^[0-9]+-[0-9kK]{1}$/;
 
-    // VALIDACIÓN
     let formularioValido = true;
-    errorMessage.textContent = "";
-    
-    // Nombre
+    let mensajesError = "";
+
     if (!regexNombre.test(nombre.value.trim())) {
-        console.log("Nombre inválido");
         formularioValido = false;
-        errorMessage.textContent += "Ingresa un nombre válido (solo letras). "; 
-    } else {
-        console.log("Nombre válido");
+        mensajesError = mensajesError + "Ingresa un nombre válido (solo letras). <br>"; 
     }
 
-    // Email
-    if (!regexEmail.test(email.value.trim())) {
-        console.log("Email inválido");
+    let runValor = run.value.trim();
+    if (!regexRun.test(runValor)) {
         formularioValido = false;
-        errorMessage.textContent += "Por favor, ingresa un correo válido. "; 
+        mensajesError = mensajesError + "El RUT debe tener formato válido con guion. <br>";
     } else {
-        console.log("Email válido");
-    }
+        let partes = runValor.split("-");
+        let numeros = partes[0];
+        let digitoVerificador = partes[1].toUpperCase();
 
-    // Confirmar Email
-    if (email.value.trim() !== confirmarEmail.value.trim() || confirmarEmail.value.trim() === "") {
-        console.log("Correos no coinciden");
-        formularioValido = false;
-        errorMessage.textContent += "Los correos no coinciden. ";
-    } else {
-        console.log("Correos coinciden");
-    }
+        let suma = 0;
+        let multiplicador = 2;
 
-    // Contraseña
-    if (!regexPassword.test(password.value.trim())) {
-        console.log("Contraseña inválida");
-        formularioValido = false;
-        errorMessage.textContent += "La contraseña debe tener al menos 6 caracteres. ";
-    } else {
-        console.log("Contraseña válida");
-    }
+        for (let i = numeros.length - 1; i >= 0; i--) {
+            suma = suma + (parseInt(numeros.charAt(i)) * multiplicador);
+            multiplicador = multiplicador + 1;
+            if (multiplicador > 7) {
+                multiplicador = 2;
+            }
+        }
 
-    // Confirmar Contraseña
-    if (password.value.trim() !== confirmarPassword.value.trim() || confirmarPassword.value.trim() === "") {
-        console.log("Contraseñas no coinciden");
-        formularioValido = false;
-        errorMessage.textContent += "Las contraseñas no coinciden. ";
-    } else {
-        console.log("Contraseñas coinciden");
-    }
+        let resto = suma % 11;
+        let resultado = 11 - resto;
+        let dvCalculado = "";
 
-    // Teléfono
-    if (telefono.value.trim() !== "") {
-        if (!regexTelefono.test(telefono.value.trim())) {
-            console.log("Teléfono inválido");
-            formularioValido = false;
-            errorMessage.textContent += "El teléfono debe tener entre 8 y 12 números. ";
+        if (resultado === 11) {
+            dvCalculado = "0";
+        } else if (resultado === 10) {
+            dvCalculado = "K";
         } else {
-            console.log("Teléfono válido");
+            dvCalculado = resultado.toString();
+        }
+
+        if (dvCalculado !== digitoVerificador) {
+            formularioValido = false;
+            mensajesError = mensajesError + "El RUT ingresado no existe o es inválido. <br>";
         }
     }
 
-    // Región 
-    if (region.value === "") {
-        console.log("Región inválida");
+    if (!regexEmail.test(email.value.trim())) {
         formularioValido = false;
-        errorMessage.textContent += "Debes seleccionar una región. ";
-    }
-    
-    // Comuna
-    if (comuna.value === "") {
-        console.log("Comuna inválida");
-        formularioValido = false;
-        errorMessage.textContent += "Debes seleccionar una comuna. ";
+        mensajesError = mensajesError + "Por favor, ingresa un correo válido. <br>"; 
     }
 
-    // Resultado final
+    if (email.value.trim() !== confirmarEmail.value.trim() || confirmarEmail.value.trim() === "") {
+        formularioValido = false;
+        mensajesError = mensajesError + "Los correos no coinciden. <br>";
+    }
+
+    if (!regexPassword.test(password.value.trim())) {
+        formularioValido = false;
+        mensajesError = mensajesError + "La contraseña debe tener al menos 6 caracteres. <br>";
+    }
+
+    if (password.value.trim() !== confirmarPassword.value.trim() || confirmarPassword.value.trim() === "") {
+        formularioValido = false;
+        mensajesError = mensajesError + "Las contraseñas no coinciden. <br>";
+    }
+
+    if (telefono.value.trim() !== "") {
+        if (!regexTelefono.test(telefono.value.trim())) {
+            formularioValido = false;
+            mensajesError = mensajesError + "El teléfono debe tener entre 8 y 12 números. <br>";
+        }
+    }
+
+    if (region.value === "") {
+        formularioValido = false;
+        mensajesError = mensajesError + "Debes seleccionar una región. <br>";
+    }
+    
+    if (comuna.value === "") {
+        formularioValido = false;
+        mensajesError = mensajesError + "Debes seleccionar una comuna. <br>";
+    }
+
+    errorMessage.innerHTML = mensajesError;
+
     if (formularioValido) {
-        console.log("Formulario válido");
         alert("¡Registro exitoso!");
-        
         form.reset();
         
         if (typeof $ !== 'undefined' && $.fn.niceSelect) {
@@ -103,17 +113,10 @@ form.addEventListener("submit", function(event) {
             $('#regionRegistro').niceSelect('update');
             $('#comunaRegistro').niceSelect('update');
         }
-    } else {
-        console.log("Formulario inválido}}}");
     }
 });
 
-
-
-
-//Cambio de comunas segun region
 $(document).ready(function() {
-    
     $('#regionRegistro').on('change', function() {
         let regionSeleccionada = $('#regionRegistro').val(); 
         let comunas = []; 
@@ -140,5 +143,4 @@ $(document).ready(function() {
             $('#comunaRegistro').niceSelect('update');
         }
     });
-
 });
