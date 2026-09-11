@@ -1,5 +1,6 @@
 const form = document.querySelector("#registerForm");
 const nombre = document.querySelector("#nombreRegistro");
+const run = document.querySelector("#runRegistro");
 const email = document.querySelector("#correoRegistro");
 const confirmarEmail = document.querySelector("#confirmarCorreoRegistro");
 const password = document.querySelector("#passwordRegistro");
@@ -16,86 +17,156 @@ form.addEventListener("submit", function(event) {
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const regexPassword = /^.{6,}$/;
     const regexTelefono = /^[0-9]{8,12}$/;
+    const regexRun = /^[0-9]+-[0-9kK]{1}$/;
 
-    // VALIDACIÓN
     let formularioValido = true;
-    errorMessage.textContent = "";
-    
-    // Nombre
+    let mensajesError = "";
+
     if (!regexNombre.test(nombre.value.trim())) {
-        console.log("Nombre inválido");
         formularioValido = false;
-        errorMessage.textContent += "Ingresa un nombre válido (solo letras). "; 
-    } else {
-        console.log("Nombre válido");
+        mensajesError += "Ingresa un nombre válido (solo letras). <br>"; 
     }
 
-    // Email
-    if (!regexEmail.test(email.value.trim())) {
-        console.log("Email inválido");
+    let runValor = run.value.trim();
+    if (!regexRun.test(runValor)) {
         formularioValido = false;
-        errorMessage.textContent += "Por favor, ingresa un correo válido. "; 
+        mensajesError += "El RUT debe tener formato válido con guion. <br>";
     } else {
-        console.log("Email válido");
-    }
+        let partes = runValor.split("-");
+        let numeros = partes[0];
+        let digitoVerificador = partes[1].toUpperCase();
 
-    // Confirmar Email
-    if (email.value.trim() !== confirmarEmail.value.trim() || confirmarEmail.value.trim() === "") {
-        console.log("Correos no coinciden");
-        formularioValido = false;
-        errorMessage.textContent += "Los correos no coinciden. ";
-    } else {
-        console.log("Correos coinciden");
-    }
+        let suma = 0;
+        let multiplicador = 2;
 
-    // Contraseña
-    if (!regexPassword.test(password.value.trim())) {
-        console.log("Contraseña inválida");
-        formularioValido = false;
-        errorMessage.textContent += "La contraseña debe tener al menos 6 caracteres. ";
-    } else {
-        console.log("Contraseña válida");
-    }
+        for (let i = numeros.length - 1; i >= 0; i--) {
+            suma += (parseInt(numeros.charAt(i)) * multiplicador);
+            multiplicador++;
+            if (multiplicador > 7) {
+                multiplicador = 2;
+            }
+        }
 
-    // Confirmar Contraseña
-    if (password.value.trim() !== confirmarPassword.value.trim() || confirmarPassword.value.trim() === "") {
-        console.log("Contraseñas no coinciden");
-        formularioValido = false;
-        errorMessage.textContent += "Las contraseñas no coinciden. ";
-    } else {
-        console.log("Contraseñas coinciden");
-    }
+        let resto = suma % 11;
+        let resultado = 11 - resto;
+        let dvCalculado = "";
 
-    // Teléfono
-    if (telefono.value.trim() !== "") {
-        if (!regexTelefono.test(telefono.value.trim())) {
-            console.log("Teléfono inválido");
-            formularioValido = false;
-            errorMessage.textContent += "El teléfono debe tener entre 8 y 12 números. ";
+        if (resultado === 11) {
+            dvCalculado = "0";
+        } else if (resultado === 10) {
+            dvCalculado = "K";
         } else {
-            console.log("Teléfono válido");
+            dvCalculado = resultado.toString();
+        }
+
+        if (dvCalculado !== digitoVerificador) {
+            formularioValido = false;
+            mensajesError += "El RUT ingresado no existe o es inválido. <br>";
         }
     }
 
-    // Región 
-    if (region.value === "") {
-        console.log("Región inválida");
+    //correo minisculas y quitar el espacio blanco
+    let correoIngresado = email.value.trim().toLowerCase();
+    let correoConfirmar = confirmarEmail.value.trim().toLowerCase();
+
+    if (!regexEmail.test(correoIngresado)) {
         formularioValido = false;
-        errorMessage.textContent += "Debes seleccionar una región. ";
-    }
-    
-    // Comuna
-    if (comuna.value === "") {
-        console.log("Comuna inválida");
-        formularioValido = false;
-        errorMessage.textContent += "Debes seleccionar una comuna. ";
+        mensajesError += "Por favor, ingresa un correo válido. <br>"; 
     }
 
-    // Resultado final
+    if (!correoIngresado.endsWith("@gmail.com") && 
+        !correoIngresado.endsWith("@duoc.cl") && 
+        !correoIngresado.endsWith("@profesor.duoc.cl") &&
+        !correoIngresado.endsWith("@duocprofesor.cl")) {
+        formularioValido = false;
+        mensajesError += "El correo debe ser de dominio: @gmail.com, @duoc.cl o @profesor.duoc.cl. <br>";
+    }
+
+    if (correoIngresado !== correoConfirmar || correoConfirmar === "") {
+        formularioValido = false;
+        mensajesError += "Los correos no coinciden. <br>";
+    }
+
+    let passIngresada = password.value.trim();
+    let passConfirmar = confirmarPassword.value.trim();
+
+    if (!regexPassword.test(passIngresada)) {
+        formularioValido = false;
+        mensajesError += "La contraseña debe tener al menos 6 caracteres. <br>";
+    }
+
+    if (passIngresada !== passConfirmar || passConfirmar === "") {
+        formularioValido = false;
+        mensajesError += "Las contraseñas no coinciden. <br>";
+    }
+
+    if (telefono.value.trim() !== "") {
+        if (!regexTelefono.test(telefono.value.trim())) {
+            formularioValido = false;
+            mensajesError += "El teléfono debe tener entre 8 y 12 números. <br>";
+        }
+    }
+
+    if (region.value === "") {
+        formularioValido = false;
+        mensajesError += "Debes seleccionar una región. <br>";
+    }
+    
+    if (comuna.value === "") {
+        formularioValido = false;
+        mensajesError += "Debes seleccionar una comuna. <br>";
+    }
+
+    //validar si el registro existe o no
+    let usuariosGuardados = getFromLocalStorage('listaUsuarios');
+    if (usuariosGuardados === null) {
+        usuariosGuardados = []; 
+    } else if (!Array.isArray(usuariosGuardados)) {
+        usuariosGuardados = [usuariosGuardados]; 
+    }
+
+    let correoYaExiste = false;
+    for (let i = 0; i < usuariosGuardados.length; i++) {
+        // También comparamos en minúsculas por si acaso
+        if (usuariosGuardados[i].email.toLowerCase() === correoIngresado) {
+            correoYaExiste = true;
+        }
+    }
+
+    if (correoYaExiste) {
+        formularioValido = false;
+        mensajesError += "Este correo ya se encuentra registrado. <br>";
+    }
+
+    errorMessage.innerHTML = mensajesError;
+
     if (formularioValido) {
-        console.log("Formulario válido");
-        alert("¡Registro exitoso!");
         
+        // Determinar el rol según el correo ingresado
+        let rol = 'user';
+        if (correoIngresado.endsWith('@profesor.duoc.cl') || 
+            correoIngresado.endsWith('@duoc.cl') || 
+            correoIngresado.endsWith('@duocprofesor.cl') || 
+            nombre.value.trim().toLowerCase() === 'admin') {
+            rol = 'admin';
+        }
+        
+        const nuevoUsuario = {
+            nombre: nombre.value.trim(),
+            run: runValor,
+            email: correoIngresado,
+            password: passIngresada,
+            telefono: telefono.value.trim(),
+            region: region.value,
+            comuna: comuna.value,
+            rol: rol
+        };
+
+        // agregar a la lista y guardar
+        usuariosGuardados.push(nuevoUsuario);
+        guardarEnLocalStorage('listaUsuarios', usuariosGuardados);
+        
+        alert("¡Registro exitoso! Serás redirigido al inicio de sesión.");
         form.reset();
         
         if (typeof $ !== 'undefined' && $.fn.niceSelect) {
@@ -103,17 +174,13 @@ form.addEventListener("submit", function(event) {
             $('#regionRegistro').niceSelect('update');
             $('#comunaRegistro').niceSelect('update');
         }
-    } else {
-        console.log("Formulario inválido}}}");
+
+        //volver al login
+        window.location.href = 'login.html';
     }
 });
 
-
-
-
-//Cambio de comunas segun region
 $(document).ready(function() {
-    
     $('#regionRegistro').on('change', function() {
         let regionSeleccionada = $('#regionRegistro').val(); 
         let comunas = []; 
@@ -140,5 +207,19 @@ $(document).ready(function() {
             $('#comunaRegistro').niceSelect('update');
         }
     });
-
 });
+
+function guardarEnLocalStorage(nombreItem, info) {
+    let stringDatos = JSON.stringify(info);
+    localStorage.setItem(nombreItem, stringDatos);
+}
+
+function getFromLocalStorage(nombreItem) {
+    let datos = localStorage.getItem(nombreItem);
+    if (!datos) return null;
+    try {
+        return JSON.parse(datos);
+    } catch (e) {
+        return null;
+    }
+}
