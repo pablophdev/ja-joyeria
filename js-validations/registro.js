@@ -24,13 +24,21 @@ form.addEventListener("submit", function(event) {
 
     if (!regexNombre.test(nombre.value.trim())) {
         formularioValido = false;
+<<<<<<< HEAD
         mensajesError += "Ingresa un nombre válido (solo letras). <br>"; 
+=======
+        mensajesError = mensajesError + "Ingresa un nombre válido (solo letras). <br>"; 
+>>>>>>> a970342cdc04ff467274aa83462ab45df9fd0f3f
     }
 
     let runValor = run.value.trim();
     if (!regexRun.test(runValor)) {
         formularioValido = false;
+<<<<<<< HEAD
         mensajesError += "El RUT debe tener formato válido con guion. <br>";
+=======
+        mensajesError = mensajesError + "El RUT debe tener formato válido con guion. <br>";
+>>>>>>> a970342cdc04ff467274aa83462ab45df9fd0f3f
     } else {
         let partes = runValor.split("-");
         let numeros = partes[0];
@@ -40,8 +48,13 @@ form.addEventListener("submit", function(event) {
         let multiplicador = 2;
 
         for (let i = numeros.length - 1; i >= 0; i--) {
+<<<<<<< HEAD
             suma += (parseInt(numeros.charAt(i)) * multiplicador);
             multiplicador++;
+=======
+            suma = suma + (parseInt(numeros.charAt(i)) * multiplicador);
+            multiplicador = multiplicador + 1;
+>>>>>>> a970342cdc04ff467274aa83462ab45df9fd0f3f
             if (multiplicador > 7) {
                 multiplicador = 2;
             }
@@ -61,6 +74,7 @@ form.addEventListener("submit", function(event) {
 
         if (dvCalculado !== digitoVerificador) {
             formularioValido = false;
+<<<<<<< HEAD
             mensajesError += "El RUT ingresado no existe o es inválido. <br>";
         }
     }
@@ -98,22 +112,55 @@ form.addEventListener("submit", function(event) {
     if (passIngresada !== passConfirmar || passConfirmar === "") {
         formularioValido = false;
         mensajesError += "Las contraseñas no coinciden. <br>";
+=======
+            mensajesError = mensajesError + "El RUT ingresado no existe o es inválido. <br>";
+        }
+    }
+
+    if (!regexEmail.test(email.value.trim())) {
+        formularioValido = false;
+        mensajesError = mensajesError + "Por favor, ingresa un correo válido. <br>"; 
+    }
+
+    if (email.value.trim() !== confirmarEmail.value.trim() || confirmarEmail.value.trim() === "") {
+        formularioValido = false;
+        mensajesError = mensajesError + "Los correos no coinciden. <br>";
+    }
+
+    if (!regexPassword.test(password.value.trim())) {
+        formularioValido = false;
+        mensajesError = mensajesError + "La contraseña debe tener al menos 6 caracteres. <br>";
+    }
+
+    if (password.value.trim() !== confirmarPassword.value.trim() || confirmarPassword.value.trim() === "") {
+        formularioValido = false;
+        mensajesError = mensajesError + "Las contraseñas no coinciden. <br>";
+>>>>>>> a970342cdc04ff467274aa83462ab45df9fd0f3f
     }
 
     if (telefono.value.trim() !== "") {
         if (!regexTelefono.test(telefono.value.trim())) {
             formularioValido = false;
+<<<<<<< HEAD
             mensajesError += "El teléfono debe tener entre 8 y 12 números. <br>";
+=======
+            mensajesError = mensajesError + "El teléfono debe tener entre 8 y 12 números. <br>";
+>>>>>>> a970342cdc04ff467274aa83462ab45df9fd0f3f
         }
     }
 
     if (region.value === "") {
         formularioValido = false;
+<<<<<<< HEAD
         mensajesError += "Debes seleccionar una región. <br>";
+=======
+        mensajesError = mensajesError + "Debes seleccionar una región. <br>";
+>>>>>>> a970342cdc04ff467274aa83462ab45df9fd0f3f
     }
     
     if (comuna.value === "") {
         formularioValido = false;
+<<<<<<< HEAD
         mensajesError += "Debes seleccionar una comuna. <br>";
     }
 
@@ -136,11 +183,15 @@ form.addEventListener("submit", function(event) {
     if (correoYaExiste) {
         formularioValido = false;
         mensajesError += "Este correo ya se encuentra registrado. <br>";
+=======
+        mensajesError = mensajesError + "Debes seleccionar una comuna. <br>";
+>>>>>>> a970342cdc04ff467274aa83462ab45df9fd0f3f
     }
 
     errorMessage.innerHTML = mensajesError;
 
     if (formularioValido) {
+<<<<<<< HEAD
         
         // Determinar el rol según el correo ingresado
         let rol = 'user';
@@ -167,6 +218,9 @@ form.addEventListener("submit", function(event) {
         guardarEnLocalStorage('listaUsuarios', usuariosGuardados);
         
         alert("¡Registro exitoso! Serás redirigido al inicio de sesión.");
+=======
+        alert("¡Registro exitoso!");
+>>>>>>> a970342cdc04ff467274aa83462ab45df9fd0f3f
         form.reset();
         
         if (typeof $ !== 'undefined' && $.fn.niceSelect) {
@@ -174,9 +228,12 @@ form.addEventListener("submit", function(event) {
             $('#regionRegistro').niceSelect('update');
             $('#comunaRegistro').niceSelect('update');
         }
+<<<<<<< HEAD
 
         //volver al login
         window.location.href = 'login.html';
+=======
+>>>>>>> a970342cdc04ff467274aa83462ab45df9fd0f3f
     }
 });
 
@@ -207,6 +264,7 @@ $(document).ready(function() {
             $('#comunaRegistro').niceSelect('update');
         }
     });
+<<<<<<< HEAD
 });
 
 function guardarEnLocalStorage(nombreItem, info) {
@@ -223,3 +281,6 @@ function getFromLocalStorage(nombreItem) {
         return null;
     }
 }
+=======
+});
+>>>>>>> a970342cdc04ff467274aa83462ab45df9fd0f3f
