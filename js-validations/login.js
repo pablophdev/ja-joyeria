@@ -17,11 +17,6 @@ form.addEventListener("submit", function(event) {
         mensajesError += "Por favor, ingresa un correo válido. <br>";
     }
 
-    if (!email.value.trim().endsWith("@duoc.cl")) {
-        formularioValido = false;
-        mensajesError += "El correo debe ser de estudiante Duoc: @duoc.cl. <br>";
-    }
-
     if (!regexPassword.test(password.value.trim())) {
         formularioValido = false;
         mensajesError += "La contraseña debe tener al menos 6 caracteres. <br>";
@@ -44,7 +39,10 @@ form.addEventListener("submit", function(event) {
             alert("¡Inicio de sesión exitoso!");
             form.reset();
 
-            if (usuario.rol === "admin") {
+            let correoIngresado = email.value.trim().toLowerCase();
+
+            if (correoIngresado.endsWith("@duoc.cl") ||
+                correoIngresado.endsWith("@profesor.duoc.cl")) {
                 window.location.href = "admin.html";
             } else {
                 window.location.href = "index.html";
