@@ -35,14 +35,15 @@ form.addEventListener("submit", function(event) {
         if (usuario.email.toLowerCase() === email.value.trim().toLowerCase() &&
             usuario.password === password.value.trim()) {
 
+            let correoIngresado = email.value.trim().toLowerCase();
+            let esCorreoAdmin = correoIngresado.endsWith("@duoc.cl") ||
+                correoIngresado.endsWith("@profesor.duoc.cl");
+
             guardarEnLocalStorage('sessionActivas', usuario);
             alert("¡Inicio de sesión exitoso!");
             form.reset();
 
-            let correoIngresado = email.value.trim().toLowerCase();
-
-            if (correoIngresado.endsWith("@duoc.cl") ||
-                correoIngresado.endsWith("@profesor.duoc.cl")) {
+            if (esCorreoAdmin) {
                 window.location.href = "admin.html";
             } else {
                 window.location.href = "index.html";
