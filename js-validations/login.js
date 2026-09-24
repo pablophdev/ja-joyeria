@@ -1,71 +1,77 @@
-document.addEventListener("DOMContentLoaded", function() {
-    var formularioLogin = document.getElementById("loginForm");
-    
-    if (formularioLogin) {
-        formularioLogin.addEventListener("submit", function(evento) {
-            evento.preventDefault();
+const form = document.querySelector("#loginForm");
+const email = document.querySelector("#emailLogin");
+const password = document.querySelector("#passwordLogin");
+const errorMessage = document.querySelector("#errorMessage");
 
-            var correoIngresado = document.getElementById("emailLogin").value.trim().toLowerCase();
-            var passwordIngresada = document.getElementById("passwordLogin").value.trim();
-            var mensajeError = document.getElementById("errorMessage");
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
 
-            mensajeError.innerHTML = ""; 
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const regexPassword = /^.{6,}$/;
 
-            var textoUsuarios = localStorage.getItem("listaUsuarios");
-            var arregloUsuarios = [];
+    let formularioValido = true;
+    let mensajesError = "";
 
-            if (textoUsuarios !== null) {
-                arregloUsuarios = JSON.parse(textoUsuarios);
-            } else {
-                mensajeError.innerHTML = "No hay usuarios registrados todavía.";
-                mensajeError.style.color = "red";
-                return;
-            }
-
-            var usuarioEncontrado = false;
-            var rolDelUsuario = "";
-            var datosDelUsuario = null;
-
-            for (var i = 0; i < arregloUsuarios.length; i++) {
-                var usuarioActual = arregloUsuarios[i];
-                var correoGuardado = usuarioActual.email.toLowerCase();
-
-                if (correoGuardado === correoIngresado) {
-                    if (usuarioActual.password === passwordIngresada) {
-                        usuarioEncontrado = true;
-                        rolDelUsuario = usuarioActual.rol;
-                        datosDelUsuario = usuarioActual;
-                    }
-                }
-            }
-
-            if (usuarioEncontrado === true) {
-                
-                var textoSesion = JSON.stringify(datosDelUsuario);
-                localStorage.setItem("sessionActivas", textoSesion);
-
-                if (rolDelUsuario === "admin" || 
-                    correoIngresado.includes("@duoc.cl") || 
-                    correoIngresado.includes("@profesor.duoc.cl") || 
-                    correoIngresado.includes("@duocprofesor.cl")) {
-                    
-                    window.location.href = "admin.html";
-                } else {
-                    window.location.href = "index.html";
-                }
-                
-            } else {
-                mensajeError.innerHTML = "Usuario o contraseña incorrectos.";
-                mensajeError.style.color = "red";
-            }
-        });
+    if (!regexEmail.test(email.value.trim())) {
+        formularioValido = false;
+        mensajesError += "Por favor, ingresa un correo válido. <br>";
     }
 
-    var btnLogout = document.getElementById("btnLogout");
-    if (btnLogout) {
-        btnLogout.addEventListener("click", function() {
-            localStorage.removeItem("sessionActivas");
-            window.location.href = "index.html";
-        });
+    if (!email.value.trim().endsWith("@duoc.cl")) {
+        formularioValido = false;
+        mensajesError += "El correo debe ser de estudiante Duoc: @duoc.cl. <br>";
+    }
+
+    if (!regexPassword.test(password.value.trim())) {
+        formularioValido = false;
+        mensajesError += "La contraseña debe tener al menos 6 caracteres. <br>";
+    }
+
+    errorMessage.innerHTML = mensajesError;
+
+    if (formularioValido) {
+        const usuario = getFromLocalStorage('usuario');
+
+        if (usuario === null) {
+            errorMessage.innerHTML = "No hay usuarios registrados todavía.";
+            return;
+        }
+
+        if (usuario.email.toLowerCase() === email.value.trim().toLowerCase() &&
+            usuario.password === password.value.trim()) {
+
+            guardarEnLocalStorage('sessionActivas', usuario);
+            alert("¡Inicio de sesión exitoso!");
+            form.reset();
+
+            if (usuario.rol === "admin") {
+                window.location.href = "admin.html";
+            } else {
+                window.location.href = "index.html";
+            }
+        } else {
+            errorMessage.innerHTML = "Usuario o contraseña incorrectos.";
+        }
     }
 });
+
+const btnLogout = document.querySelector("#btnLogout");
+
+if (btnLogout) {
+    btnLogout.addEventListener("click", function() {
+        localStorage.removeItem("sessionActivas");
+        window.location.href = "index.html";
+    });
+}
+
+/* utils */
+
+function guardarEnLocalStorage(nombreItem, info) {
+    let stringDatos = JSON.stringify(info);
+    localStorage.setItem(nombreItem, stringDatos);
+}
+
+function getFromLocalStorage(nombreItem) {
+    let datos = localStorage.getItem(nombreItem);
+    return datos ? JSON.parse(datos) : null;
+}
