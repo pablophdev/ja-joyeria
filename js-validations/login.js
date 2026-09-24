@@ -47,10 +47,9 @@ function guardarEnLocalStorage(nombreIteam, info) {
     localStorage.setItem(nombreIteam, stringDatos);
 }
 
-function  getFromLocalStorage(nombreItem)  {
+function getFromLocalStorage(nombreItem) {
     let datos = localStorage.getItem(nombreItem);
-    datos  =  JSON.parse(datos);
-    return  datos;
+    return datos ? JSON.parse(datos) : null;
 }
 
 function cerrarSesion() {
