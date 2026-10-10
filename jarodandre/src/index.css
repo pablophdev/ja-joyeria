@@ -11,11 +11,44 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html[data-bs-theme="dark"] {
+  --bs-body-bg: #000000;
+  --bs-body-bg-rgb: 0, 0, 0;
+  --bs-body-color: #ffffff;
+  --bs-body-color-rgb: 255, 255, 255;
+  --bs-emphasis-color: #ffffff;
+  --bs-emphasis-color-rgb: 255, 255, 255;
+  --bs-secondary: #adb5bd;
+  --bs-secondary-rgb: 173, 181, 189;
+  --bs-secondary-color: rgba(255, 255, 255, 0.75);
+  --bs-secondary-color-rgb: 255, 255, 255;
+  --bs-secondary-bg: #1a1a1a;
+  --bs-secondary-bg-rgb: 26, 26, 26;
+  --bs-tertiary-bg: #111111;
+  --bs-tertiary-bg-rgb: 17, 17, 17;
+  --bs-border-color: #333333;
+  --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
+}
+
 body {
   margin: 0;
   font-family: "Jura", sans-serif;
-  color: #212529;
-  background-color: #fff;
+  color: #ffffff;
+  background-color: #000000;
+}
+
+.bg-light {
+  background-color: #000000 !important;
+}
+
+.text-dark {
+  color: #ffffff !important;
+}
+
+.text-bg-dark {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #ffffff;
 }
 
 a {
