@@ -15,7 +15,6 @@ function CollectionBanners({ collections }) {
                 loop
                 muted
                 playsInline
-                controls
                 preload="metadata"
                 aria-label={`Video de la colección ${collection.title}`}
               >

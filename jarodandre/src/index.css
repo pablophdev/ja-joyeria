@@ -11,6 +11,10 @@ body {
   background-color: #fff;
 }
 
+a {
+  text-decoration: none;
+}
+
 .site-layout {
   min-height: 100svh;
 }
