@@ -1,12 +1,14 @@
 import { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { clearCart, getCart, removeFromCart, subscribeToCart, updateCartQuantity } from '../data/cart'
+import { clearCart, confirmOrder, getCart, removeFromCart, subscribeToCart, updateCartQuantity } from '../data/cart'
 import CartItem from '../components/cart/CartItem'
 import { routes } from '../navigation/routes'
 import { formatPrice } from '../utils/formatPrice'
+import { formatOrderId } from '../data/orderRecords'
+import CheckoutForm from '../components/orders/CheckoutForm'
 
 class CartPage extends Component {
-  state = { cart: getCart(), error: '', message: '' }
+  state = { cart: getCart(), error: '', message: '', confirmedOrder: null }
 
   componentDidMount() {
     this.unsubscribe = subscribeToCart(this.refreshCart)
@@ -28,6 +30,15 @@ class CartPage extends Component {
     }
   }
 
+  handleConfirmOrder = (customer) => {
+    try {
+      const order = confirmOrder(customer)
+      this.setState({ confirmedOrder: order, error: '', message: `Pedido ${formatOrderId(order.id)} registrado correctamente. No se realizó ningún cobro.` })
+    } catch (error) {
+      this.setState({ error: error.message, message: '' })
+    }
+  }
+
   render() {
     const { cart, error, message } = this.state
     return (
@@ -42,6 +53,7 @@ class CartPage extends Component {
         </nav>
         {error && <p className="alert alert-danger" role="alert">{error}</p>}
         <p className="text-success" role="status">{message}</p>
+        {this.state.confirmedOrder && <Link className="btn btn-outline-dark mb-4" to={`${routes.orders}#pedido-${this.state.confirmedOrder.id}`}>Ver pedido {formatOrderId(this.state.confirmedOrder.id)}</Link>}
         {!cart.items.length ? (
           <div className="bg-light rounded p-4 mb-4">
             <h2 className="h4">Tu carrito está vacío</h2>
@@ -68,7 +80,9 @@ class CartPage extends Component {
                   <dt>Subtotal</dt><dd>{formatPrice(cart.total)}</dd>
                   <dt className="fs-5">Total</dt><dd className="fs-4 fw-bold">{formatPrice(cart.total)}</dd>
                 </dl>
-                <p className="small mb-0">Total de productos disponibles. Sin gastos de envío ni descuentos. La confirmación de pedidos estará disponible en la siguiente etapa.</p>
+                <p className="small mb-0">Total de productos disponibles. Sin gastos de envío ni descuentos.</p>
+                {cart.items.some((item) => !item.available) && <p className="text-danger mt-3">Elimina los artículos no disponibles para confirmar el pedido.</p>}
+                <CheckoutForm disabled={cart.items.some((item) => !item.available)} onConfirm={this.handleConfirmOrder} />
               </section>
             </div>
           </div>

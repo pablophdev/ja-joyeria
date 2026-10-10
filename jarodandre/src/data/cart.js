@@ -1,9 +1,12 @@
 import { getProductById, getProducts, subscribeToProducts } from './products'
 import { readStoredData, writeStoredData } from './persistence'
+import { normalizeCustomer, normalizeOrder } from './orderRecords'
 
 export const MAX_CART_QUANTITY = 99
 const storageKey = 'jarodandre.cart'
 let items = []
+let orders = []
+let nextOrderId = 1
 let initialized = false
 const listeners = new Set()
 let unsubscribeProducts
@@ -30,7 +33,7 @@ function initializeCart() {
   if (stored === null) return
 
   try {
-    if (stored.version !== 1 || !Array.isArray(stored.items)) throw new Error('Formato de carrito no válido.')
+    if (![1, 2].includes(stored.version) || !Array.isArray(stored.items)) throw new Error('Formato de carrito no válido.')
     const ids = new Set()
     const restored = stored.items.map(({ productId, quantity }) => {
       validateId(productId)
@@ -39,9 +42,21 @@ function initializeCart() {
       ids.add(productId)
       return { productId, quantity }
     })
+    let restoredOrders = []
+    let restoredNextId = 1
+    if (stored.version === 2) {
+      if (!Array.isArray(stored.orders)) throw new Error('El historial de pedidos no es válido.')
+      restoredOrders = stored.orders.map((order) => normalizeOrder(order, MAX_CART_QUANTITY))
+      const orderIds = new Set(restoredOrders.map((order) => order.id))
+      restoredNextId = stored.nextOrderId
+      if (orderIds.size !== restoredOrders.length || !Number.isSafeInteger(restoredNextId) || restoredNextId < 1
+        || restoredOrders.some((order) => order.id >= restoredNextId)) throw new Error('Los IDs de pedidos no son válidos.')
+    }
     items = restored
+    orders = restoredOrders
+    nextOrderId = restoredNextId
   } catch (error) {
-    console.warn('No se pudo restaurar el carrito. Se mostrará vacío.', error)
+    console.warn('No se pudieron restaurar el carrito y sus pedidos. Se mostrarán vacíos.', error)
   }
 }
 
@@ -55,9 +70,12 @@ function notifyCart() {
   }
 }
 
-function saveCart(updatedItems) {
-  writeStoredData(storageKey, { version: 1, items: updatedItems })
+function saveCart(updatedItems, updatedOrders = orders, updatedNextOrderId = nextOrderId) {
+  // Un único registro permite confirmar el pedido y vaciar el carrito de forma atómica.
+  writeStoredData(storageKey, { version: 2, items: updatedItems, orders: updatedOrders, nextOrderId: updatedNextOrderId })
   items = updatedItems
+  orders = updatedOrders
+  nextOrderId = updatedNextOrderId
   notifyCart()
 }
 
@@ -121,4 +139,32 @@ export function removeFromCart(productId) {
 export function clearCart() {
   initializeCart()
   saveCart([])
+}
+
+export function getOrders() {
+  initializeCart()
+  return orders.map((order) => normalizeOrder(order, MAX_CART_QUANTITY)).sort((first, second) => second.id - first.id)
+}
+
+export function subscribeToOrders(listener) {
+  return subscribeToCart(listener)
+}
+
+export function confirmOrder(customer) {
+  const normalizedCustomer = normalizeCustomer(customer)
+  const cart = getCart()
+  if (!cart.items.length) throw new Error('El carrito está vacío.')
+  if (cart.items.some((item) => !item.available)) throw new Error('Quita los productos no disponibles antes de confirmar el pedido.')
+  if (nextOrderId >= Number.MAX_SAFE_INTEGER) throw new Error('No hay más IDs de pedido disponibles.')
+
+  const order = normalizeOrder({
+    id: nextOrderId,
+    createdAt: new Date().toISOString(),
+    status: 'Pendiente',
+    customer: normalizedCustomer,
+    items: cart.items.map(({ product, quantity, subtotal }) => ({ productId: product.id, name: product.name, price: product.price, quantity, subtotal })),
+    total: cart.total,
+  }, MAX_CART_QUANTITY)
+  saveCart([], [...orders, order], nextOrderId + 1)
+  return normalizeOrder(order, MAX_CART_QUANTITY)
 }

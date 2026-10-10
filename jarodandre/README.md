@@ -306,6 +306,54 @@ se implementarán en el cambio 10. No se agregan hooks ni pruebas unitarias en e
 7. Marcar un producto como agotado o eliminarlo desde el CRUD: su línea queda no disponible y excluida del total.
 8. Revisar controles con teclado y distribución en móvil y escritorio.
 
+## Cambio 10 de 17
+
+El carrito permite confirmar un pedido simulado con nombre, correo, dirección y ciudad.
+`CheckoutForm` valida los campos con controles HTML y la fuente de datos vuelve a validarlos antes de guardar.
+La confirmación requiere un carrito no vacío y todos sus artículos disponibles.
+Al terminar, se muestra el número de pedido y un enlace al historial, y el carrito y su contador quedan vacíos.
+
+### Datos y persistencia
+
+- `confirmOrder(customer)`, `getOrders()` y `subscribeToOrders(listener)` se exportan desde `src/data/cart.js`.
+- `src/data/orderRecords.js` valida los registros, normaliza los datos de contacto y formatea los números de pedido.
+- Cada pedido tiene ID incremental, fecha ISO, estado `Pendiente`, datos de contacto, artículos y total.
+- Los artículos guardan una copia de ID, nombre, precio unitario, cantidad y subtotal al confirmar.
+- Cambiar o eliminar productos del catálogo no modifica el historial.
+- Las consultas devuelven copias de los pedidos y de sus objetos internos.
+
+Carrito y pedidos comparten la clave `jarodandre.cart`, ahora con formato
+`{ version: 2, items, orders, nextOrderId }`. La confirmación guarda el pedido y el vaciado del carrito
+en una única llamada a `localStorage.setItem`, antes de modificar el estado en memoria.
+Si falla la escritura, no se crea el pedido ni se vacía el carrito.
+Las operaciones posteriores del carrito conservan los pedidos existentes.
+El carrito de versión 1 se lee conservando sus artículos, con historial vacío y contador de pedidos en 1;
+se escribe en versión 2 en la siguiente operación exitosa.
+
+### Historial
+
+`/pedidos` muestra `OrdersPage`, con enlace desde la cabecera y desde la confirmación del carrito.
+Los pedidos aparecen del más reciente al más antiguo, con fecha, total y estado.
+`OrderCard` permite desplegar el contacto, dirección y tabla de artículos mediante un control nativo accesible.
+El historial se actualiza mediante suscripciones y se conserva al recargar.
+El listado muestra los pedidos realmente confirmados en este navegador, sin los ejemplos ficticios de `orders.html`.
+La administración y modificación de estados se incorporarán en su etapa correspondiente.
+
+El flujo es local y simulado: no cobra, no envía correos y no realiza envíos.
+Los registros pertenecen a este navegador; la asociación con usuarios se abordará con la sesión simulada.
+No se agregaron hooks ni pruebas unitarias.
+
+### Revisión manual del cambio 10
+
+1. Añadir dos productos al carrito y completar los datos de contacto y entrega.
+2. Confirmar y comprobar el número de pedido, el carrito vacío y el contador en cero.
+3. Abrir `/pedidos`, desplegar el detalle y revisar cantidades, precios, dirección y total.
+4. Recargar y comprobar que el pedido y el carrito vacío se conservan.
+5. Cambiar o eliminar un producto mediante el CRUD: el pedido debe mantener los datos originales.
+6. Intentar enviar el formulario vacío o con un correo inválido: no debe crearse un pedido.
+7. Marcar un artículo del carrito como agotado: debe requerirse eliminarlo antes de confirmar.
+8. Confirmar un segundo pedido y verificar que tiene un ID diferente y aparece primero.
+
 ## Secuencia propuesta
 
 1. Base React, navegación y layout.

@@ -18,6 +18,7 @@ function Header() {
         <div className="container d-flex flex-wrap justify-content-end gap-3">
           <Link className="text-white" to={routes.register}>Registrarse</Link>
           <Link className="text-white" to={routes.login}>Iniciar sesión</Link>
+          <Link className="text-white" to={routes.orders}>Pedidos</Link>
         </div>
       </div>
       <div className="container py-3 d-flex flex-column flex-lg-row align-items-center gap-3">

@@ -4,6 +4,7 @@ export const routes = {
   productDetails: '/productos/:productId',
   about: '/nosotros',
   cart: '/carrito',
+  orders: '/pedidos',
   blog: '/blog',
   contact: '/contacto',
   register: '/registro',
