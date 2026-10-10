@@ -30,6 +30,9 @@ class FeaturedProducts extends Component {
           {visibleProducts.length} productos · {filters.find((filter) => filter.id === activeFilter)?.label}
         </p>
         <div className="row g-4" id="featured-products">
+          {visibleProducts.length === 0 && (
+            <p className="text-center text-secondary py-4">No hay productos destacados para este filtro.</p>
+          )}
           {visibleProducts.map((product) => (
             <div className="col-sm-6 col-lg-3" key={product.id}>
               <ProductCard product={product} />

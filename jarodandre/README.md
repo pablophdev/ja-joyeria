@@ -113,10 +113,55 @@ const updatedProduct = updateProduct(product.id, { price: 105000, featured: true
 const deletedProduct = deleteProduct(product.id)
 ```
 
-Esta etapa trabaja en memoria: recargar la aplicación restaura los ocho productos iniciales.
-La portada consulta los datos al renderizarse; todavía no se suscribe a cambios del CRUD.
-La persistencia local y la actualización reactiva se incorporarán en el cambio 5.
+En el cambio 4 los datos se manejaban en memoria. El cambio 5 incorpora persistencia local
+y suscripciones para actualizar la portada.
 Los formularios de administración se incorporarán en su etapa correspondiente.
+
+## Cambio 5 de 17
+
+- `src/data/persistence.js`: lectura y escritura JSON mediante `localStorage`.
+- `src/data/products.js`: restaura la colección en la primera consulta y guarda cada operación CRUD exitosa.
+- `subscribeToProducts(listener)`: notifica los cambios del CRUD a los componentes de esta instancia de la aplicación y devuelve una función para cancelar la suscripción.
+- `HomePage`: componente de clase que se suscribe al montar y cancela la suscripción al desmontar, también bajo `StrictMode`.
+- `FeaturedProducts`: mensaje cuando el filtro seleccionado no tiene productos.
+
+Los datos se almacenan en la clave `jarodandre.products`, con `version`, `nextId` y `products`.
+Se conservan las eliminaciones, una colección vacía y el contador de IDs después de recargar.
+Las imágenes incluidas en el proyecto se guardan como referencias estables y se resuelven a sus URLs actuales al cargar.
+Las imágenes personalizadas conservan la URL proporcionada.
+
+Si no hay datos guardados se utilizan los ocho productos iniciales; el primer cambio del CRUD guarda la colección.
+Si el JSON o sus datos no son válidos, se usan los productos iniciales y se informa en la consola,
+sin sobrescribir el almacenamiento durante la lectura. Una operación CRUD posterior guardará la colección válida.
+Si una escritura falla por falta de espacio o permisos, el CRUD lanza un error y conserva el estado anterior.
+No hay backend: los datos pertenecen al navegador y origen donde se ejecuta la aplicación.
+La suscripción actual notifica cambios hechos en la misma instancia; otras pestañas recuperan los datos al recargar.
+
+### Comprobación manual en desarrollo
+
+Con `npm run dev`, abrir la portada y ejecutar en la consola del navegador
+(para el servidor en `/`; si se configura otra base, anteponerla a la ruta del módulo):
+
+```js
+const productsDb = await import('/src/data/products.js')
+const original = productsDb.getProductById(1)
+productsDb.updateProduct(1, { price: 99000 })
+// El precio cambia en la portada sin recargar y se conserva al recargar.
+productsDb.updateProduct(1, { price: original.price })
+
+const sample = productsDb.createProduct({
+  name: 'Producto de demostración',
+  price: 15000,
+  image: original.image,
+  featured: true,
+})
+// Aparece en la portada; al eliminarlo desaparece sin recargar.
+productsDb.deleteProduct(sample.id)
+```
+
+Para comprobar la limpieza de suscripciones, navegar a Productos y volver al inicio;
+repetir una actualización y verificar la portada. Los filtros conservan su selección al cambiar los datos.
+No se agregaron hooks ni pruebas unitarias.
 
 ## Secuencia propuesta
 

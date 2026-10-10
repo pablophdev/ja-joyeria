@@ -6,8 +6,9 @@ import product5 from '../assets/products/product-5.jpg'
 import product6 from '../assets/products/product-6.jpg'
 import product7 from '../assets/products/product-7.jpg'
 import product8 from '../assets/products/product-8.jpg'
+import { readStoredData, writeStoredData } from './persistence'
 
-// Base simulada en memoria. Se restablece al recargar la aplicación.
+// Base simulada, restaurada desde localStorage en la primera consulta.
 // Solo las funciones de este módulo pueden modificar la colección.
 let products = [
   { id: 1, name: 'Grillz Custom Silver Star & Heart', price: 90990, image: product1, group: 'new', badge: 'Nuevo', rating: 0, featured: true },
@@ -21,6 +22,86 @@ let products = [
 ]
 
 let nextId = Math.max(...products.map((product) => product.id)) + 1
+let initialized = false
+const listeners = new Set()
+const storageKey = 'jarodandre.products'
+const storageVersion = 1
+
+// Guardar referencias estables evita persistir las URLs con hash generadas por Vite.
+const productImages = Object.fromEntries(products.map((product) => [`asset:product-${product.id}`, product.image]))
+
+function serializeImage(image) {
+  return Object.entries(productImages).find(([, url]) => url === image)?.[0] ?? image
+}
+
+function restoreImage(image) {
+  if (typeof image === 'string' && image.startsWith('asset:')) {
+    if (!Object.hasOwn(productImages, image)) throw new Error('La referencia de imagen no existe.')
+    return productImages[image]
+  }
+  return image
+}
+
+function initializeProducts() {
+  if (initialized) return
+  initialized = true
+  const stored = readStoredData(storageKey)
+  if (stored === null) return
+
+  try {
+    if (stored.version !== storageVersion || !Array.isArray(stored.products)) {
+      throw new Error('El formato de los productos guardados no es compatible.')
+    }
+
+    const ids = new Set()
+    const restoredProducts = stored.products.map((product) => {
+      validateId(product.id)
+      if (ids.has(product.id)) throw new Error('Hay IDs de productos duplicados.')
+      ids.add(product.id)
+      const { id, ...values } = product
+      validateInput(values)
+      return { id, ...normalizeProduct({ ...values, image: restoreImage(values.image) }) }
+    })
+
+    validateId(stored.nextId)
+    if (restoredProducts.some((product) => product.id >= stored.nextId)) {
+      throw new Error('El siguiente ID de producto no es válido.')
+    }
+
+    products = restoredProducts
+    nextId = stored.nextId
+  } catch (error) {
+    // No sobrescribir el contenido inválido durante la lectura.
+    console.warn('Los productos guardados no son válidos. Se usarán los datos iniciales.', error)
+  }
+}
+
+function saveProducts(updatedProducts, updatedNextId = nextId) {
+  // Persistir primero: si el navegador rechaza la escritura, no cambia la colección.
+  writeStoredData(storageKey, {
+    version: storageVersion,
+    nextId: updatedNextId,
+    products: updatedProducts.map((product) => ({ ...product, image: serializeImage(product.image) })),
+  })
+  products = updatedProducts
+  nextId = updatedNextId
+
+  for (const listener of listeners) {
+    try {
+      listener()
+    } catch (error) {
+      console.error('No se pudo actualizar un componente suscrito a los productos.', error)
+    }
+  }
+}
+
+// Cada componente debe cancelar su suscripción al desmontarse.
+export function subscribeToProducts(listener) {
+  if (typeof listener !== 'function') throw new Error('La suscripción debe recibir una función.')
+  initializeProducts()
+  listeners.add(listener)
+  return () => listeners.delete(listener)
+}
 
 const editableFields = ['name', 'price', 'image', 'group', 'badge', 'rating', 'featured']
 
@@ -84,6 +165,7 @@ function normalizeProduct(data) {
 
 // Se devuelven copias: modificar un resultado no altera la base simulada.
 export function getProducts() {
+  initializeProducts()
   return products.map((product) => ({ ...product }))
 }
 
@@ -92,12 +174,14 @@ export function getFeaturedProducts() {
 }
 
 export function getProductById(id) {
+  initializeProducts()
   validateId(id)
   const product = products.find((item) => item.id === id)
   return product ? { ...product } : null
 }
 
 export function createProduct(data) {
+  initializeProducts()
   validateInput(data)
   const values = normalizeProduct({
     group: 'new',
@@ -106,13 +190,14 @@ export function createProduct(data) {
     featured: false,
     ...data,
   })
+  if (nextId >= Number.MAX_SAFE_INTEGER) throw new Error('No hay más IDs de producto disponibles.')
   const product = { id: nextId, ...values }
-  products.push(product)
-  nextId += 1
+  saveProducts([...products, product], nextId + 1)
   return { ...product }
 }
 
 export function updateProduct(id, changes) {
+  initializeProducts()
   validateId(id)
   validateInput(changes)
   const index = products.findIndex((product) => product.id === id)
@@ -121,16 +206,18 @@ export function updateProduct(id, changes) {
 
   // Validar antes de reemplazar evita actualizaciones parciales ante un error.
   const values = normalizeProduct({ ...products[index], ...changes })
-  products[index] = { id, ...values }
-  return { ...products[index] }
+  const updatedProduct = { id, ...values }
+  saveProducts(products.map((product) => product.id === id ? updatedProduct : product))
+  return { ...updatedProduct }
 }
 
 export function deleteProduct(id) {
+  initializeProducts()
   validateId(id)
   const product = products.find((item) => item.id === id)
 
   if (!product) return null
 
-  products = products.filter((item) => item.id !== id)
+  saveProducts(products.filter((item) => item.id !== id))
   return { ...product }
 }
