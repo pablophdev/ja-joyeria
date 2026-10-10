@@ -9,10 +9,16 @@ export const routes = {
   contact: '/contacto',
   register: '/registro',
   login: '/login',
+  users: '/usuarios',
+  userEdit: '/usuarios/:userId/editar',
 }
 
 export function getProductDetailsPath(id) {
   return `${routes.shop}/${encodeURIComponent(id)}`
+}
+
+export function getUserEditPath(id) {
+  return `${routes.users}/${encodeURIComponent(id)}/editar`
 }
 
 export const pendingPages = [

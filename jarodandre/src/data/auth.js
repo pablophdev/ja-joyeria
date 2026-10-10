@@ -1,5 +1,6 @@
 import { readStoredData, writeStoredData } from './persistence'
 import { normalizeEmail, normalizeUserProfile, validatePassword } from '../utils/userValidation'
+import { userRoles, userStatuses } from './userOptions'
 
 const storageKey = 'jarodandre.auth'
 let users = []
@@ -9,7 +10,17 @@ let initialized = false
 const listeners = new Set()
 
 function publicUser(user) {
-  return { id: user.id, name: user.name, email: user.email, rut: user.rut, phone: user.phone, region: user.region, commune: user.commune, role: user.role }
+  return { id: user.id, name: user.name, email: user.email, rut: user.rut, phone: user.phone, region: user.region, commune: user.commune, role: user.role, status: user.status, createdAt: user.createdAt }
+}
+
+function validateUserId(id) {
+  if (!Number.isSafeInteger(id) || id < 1) throw new Error('El ID de usuario no es válido.')
+}
+
+function validateAccount(role, status) {
+  if (!userRoles.some((item) => item.value === role) || !userStatuses.some((item) => item.value === status)) {
+    throw new Error('Selecciona un rol y un estado válidos.')
+  }
 }
 
 function initializeAuth() {
@@ -24,19 +35,23 @@ function initializeAuth() {
     const ruts = new Set()
     const restored = stored.users.map((user) => {
       const profile = normalizeUserProfile(user)
+      const status = user.status ?? 'active'
+      const createdAt = user.createdAt ?? null
+      validateAccount(user.role, status)
       if (!Number.isSafeInteger(user.id) || user.id < 1 || ids.has(user.id) || emails.has(profile.email) || ruts.has(profile.rut)
-        || user.role !== 'user' || !/^[a-f0-9]{32}$/.test(user.salt) || !/^[a-f0-9]{64}$/.test(user.passwordHash)) {
+        || (createdAt !== null && (typeof createdAt !== 'string' || !Number.isFinite(Date.parse(createdAt))))
+        || !/^[a-f0-9]{32}$/.test(user.salt) || !/^[a-f0-9]{64}$/.test(user.passwordHash)) {
         throw new Error('Los datos de una cuenta no son válidos.')
       }
       ids.add(user.id)
       emails.add(profile.email)
       ruts.add(profile.rut)
-      return { ...profile, id: user.id, role: 'user', salt: user.salt, passwordHash: user.passwordHash }
+      return { ...profile, id: user.id, role: user.role, status, createdAt, salt: user.salt, passwordHash: user.passwordHash }
     })
     if (!Number.isSafeInteger(stored.nextId) || stored.nextId < 1 || restored.some((user) => user.id >= stored.nextId)) throw new Error('El contador de usuarios no es válido.')
     users = restored
     nextId = stored.nextId
-    currentUserId = ids.has(stored.currentUserId) ? stored.currentUserId : null
+    currentUserId = restored.some((user) => user.id === stored.currentUserId && user.status === 'active') ? stored.currentUserId : null
   } catch (error) {
     console.warn('No se pudieron restaurar las cuentas locales.', error)
   }
@@ -63,9 +78,9 @@ async function hashPassword(password, salt) {
   return toHex(new Uint8Array(bits))
 }
 
-function checkDuplicates(profile) {
-  if (users.some((user) => user.email === profile.email)) throw new Error('Ya existe una cuenta con ese correo.')
-  if (users.some((user) => user.rut === profile.rut)) throw new Error('Ya existe una cuenta con ese RUT.')
+function checkDuplicates(profile, excludedId = null) {
+  if (users.some((user) => user.id !== excludedId && user.email === profile.email)) throw new Error('Ya existe una cuenta con ese correo.')
+  if (users.some((user) => user.id !== excludedId && user.rut === profile.rut)) throw new Error('Ya existe una cuenta con ese RUT.')
 }
 
 export function getCurrentUser() {
@@ -98,7 +113,7 @@ export async function registerUser(data) {
   // Volver a comprobar tras la operación asíncrona evita registros simultáneos duplicados.
   checkDuplicates(profile)
   if (nextId >= Number.MAX_SAFE_INTEGER) throw new Error('No hay más IDs de usuario disponibles.')
-  const user = { ...profile, id: nextId, role: 'user', salt, passwordHash }
+  const user = { ...profile, id: nextId, role: 'user', status: 'active', createdAt: new Date().toISOString(), salt, passwordHash }
   saveAuth([...users, user], currentUserId, nextId + 1)
   return publicUser(user)
 }
@@ -109,6 +124,8 @@ export async function login(email, password) {
   validatePassword(password)
   const user = users.find((item) => item.email === normalizedEmail)
   if (!user || await hashPassword(password, user.salt) !== user.passwordHash) throw new Error('Correo o contraseña incorrectos.')
+  if (users.find((item) => item.id === user.id) !== user) throw new Error('La cuenta cambió durante el acceso. Inténtalo de nuevo.')
+  if (user.status !== 'active') throw new Error('Esta cuenta no está activa.')
   saveAuth(users, user.id)
   return publicUser(user)
 }
@@ -116,4 +133,51 @@ export async function login(email, password) {
 export function logout() {
   initializeAuth()
   saveAuth(users, null)
+}
+
+export function getUserById(id) {
+  initializeAuth()
+  validateUserId(id)
+  const user = users.find((item) => item.id === id)
+  return user ? publicUser(user) : null
+}
+
+export async function updateUser(id, changes) {
+  initializeAuth()
+  validateUserId(id)
+  const user = users.find((item) => item.id === id)
+  if (!user) return null
+  const allowedFields = ['name', 'rut', 'email', 'phone', 'region', 'commune', 'role', 'status', 'password', 'confirmPassword']
+  if (!changes || typeof changes !== 'object' || Array.isArray(changes) || Object.keys(changes).some((field) => !allowedFields.includes(field))) {
+    throw new Error('Los cambios contienen campos no editables.')
+  }
+  const values = { ...user, ...changes }
+  const profile = normalizeUserProfile(values)
+  validateAccount(values.role, values.status)
+  checkDuplicates(profile, id)
+  let { salt, passwordHash } = user
+  const password = changes.password ?? ''
+  const confirmPassword = changes.confirmPassword ?? ''
+  if (password !== confirmPassword) throw new Error('Las contraseñas no coinciden.')
+  if (password !== '') {
+    validatePassword(password)
+    salt = toHex(crypto.getRandomValues(new Uint8Array(16)))
+    passwordHash = await hashPassword(password, salt)
+  }
+  // No sobrescribir una eliminación o edición realizada durante el cálculo de la contraseña.
+  if (users.find((item) => item.id === id) !== user) throw new Error('La cuenta cambió durante la edición. Vuelve a cargar sus datos.')
+  checkDuplicates(profile, id)
+  const updatedUser = { ...user, ...profile, role: values.role, status: values.status, salt, passwordHash }
+  const sessionId = currentUserId === id && updatedUser.status !== 'active' ? null : currentUserId
+  saveAuth(users.map((item) => item.id === id ? updatedUser : item), sessionId)
+  return publicUser(updatedUser)
+}
+
+export function deleteUser(id) {
+  initializeAuth()
+  validateUserId(id)
+  const user = users.find((item) => item.id === id)
+  if (!user) return null
+  saveAuth(users.filter((item) => item.id !== id), currentUserId === id ? null : currentUserId)
+  return publicUser(user)
 }

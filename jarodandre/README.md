@@ -403,6 +403,51 @@ Las suscripciones de los componentes se cancelan al desmontarse, sin hooks nuevo
 6. Cambiar de cuenta y comprobar que cada una muestra sus propios pedidos; salir para consultar los de invitado.
 7. Revisar los campos y las comunas dependientes con teclado y en pantalla móvil.
 
+## Cambio 12 de 17
+
+Se migraron las vistas de usuarios y edición:
+
+- `/usuarios`: listado de cuentas locales, búsqueda por nombre/RUT/correo y métricas calculadas desde los registros.
+- `/usuarios/:userId/editar`: formulario de edición con datos actuales, cambio opcional de contraseña,
+  rol, estado y eliminación de la cuenta.
+- `UserProfileFields`: campos compartidos entre registro y edición, incluyendo región y comuna dependientes.
+- `UserEditForm`: formulario responsivo con guardar, cancelar y eliminar.
+- `UserEditRoute`: adaptador de `useParams`, siguiendo el patrón de los detalles de producto.
+
+Las rutas y enlaces se mantienen en `navigation` y usan React Router. El enlace Usuarios está en la cabecera.
+Las páginas manejan estado y suscripciones mediante clases y muestran estados vacíos o de usuario no encontrado.
+El listado omite las credenciales internas y permite buscar RUT con o sin puntos y guion.
+Las métricas sustituyen los valores ficticios del HTML por las cuentas realmente guardadas.
+
+### Operaciones de usuarios
+
+`src/data/auth.js` incorpora `getUserById(id)`, `updateUser(id, changes)` y `deleteUser(id)`.
+La edición es parcial, conserva el ID y la fecha de registro, y rechaza campos no editables.
+Se reutilizan las validaciones de perfil y se comprueban correos/RUT duplicados excluyendo la propia cuenta.
+Dejar ambas contraseñas vacías conserva la actual; cambiarla genera una nueva sal y derivado PBKDF2.
+Los cambios se guardan antes de notificar a los componentes. Si falla el almacenamiento, se conserva el estado anterior.
+
+Los roles disponibles son Cliente (`user`), Empleado/Ventas (`employee`) y Administrador (`admin`).
+Los estados son Activo (`active`), Pendiente (`pending`) e Inactivo/Bloqueado (`inactive`).
+Solo las cuentas activas pueden iniciar sesión. Bloquear o eliminar la cuenta de la sesión actual la cierra.
+Editar su nombre o correo actualiza la cabecera y el acceso; los pedidos conservan su ID de usuario e información histórica.
+Eliminar una cuenta no elimina sus pedidos ni reutiliza su ID.
+
+Las cuentas anteriores se leen como activas y sin fecha conocida; el listado muestra «Sin registro de fecha».
+Las nuevas cuentas registran fecha ISO y siguen creándose como clientes activos.
+Esta etapa ofrece gestión local de las cuentas del navegador; el panel de administración corresponde al cambio 13.
+
+### Revisión manual del cambio 12
+
+1. Registrar dos cuentas y abrir `/usuarios`: revisar métricas, búsqueda y enlaces de edición.
+2. Cambiar nombre, correo, teléfono y comuna de una cuenta; recargar y comprobar persistencia.
+3. Intentar usar el correo o RUT de la otra cuenta y comprobar el error sin cambios parciales.
+4. Guardar sin contraseña nueva y verificar el acceso con la anterior; cambiarla y verificar que solo funciona la nueva.
+5. Con una sesión activa, editar su nombre y comprobar la cabecera; bloquearla y comprobar el cierre de sesión.
+6. Reactivar la cuenta y cambiar el rol; comprobar listado, métricas y persistencia al recargar.
+7. Eliminar una cuenta y comprobar la vuelta al listado, sus métricas y el estado no encontrado de su antigua URL.
+8. Revisar el registro original, los campos compartidos y la distribución en móvil y escritorio.
+
 ## Secuencia propuesta
 
 1. Base React, navegación y layout.

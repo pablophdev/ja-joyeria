@@ -1,0 +1,42 @@
+import { Link } from 'react-router-dom'
+import { routes } from '../../navigation/routes'
+import { userRoles, userStatuses } from '../../data/userOptions'
+import UserProfileFields from './UserProfileFields'
+
+function UserEditForm({ values, busy, onChange, onSubmit, onDelete }) {
+  return (
+    <form onSubmit={onSubmit}>
+      <fieldset disabled={busy}>
+        <legend className="h5">Datos de la cuenta</legend>
+        <UserProfileFields values={values} onChange={onChange} />
+        <p className="small text-secondary">Correos admitidos: @gmail.com, @duoc.cl y @profesor.duoc.cl.</p>
+        <div className="row g-3 mb-4">
+          <div className="col-sm-6">
+            <label className="form-label" htmlFor="edit-password">Nueva contraseña (opcional)</label>
+            <input className="form-control" id="edit-password" name="password" type="password" autoComplete="new-password" minLength={6} maxLength={128} value={values.password} onChange={onChange} aria-describedby="password-help" />
+          </div>
+          <div className="col-sm-6">
+            <label className="form-label" htmlFor="edit-confirm-password">Confirmar nueva contraseña</label>
+            <input className="form-control" id="edit-confirm-password" name="confirmPassword" type="password" autoComplete="new-password" minLength={6} maxLength={128} value={values.confirmPassword} onChange={onChange} required={Boolean(values.password)} />
+          </div>
+          <p className="small text-secondary mb-0" id="password-help">Deja ambas contraseñas vacías para conservar la actual.</p>
+          {[{ name: 'role', label: 'Rol', options: userRoles }, { name: 'status', label: 'Estado', options: userStatuses }].map(({ name, label, options }) => (
+            <div className="col-sm-6" key={name}>
+              <label className="form-label" htmlFor={`edit-${name}`}>{label}</label>
+              <select className="form-select" id={`edit-${name}`} name={name} value={values[name]} onChange={onChange} required>
+                {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+              </select>
+            </div>
+          ))}
+        </div>
+        <div className="d-flex flex-wrap gap-2">
+          <button className="btn btn-dark" type="submit">{busy ? 'Guardando…' : 'Guardar cambios'}</button>
+          <Link className="btn btn-outline-secondary" to={routes.users}>Cancelar</Link>
+          <button className="btn btn-outline-danger ms-sm-auto" type="button" onClick={onDelete}>Eliminar usuario</button>
+        </div>
+      </fieldset>
+    </form>
+  )
+}
+
+export default UserEditForm
