@@ -172,7 +172,7 @@ Incluye navegación Inicio / Productos con `Link`, contador de productos, cuadr�
 `ProductGrid` y `ProductCard` se reutilizan en inicio y catálogo. Los estilos de las imágenes
 pertenecen ahora a `ProductCard.css`, para que la tarjeta funcione sin depender de los estilos del inicio.
 En el catálogo se oculta el enlace «Ver catálogo» para evitar enlaces a la propia página.
-La búsqueda y los filtros se incorporarán en el cambio 7; los detalles y el carrito en sus etapas previstas.
+La búsqueda y los filtros se incorporan en el cambio 7; los detalles y el carrito en sus etapas previstas.
 
 Se incorporaron seis productos de `shop.html` con sus nombres, precios, etiquetas e imágenes originales.
 La colección inicial reúne catorce productos únicos de inicio y tienda; ocho siguen siendo destacados.
@@ -194,6 +194,38 @@ Si el almacenamiento rechaza la actualización, se conserva la colección y vers
 4. Actualizar un precio mediante el CRUD desde la consola: el catálogo debe reflejarlo sin recargar.
 5. Navegar entre inicio y catálogo, y recargar para comprobar la persistencia.
 6. Con datos guardados de la etapa anterior, comprobar que se agregan seis productos una sola vez y se mantienen los cambios existentes.
+
+## Cambio 7 de 17
+
+El catálogo incluye búsqueda por nombre, filtros combinables y ordenamiento.
+
+- `CatalogFilters`: controles responsivos con etiquetas, búsqueda y botón para restablecer.
+- `src/utils/catalogFilters.js`: opciones y lógica de filtrado y ordenamiento, sin modificar la colección original.
+- `ShopPage`: mantiene los controles en estado de clase y calcula los resultados a partir de los productos actuales.
+
+La búsqueda ignora mayúsculas, tildes y espacios sobrantes. Cada palabra debe aparecer en el nombre,
+sin importar su orden: por ejemplo, «rosa oro» encuentra nombres que contienen «Oro Rosa».
+Los filtros permiten elegir grupo (Todos, Nuevos, Populares), etiqueta (Todas, Nuevo, Oferta)
+y precio en CLP (menos de $100.000, de $100.000 a $200.000 inclusive, o más de $200.000).
+Los rangos de precio no se solapan.
+
+Se puede ordenar por precio ascendente/descendente, nombre A–Z/Z–A o conservar el orden original.
+El contador anuncia cuántos productos se muestran sobre el total. El estado sin coincidencias
+se distingue del catálogo vacío. Restablecer limpia la búsqueda, los filtros y el ordenamiento.
+
+Las actualizaciones del CRUD vuelven a calcular los resultados conservando los controles seleccionados.
+Estos controles son estado local de la vista: al salir del catálogo o recargar vuelven a sus valores iniciales.
+Los productos siguen persistiendo en `localStorage`.
+
+### Revisión manual del cambio 7
+
+1. Buscar `NACAR` y comprobar que aparece «Collar Flor de Nácar con Detalles Esmeralda».
+2. Buscar `  rosa   oro  ` y comprobar las coincidencias con nombres que contienen ambas palabras.
+3. Combinar Populares + Oferta + Menos de $100.000: con los datos iniciales aparece el anillo Halo Zafiro Azul.
+4. Ordenar por precio y por nombre en ambos sentidos; restablecer y comprobar los catorce productos iniciales.
+5. Buscar un texto inexistente y comprobar el contador y el mensaje sin resultados.
+6. Con filtros activos, actualizar un producto mediante el CRUD: los resultados deben reflejar el cambio sin perder la selección.
+7. Recorrer los controles con teclado y revisar la distribución en móvil y escritorio.
 
 ## Secuencia propuesta
 
