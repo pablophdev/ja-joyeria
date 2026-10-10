@@ -227,6 +227,41 @@ Los productos siguen persistiendo en `localStorage`.
 6. Con filtros activos, actualizar un producto mediante el CRUD: los resultados deben reflejar el cambio sin perder la selección.
 7. Recorrer los controles con teclado y revisar la distribución en móvil y escritorio.
 
+## Cambio 8 de 17
+
+Ruta dinámica `/productos/:productId`, declarada en `src/navigation/`, para consultar cualquier producto del catálogo.
+Las imágenes, nombres y botones «Ver detalle» de `ProductCard` utilizan `Link` y `getProductDetailsPath(id)`.
+La ficha reutiliza `ProductRating` y el formateador de precios `formatPrice`.
+
+`ProductDetailsRoute` es un adaptador mínimo que usa el hook de React Router `useParams` para pasar el ID
+a `ProductDetailsPage`. El estado y la suscripción al CRUD permanecen en la clase de la página;
+no se agregan hooks personalizados. Al cambiar el ID se remonta la ficha y se limpia la suscripción anterior.
+
+Los textos de `shop-details.html`, `shop-details-2.html` y `shop-details-3.html` se conservan en
+`src/data/productDetails.js` y se incorporan a los productos iniciales 3, 2 y 4 respectivamente.
+Sus imágenes se reutilizan desde `src/assets/products/`.
+La fuente de productos admite ahora campos opcionales de texto `description`, `category`, `tags`
+y `availability`, además de `reviewCount` (entero no negativo, por defecto 0).
+Estos campos pueden modificarse con `updateProduct` y se guardan mediante la persistencia existente.
+Los registros guardados en las etapas anteriores se completan con los detalles originales cuando faltan;
+sus precios, nombres y demás modificaciones se conservan. No se restaura ningún producto eliminado.
+
+La vista muestra nombre, imagen, precio, valoración, descripción y datos disponibles, con diseño Bootstrap.
+Los productos sin descripción o disponibilidad presentan mensajes de información pendiente.
+Los IDs inválidos, inexistentes o eliminados muestran «Producto no encontrado» con un enlace al catálogo.
+El precio y los detalles se actualizan cuando cambia el CRUD; eliminar el producto abierto muestra el estado no encontrado.
+La incorporación de cantidades y la acción de añadir al carrito corresponden al cambio 9.
+
+### Revisión manual del cambio 8
+
+1. Abrir las tarjetas desde inicio y catálogo y comprobar la URL `/productos/ID`.
+2. Visitar `/productos/2`, `/productos/3` y `/productos/4`: revisar los textos originales y las imágenes.
+3. Visitar `/productos/1` y comprobar la ficha con información pendiente, sin inventar especificaciones.
+4. Abrir `/productos/abc`, `/productos/0` y un ID inexistente: deben mostrar el estado no encontrado.
+5. Recargar una ficha y comprobar que se conserva el acceso directo a la ruta.
+6. Actualizar precio y descripción mediante el CRUD con una ficha abierta y comprobar la actualización.
+7. Revisar los enlaces de regreso, el historial del navegador y la distribución en móvil y escritorio.
+
 ## Secuencia propuesta
 
 1. Base React, navegación y layout.

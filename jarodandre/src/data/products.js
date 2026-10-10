@@ -13,6 +13,7 @@ import product12 from '../assets/products/product-12.jpg'
 import product13 from '../assets/products/product-13.jpg'
 import product14 from '../assets/products/product-14.jpg'
 import { readStoredData, writeStoredData } from './persistence'
+import { initialProductDetails } from './productDetails'
 
 // Base simulada, restaurada desde localStorage en la primera consulta.
 // Solo las funciones de este módulo pueden modificar la colección.
@@ -31,7 +32,7 @@ let products = [
   { id: 12, name: 'Anillo Solitario Oro Rosa con Circonia Corte Brillante', price: 150990, image: product12, group: 'new', badge: 'Oferta', rating: 4, featured: false },
   { id: 13, name: 'Sello San Benito Oro Laminado 18K', price: 210990, image: product13, group: 'new', badge: '', rating: 0, featured: false },
   { id: 14, name: 'Anillo Signet Oro con Piedra Onix Negra y Circones', price: 230990, image: product14, group: 'new', badge: '', rating: 0, featured: false },
-]
+].map((product) => ({ ...product, ...normalizeProduct({ ...initialProductDetails[product.id], ...product }) }))
 
 const catalogAdditions = products.slice(8)
 let nextId = Math.max(...products.map((product) => product.id)) + 1
@@ -74,7 +75,7 @@ function initializeProducts() {
       ids.add(product.id)
       const { id, ...values } = product
       validateInput(values)
-      return { id, ...normalizeProduct({ ...values, image: restoreImage(values.image) }) }
+      return { id, ...normalizeProduct({ ...initialProductDetails[id], ...values, image: restoreImage(values.image) }) }
     })
 
     validateId(stored.nextId)
@@ -130,7 +131,7 @@ export function subscribeToProducts(listener) {
   return () => listeners.delete(listener)
 }
 
-const editableFields = ['name', 'price', 'image', 'group', 'badge', 'rating', 'featured']
+const editableFields = ['name', 'price', 'image', 'group', 'badge', 'rating', 'featured', 'description', 'category', 'tags', 'availability', 'reviewCount']
 
 function validateId(id) {
   if (!Number.isSafeInteger(id) || id <= 0) {
@@ -151,6 +152,7 @@ function validateInput(data) {
 }
 
 function normalizeProduct(data) {
+  const { description = '', category = '', tags = '', availability = '', reviewCount = 0 } = data
   if (typeof data.name !== 'string' || !data.name.trim()) {
     throw new Error('El nombre del producto es obligatorio.')
   }
@@ -179,6 +181,14 @@ function normalizeProduct(data) {
     throw new Error('El indicador de producto destacado debe ser booleano.')
   }
 
+  if (![description, category, tags, availability].every((value) => typeof value === 'string')) {
+    throw new Error('La descripción, categoría, etiquetas y disponibilidad deben ser textos.')
+  }
+
+  if (!Number.isSafeInteger(reviewCount) || reviewCount < 0) {
+    throw new Error('La cantidad de reseñas debe ser un entero mayor o igual a cero.')
+  }
+
   return {
     name: data.name.trim(),
     price: data.price,
@@ -187,6 +197,11 @@ function normalizeProduct(data) {
     badge: data.badge,
     rating: data.rating,
     featured: data.featured,
+    description: description.trim(),
+    category: category.trim(),
+    tags: tags.trim(),
+    availability: availability.trim(),
+    reviewCount,
   }
 }
 

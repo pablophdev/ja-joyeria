@@ -56,7 +56,6 @@ class ShopPage extends Component {
           <div id="catalog-results">
             <ProductGrid
               products={visibleProducts}
-              showCatalogLink={false}
               emptyMessage={products.length === 0
                 ? 'No hay productos disponibles.'
                 : 'No encontramos productos con estos criterios. Prueba otra búsqueda o restablece los filtros.'}
