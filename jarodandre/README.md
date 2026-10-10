@@ -17,7 +17,7 @@ Al desplegar, el alojamiento debe redirigir las rutas de la aplicación a `index
 - `src/navigation/`: rutas y configuración de React Router.
 - `src/components/`: componentes reutilizables; cabecera, pie y layout compartido.
 - `src/pages/`: vistas de las rutas.
-- `src/data/`: datos de presentación de la portada; la fuente simulada con CRUD se incorporará en el cambio 4.
+- `src/data/`: contenido de la portada y fuente simulada de productos con funciones CRUD.
 - `src/assets/`: recursos importados por los componentes, como el logo original.
 - `public/`: archivos servidos directamente, como el favicon y los videos de `public/videos/`.
 
@@ -70,6 +70,53 @@ El formulario de novedades es una demostración: valida el correo sin guardarlo 
 4. Revisar las secciones en móvil, tableta y escritorio, sin desbordamiento horizontal.
 5. Comprobar los enlaces al catálogo y el perfil de Instagram.
 6. En el pie, enviar un correo vacío o inválido y luego uno válido; comprobar la validación y la respuesta de demostración sin recarga.
+
+## Cambio 4 de 17
+
+`src/data/products.js` centraliza los ocho productos migrados y las operaciones CRUD.
+`HomePage` consulta `getFeaturedProducts()` para obtener los productos de portada.
+`homeContent.js` conserva los banners, filtros, galería y redes sociales.
+
+### Funciones disponibles
+
+| Función | Resultado |
+| --- | --- |
+| `getProducts()` | Lista de todos los productos. |
+| `getFeaturedProducts()` | Lista de productos con `featured: true`. |
+| `getProductById(id)` | Producto encontrado o `null`. |
+| `createProduct(data)` | Producto creado con ID automático. |
+| `updateProduct(id, changes)` | Producto actualizado o `null` si no existe. |
+| `deleteProduct(id)` | Producto eliminado o `null` si no existe. |
+
+Las funciones son síncronas y devuelven copias. La colección interna no se exporta.
+Los IDs son números enteros positivos, no editables, y no se reutilizan al eliminar registros.
+Las entradas inválidas lanzan un `Error` con un mensaje en español sin modificar los datos.
+
+Para crear un producto se requieren `name`, `price` e `image`.
+El precio es un entero no negativo en CLP; los nombres y las imágenes deben ser cadenas no vacías.
+Los campos opcionales son `group` (`new` por defecto, o `popular`), `badge` (`''`, `Nuevo` u `Oferta`),
+`rating` (entero de 0 a 5, por defecto 0) y `featured` (booleano, por defecto `false`).
+Solo se aceptan esos campos; la actualización es parcial y conserva el ID.
+
+```js
+import {
+  createProduct,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+} from './data/products'
+import image from './assets/products/product-1.jpg'
+
+const product = createProduct({ name: 'Grillz personalizados', price: 99000, image })
+const savedProduct = getProductById(product.id)
+const updatedProduct = updateProduct(product.id, { price: 105000, featured: true })
+const deletedProduct = deleteProduct(product.id)
+```
+
+Esta etapa trabaja en memoria: recargar la aplicación restaura los ocho productos iniciales.
+La portada consulta los datos al renderizarse; todavía no se suscribe a cambios del CRUD.
+La persistencia local y la actualización reactiva se incorporarán en el cambio 5.
+Los formularios de administración se incorporarán en su etapa correspondiente.
 
 ## Secuencia propuesta
 

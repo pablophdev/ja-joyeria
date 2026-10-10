@@ -1,0 +1,136 @@
+import product1 from '../assets/products/product-1.jpg'
+import product2 from '../assets/products/product-2.jpg'
+import product3 from '../assets/products/product-3.jpg'
+import product4 from '../assets/products/product-4.jpg'
+import product5 from '../assets/products/product-5.jpg'
+import product6 from '../assets/products/product-6.jpg'
+import product7 from '../assets/products/product-7.jpg'
+import product8 from '../assets/products/product-8.jpg'
+
+// Base simulada en memoria. Se restablece al recargar la aplicación.
+// Solo las funciones de este módulo pueden modificar la colección.
+let products = [
+  { id: 1, name: 'Grillz Custom Silver Star & Heart', price: 90990, image: product1, group: 'new', badge: 'Nuevo', rating: 0, featured: true },
+  { id: 2, name: 'Grillz Flor y Media Luna Plata', price: 90990, image: product2, group: 'popular', badge: '', rating: 0, featured: true },
+  { id: 3, name: 'Cadena Eslabón Cubano Oro Rosa', price: 105990, image: product3, group: 'new', badge: 'Oferta', rating: 4, featured: true },
+  { id: 4, name: 'Cadena Corona Real', price: 219990, image: product4, group: 'popular', badge: '', rating: 0, featured: true },
+  { id: 5, name: 'Collar Flor de Nácar con Detalles Esmeralda', price: 80000, image: product5, group: 'new', badge: '', rating: 0, featured: true },
+  { id: 6, name: 'Anillo Halo Zafiro Azul en Plata', price: 95990, image: product6, group: 'popular', badge: 'Oferta', rating: 4, featured: true },
+  { id: 7, name: 'Anillo Solitario Doble Halo Circonias', price: 200990, image: product7, group: 'new', badge: '', rating: 0, featured: true },
+  { id: 8, name: 'Anillo Compromiso Oro Blanco y Rosa', price: 189990, image: product8, group: 'popular', badge: '', rating: 0, featured: true },
+]
+
+let nextId = Math.max(...products.map((product) => product.id)) + 1
+
+const editableFields = ['name', 'price', 'image', 'group', 'badge', 'rating', 'featured']
+
+function validateId(id) {
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    throw new Error('El ID del producto debe ser un entero positivo.')
+  }
+}
+
+function validateInput(data) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw new Error('Los datos del producto deben ser un objeto.')
+  }
+
+  for (const field of Object.keys(data)) {
+    if (!editableFields.includes(field)) {
+      throw new Error(`El campo "${field}" no se puede asignar. El ID se genera automáticamente.`)
+    }
+  }
+}
+
+function normalizeProduct(data) {
+  if (typeof data.name !== 'string' || !data.name.trim()) {
+    throw new Error('El nombre del producto es obligatorio.')
+  }
+
+  if (!Number.isSafeInteger(data.price) || data.price < 0) {
+    throw new Error('El precio debe ser un entero mayor o igual a cero, en pesos chilenos.')
+  }
+
+  if (typeof data.image !== 'string' || !data.image.trim()) {
+    throw new Error('La imagen del producto es obligatoria.')
+  }
+
+  if (!['new', 'popular'].includes(data.group)) {
+    throw new Error('El grupo debe ser "new" o "popular".')
+  }
+
+  if (!['', 'Nuevo', 'Oferta'].includes(data.badge)) {
+    throw new Error('La etiqueta debe ser "Nuevo", "Oferta" o una cadena vacía.')
+  }
+
+  if (!Number.isInteger(data.rating) || data.rating < 0 || data.rating > 5) {
+    throw new Error('La valoración debe ser un entero entre 0 y 5.')
+  }
+
+  if (typeof data.featured !== 'boolean') {
+    throw new Error('El indicador de producto destacado debe ser booleano.')
+  }
+
+  return {
+    name: data.name.trim(),
+    price: data.price,
+    image: data.image.trim(),
+    group: data.group,
+    badge: data.badge,
+    rating: data.rating,
+    featured: data.featured,
+  }
+}
+
+// Se devuelven copias: modificar un resultado no altera la base simulada.
+export function getProducts() {
+  return products.map((product) => ({ ...product }))
+}
+
+export function getFeaturedProducts() {
+  return getProducts().filter((product) => product.featured)
+}
+
+export function getProductById(id) {
+  validateId(id)
+  const product = products.find((item) => item.id === id)
+  return product ? { ...product } : null
+}
+
+export function createProduct(data) {
+  validateInput(data)
+  const values = normalizeProduct({
+    group: 'new',
+    badge: '',
+    rating: 0,
+    featured: false,
+    ...data,
+  })
+  const product = { id: nextId, ...values }
+  products.push(product)
+  nextId += 1
+  return { ...product }
+}
+
+export function updateProduct(id, changes) {
+  validateId(id)
+  validateInput(changes)
+  const index = products.findIndex((product) => product.id === id)
+
+  if (index === -1) return null
+
+  // Validar antes de reemplazar evita actualizaciones parciales ante un error.
+  const values = normalizeProduct({ ...products[index], ...changes })
+  products[index] = { id, ...values }
+  return { ...products[index] }
+}
+
+export function deleteProduct(id) {
+  validateId(id)
+  const product = products.find((item) => item.id === id)
+
+  if (!product) return null
+
+  products = products.filter((item) => item.id !== id)
+  return { ...product }
+}
