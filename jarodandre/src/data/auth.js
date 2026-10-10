@@ -89,6 +89,10 @@ export function getCurrentUser() {
   return user ? publicUser(user) : null
 }
 
+export function isAdminEmail(user) {
+  return Boolean(user && user.email && user.email.toLowerCase().includes('@duoc.cl'))
+}
+
 export function getUsers() {
   initializeAuth()
   return users.map(publicUser)

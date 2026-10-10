@@ -1,6 +1,6 @@
 import { Component } from 'react'
-import { Link } from 'react-router-dom'
-import { getCurrentUser, login, registerUser, subscribeToAuth } from '../data/auth'
+import { Link, Navigate } from 'react-router-dom'
+import { getCurrentUser, isAdminEmail, login, registerUser, subscribeToAuth } from '../data/auth'
 import AuthForm from '../components/auth/AuthForm'
 import { routes } from '../navigation/routes'
 
@@ -39,8 +39,8 @@ class AuthPage extends Component {
         await registerUser(this.state.values)
         if (this.mounted) this.setState({ registered: true, values: { ...emptyValues } })
       } else {
-        await login(this.state.values.email, this.state.values.password)
-        if (this.mounted) this.setState({ values: { ...emptyValues } })
+        const logged = await login(this.state.values.email, this.state.values.password)
+        if (this.mounted) this.setState({ values: { ...emptyValues }, user: logged })
       }
     } catch (error) {
       if (this.mounted) this.setState({ error: error.message })
@@ -53,6 +53,7 @@ class AuthPage extends Component {
   render() {
     const isRegister = this.props.mode === 'register'
     const { user, registered, error, busy, values } = this.state
+    if (isAdminEmail(user)) return <Navigate to={routes.admin} replace />
     return (
       <section className="container py-5">
         <div className="row justify-content-center"><div className="col-md-8 col-lg-6">

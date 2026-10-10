@@ -11,6 +11,7 @@ import OrdersPage from '../pages/OrdersPage'
 import AuthPage from '../pages/AuthPage'
 import UsersPage from '../pages/UsersPage'
 import UserEditRoute from './UserEditRoute'
+import AdminRoute from './AdminRoute'
 import AdminLayout from '../components/admin/AdminLayout'
 import AdminPage from '../pages/AdminPage'
 import AdminProductsPage from '../pages/AdminProductsPage'
@@ -35,7 +36,7 @@ function AppRouter() {
           <Route path={routes.users} element={<UsersPage />} />
           <Route path={routes.userEdit} element={<UserEditRoute />} />
           <Route path={routes.productDetails} element={<ProductDetailsRoute />} />
-          <Route path={routes.admin} element={<AdminLayout />}>
+          <Route path={routes.admin} element={<AdminRoute><AdminLayout /></AdminRoute>}>
             <Route index element={<AdminPage />} />
             <Route path={routes.adminProducts} element={<AdminProductsPage />} />
             <Route path={routes.adminProductNew} element={<AdminProductEditorPage key="new" />} />
