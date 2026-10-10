@@ -19,6 +19,8 @@ export function normalizeOrder(order, maxQuantity) {
     || order.status !== 'Pendiente' || !Array.isArray(order.items) || !order.items.length) {
     throw new Error('El pedido guardado no es válido.')
   }
+  const userId = order.userId ?? null
+  if (userId !== null && (!Number.isSafeInteger(userId) || userId < 1)) throw new Error('El usuario del pedido no es válido.')
   const ids = new Set()
   const items = order.items.map((item) => {
     if (!item || !Number.isSafeInteger(item.productId) || item.productId < 1 || ids.has(item.productId)
@@ -34,7 +36,7 @@ export function normalizeOrder(order, maxQuantity) {
   })
   const total = items.reduce((sum, item) => sum + item.subtotal, 0)
   if (!Number.isSafeInteger(total) || order.total !== total) throw new Error('El total del pedido no es válido.')
-  return { id: order.id, createdAt: order.createdAt, status: order.status, customer: normalizeCustomer(order.customer), items, total }
+  return { id: order.id, userId, createdAt: order.createdAt, status: order.status, customer: normalizeCustomer(order.customer), items, total }
 }
 
 export function formatOrderId(id) {

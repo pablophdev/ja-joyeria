@@ -354,6 +354,55 @@ No se agregaron hooks ni pruebas unitarias.
 7. Marcar un artículo del carrito como agotado: debe requerirse eliminarlo antes de confirmar.
 8. Confirmar un segundo pedido y verificar que tiene un ID diferente y aparece primero.
 
+## Cambio 11 de 17
+
+Las rutas `/registro` y `/login` muestran formularios React mediante `AuthPage` y `AuthForm`.
+Se migraron nombre, RUT, correo y confirmación, contraseña y confirmación, teléfono opcional,
+región y comuna. Las tres regiones y sus comunas originales están en `registrationOptions.js`;
+cambiar la región limpia la comuna seleccionada.
+
+`src/data/auth.js` proporciona `registerUser`, `login`, `logout`, `getCurrentUser`, `getUsers`
+y `subscribeToAuth`. Registro e inicio de sesión son asíncronos; los formularios bloquean envíos repetidos
+y muestran los errores sin recargar la página. El registro termina con un enlace al inicio de sesión.
+Al iniciar sesión, la cabecera muestra el nombre y la acción «Cerrar sesión».
+
+### Validaciones y almacenamiento
+
+- Nombre con letras y espacios, RUT con dígito verificador y teléfono opcional de 8 a 12 números.
+- Correo normalizado sin distinguir mayúsculas. Se mantienen los dominios originales del registro:
+  Gmail, Duoc y Profesor Duoc; cualquiera de ellos puede iniciar sesión.
+- Correo y RUT únicos. Las confirmaciones deben coincidir.
+- Contraseña de 6 a 128 caracteres; se conserva exactamente al comparar, sin recortar espacios.
+- Región y comuna deben pertenecer a las opciones disponibles.
+
+Usuarios, contador de IDs y sesión se guardan juntos en `jarodandre.auth`, versión 1.
+La sesión se conserva al recargar; cerrar sesión conserva las cuentas y borra el usuario activo.
+Las contraseñas se guardan como un derivado PBKDF2/SHA-256 con sal aleatoria por usuario,
+no como texto. Se usa Web Crypto, disponible en localhost y HTTPS.
+Las consultas públicas omiten la sal y el derivado de contraseña.
+Las escrituras fallidas conservan los datos y la sesión anteriores.
+Las cuentas registradas tienen rol `user`; el nombre ingresado no concede un rol de administrador.
+Se trata de una simulación local, no de autenticación de servidor.
+
+### Pedidos y sesión
+
+Los nuevos pedidos guardan el ID del usuario activo, o `null` cuando se confirma como invitado.
+La vista `/pedidos` muestra los pedidos de la sesión actual y se actualiza al iniciar o cerrar sesión.
+Los pedidos anteriores se conservan como pedidos de invitado y pueden consultarse al cerrar sesión.
+El carrito sigue siendo compartido por el navegador; iniciar o cerrar sesión no elimina sus artículos.
+Los datos de contacto del pedido siguen completándose en el formulario de confirmación.
+Las suscripciones de los componentes se cancelan al desmontarse, sin hooks nuevos.
+
+### Revisión manual del cambio 11
+
+1. Registrar una cuenta con RUT válido y una región/comuna del formulario; comprobar el mensaje de éxito.
+2. Intentar registrar el mismo correo o RUT, o ingresar confirmaciones diferentes; comprobar los errores.
+3. Iniciar sesión con el correo en mayúsculas y la contraseña correcta. Comprobar el saludo en la cabecera.
+4. Recargar y comprobar la sesión; cerrar sesión y verificar que vuelven los enlaces de acceso.
+5. Confirmar un pedido con una sesión activa y comprobarlo en `/pedidos`.
+6. Cambiar de cuenta y comprobar que cada una muestra sus propios pedidos; salir para consultar los de invitado.
+7. Revisar los campos y las comunas dependientes con teclado y en pantalla móvil.
+
 ## Secuencia propuesta
 
 1. Base React, navegación y layout.

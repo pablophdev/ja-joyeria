@@ -19,6 +19,4 @@ export const pendingPages = [
   { path: routes.about, title: 'Sobre nosotros' },
   { path: routes.blog, title: 'Blog' },
   { path: routes.contact, title: 'Contacto' },
-  { path: routes.register, title: 'Registrarse' },
-  { path: routes.login, title: 'Iniciar sesión' },
 ]

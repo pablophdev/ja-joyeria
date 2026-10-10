@@ -1,6 +1,7 @@
 import { getProductById, getProducts, subscribeToProducts } from './products'
 import { readStoredData, writeStoredData } from './persistence'
 import { normalizeCustomer, normalizeOrder } from './orderRecords'
+import { getCurrentUser } from './auth'
 
 export const MAX_CART_QUANTITY = 99
 const storageKey = 'jarodandre.cart'
@@ -143,7 +144,8 @@ export function clearCart() {
 
 export function getOrders() {
   initializeCart()
-  return orders.map((order) => normalizeOrder(order, MAX_CART_QUANTITY)).sort((first, second) => second.id - first.id)
+  const userId = getCurrentUser()?.id ?? null
+  return orders.filter((order) => order.userId === userId).map((order) => normalizeOrder(order, MAX_CART_QUANTITY)).sort((first, second) => second.id - first.id)
 }
 
 export function subscribeToOrders(listener) {
@@ -159,6 +161,7 @@ export function confirmOrder(customer) {
 
   const order = normalizeOrder({
     id: nextOrderId,
+    userId: getCurrentUser()?.id ?? null,
     createdAt: new Date().toISOString(),
     status: 'Pendiente',
     customer: normalizedCustomer,

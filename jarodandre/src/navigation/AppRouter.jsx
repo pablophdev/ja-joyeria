@@ -8,6 +8,7 @@ import { pendingPages, routes } from './routes'
 import ProductDetailsRoute from './ProductDetailsRoute'
 import CartPage from '../pages/CartPage'
 import OrdersPage from '../pages/OrdersPage'
+import AuthPage from '../pages/AuthPage'
 
 function AppRouter() {
   return (
@@ -18,6 +19,8 @@ function AppRouter() {
           <Route path={routes.shop} element={<ShopPage />} />
           <Route path={routes.cart} element={<CartPage />} />
           <Route path={routes.orders} element={<OrdersPage />} />
+          <Route path={routes.login} element={<AuthPage key="login" mode="login" />} />
+          <Route path={routes.register} element={<AuthPage key="register" mode="register" />} />
           <Route path={routes.productDetails} element={<ProductDetailsRoute />} />
           {pendingPages.map(({ path, title }) => (
             <Route key={path} path={path} element={<PendingPage title={title} />} />

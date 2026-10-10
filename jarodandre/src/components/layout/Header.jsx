@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import logo from '../../assets/logo.jpg'
 import { routes } from '../../navigation/routes'
 import CartLink from '../cart/CartLink'
+import AuthLinks from '../auth/AuthLinks'
 
 const menuItems = [
   { to: routes.home, label: 'Inicio' },
@@ -16,8 +17,7 @@ function Header() {
     <header className="border-bottom">
       <div className="bg-dark py-2">
         <div className="container d-flex flex-wrap justify-content-end gap-3">
-          <Link className="text-white" to={routes.register}>Registrarse</Link>
-          <Link className="text-white" to={routes.login}>Iniciar sesión</Link>
+          <AuthLinks />
           <Link className="text-white" to={routes.orders}>Pedidos</Link>
         </div>
       </div>
