@@ -493,6 +493,44 @@ Los IDs inválidos o eliminados muestran el estado Producto no encontrado.
 7. Eliminar un producto, comprobar el listado y visitar su URL anterior: debe mostrarse el estado no encontrado.
 8. Revisar el formulario en móvil y escritorio, incluyendo selección y vista previa de imágenes.
 
+## Cambio 14 de 17
+
+Las rutas `/nosotros` y `/contacto` sustituyen sus vistas provisionales por `AboutPage` y `ContactPage`.
+Comparten `PageHeading`, con título y navegación Inicio / Página mediante `Link`.
+
+### Sobre nosotros
+
+Se conservan la imagen original, los textos de Quiénes somos, Qué hacemos y Por qué elegirnos,
+y las cuatro cifras de presentación de `about.html`. Estas cifras son contenido del sitio original,
+no métricas calculadas a partir de las cuentas o productos de la simulación.
+`CompanyStats` recibe sus valores por props; `companyContent.js` concentra los textos y datos de la empresa.
+La imagen se importa desde `src/assets/about/about-us.jpg`.
+La vista incorpora enlaces al catálogo y a contacto, con distribución Bootstrap responsiva.
+
+### Contacto
+
+Se conservan Santiago, Chile y los dos teléfonos del HTML, con enlaces `tel:` para llamar.
+`ContactForm` usa estado de clase para nombre, correo y mensaje, sin manipulación directa del DOM.
+Valida nombre con letras y espacios, correo válido y mensaje no vacío, con límites de longitud.
+El contador muestra los caracteres del mensaje; los errores y confirmaciones se anuncian mediante roles accesibles.
+
+`saveContactMessage(data)` y `getContactMessages()` están en `src/data/contactMessages.js`.
+Los mensajes se guardan en `jarodandre.contactMessages` con versión, contador de IDs, contenido y fecha ISO.
+Se normalizan los datos y se devuelven copias. Un fallo al guardar conserva el contenido del formulario
+y no modifica los mensajes en memoria. Después de un guardado exitoso se limpia el formulario.
+El texto de confirmación indica que el mensaje se guardó localmente: no se envían correos ni solicitudes a un backend.
+No se agregaron hooks ni pruebas unitarias.
+
+### Revisión manual del cambio 14
+
+1. Abrir Sobre nosotros desde el menú y comprobar imagen, textos, cifras y enlaces.
+2. Abrir Contacto desde menú, pie de página y ficha de producto; revisar los teléfonos y sus enlaces.
+3. Completar el formulario y comprobar la confirmación local y la limpieza de campos.
+4. Intentar guardar un nombre con números, correo inválido o mensaje compuesto solo de espacios.
+5. Con `npm run dev`, consultar `getContactMessages()` importando `/src/data/contactMessages.js` en la consola;
+   recargar y comprobar que se conserva el mensaje.
+6. Revisar ambas vistas en móvil y escritorio, y recorrer el formulario con teclado.
+
 ## Secuencia propuesta
 
 1. Base React, navegación y layout.

@@ -16,6 +16,8 @@ import AdminPage from '../pages/AdminPage'
 import AdminProductsPage from '../pages/AdminProductsPage'
 import AdminProductEditorPage from '../pages/AdminProductEditorPage'
 import AdminProductEditRoute from './AdminProductEditRoute'
+import AboutPage from '../pages/AboutPage'
+import ContactPage from '../pages/ContactPage'
 
 function AppRouter() {
   return (
@@ -24,6 +26,8 @@ function AppRouter() {
         <Route element={<SiteLayout />}>
           <Route path={routes.home} element={<HomePage />} />
           <Route path={routes.shop} element={<ShopPage />} />
+          <Route path={routes.about} element={<AboutPage />} />
+          <Route path={routes.contact} element={<ContactPage />} />
           <Route path={routes.cart} element={<CartPage />} />
           <Route path={routes.orders} element={<OrdersPage />} />
           <Route path={routes.login} element={<AuthPage key="login" mode="login" />} />

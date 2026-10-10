@@ -30,7 +30,5 @@ export function getAdminProductEditPath(id) {
 }
 
 export const pendingPages = [
-  { path: routes.about, title: 'Sobre nosotros' },
   { path: routes.blog, title: 'Blog' },
-  { path: routes.contact, title: 'Contacto' },
 ]
