@@ -17,9 +17,9 @@ Al desplegar, el alojamiento debe redirigir las rutas de la aplicación a `index
 - `src/navigation/`: rutas y configuración de React Router.
 - `src/components/`: componentes reutilizables; cabecera, pie y layout compartido.
 - `src/pages/`: vistas de las rutas.
-- `src/data/`: datos de presentación del hero; la fuente simulada con CRUD se incorporará en el cambio 4.
+- `src/data/`: datos de presentación de la portada; la fuente simulada con CRUD se incorporará en el cambio 4.
 - `src/assets/`: recursos importados por los componentes, como el logo original.
-- `public/`: archivos servidos directamente, como el favicon. Los videos se incorporarán aquí al migrar sus secciones.
+- `public/`: archivos servidos directamente, como el favicon y los videos de `public/videos/`.
 
 ## Cambio 1 de 17
 
@@ -45,6 +45,31 @@ y la animación respeta la preferencia de movimiento reducido. El diseño utiliz
 3. Recorrer los controles con Tab y activarlos con Enter/Espacio.
 4. Pulsar «Ver productos» y comprobar la navegación a `/productos` sin recargar.
 5. Revisar el hero en móvil y escritorio, y con movimiento reducido habilitado.
+
+## Cambio 3 de 17
+
+Secciones de inicio migradas a componentes React:
+
+- `CollectionBanners`: tres videos originales con reproducción en silencio, bucle, controles y diseño responsivo.
+- `FeaturedProducts`: ocho productos originales y filtros Top Productos, Nuevos y Populares con estado de clase.
+- `ProductCard`: tarjeta reutilizable con imagen, etiqueta, valoración y precio en pesos chilenos.
+- `InstagramGallery`: seis imágenes originales y enlace al perfil de la tienda.
+- Pie compartido con logo, navegación interna, redes sociales y `NewsletterForm` con validación nativa y respuesta de React.
+
+Los videos se sirven desde `public/videos/`, respetando la URL base de Vite.
+Las imágenes están en `src/assets/products/` y `src/assets/instagram/`.
+Los datos de presentación están en `src/data/homeContent.js`.
+Las tarjetas enlazan al catálogo provisional; los detalles y las compras se implementarán en sus etapas correspondientes.
+El formulario de novedades es una demostración: valida el correo sin guardarlo ni realizar envíos.
+
+### Revisión manual del cambio 3
+
+1. Abrir el inicio y comprobar los tres videos, sus controles y las ocho tarjetas.
+2. Seleccionar Nuevos y Populares: cada filtro debe mostrar cuatro productos; Top Productos restaura los ocho.
+3. Recorrer los filtros con Tab y activarlos con Enter/Espacio.
+4. Revisar las secciones en móvil, tableta y escritorio, sin desbordamiento horizontal.
+5. Comprobar los enlaces al catálogo y el perfil de Instagram.
+6. En el pie, enviar un correo vacío o inválido y luego uno válido; comprobar la validación y la respuesta de demostración sin recarga.
 
 ## Secuencia propuesta
 
