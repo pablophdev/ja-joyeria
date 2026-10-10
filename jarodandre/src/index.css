@@ -1,4 +1,10 @@
 :root {
+  font-family: "Jura", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  --bs-body-font-family: "Jura", sans-serif;
+  --bs-font-sans-serif: "Jura", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -7,6 +13,7 @@
 
 body {
   margin: 0;
+  font-family: "Jura", sans-serif;
   color: #212529;
   background-color: #fff;
 }
