@@ -262,6 +262,50 @@ La incorporación de cantidades y la acción de añadir al carrito corresponden 
 6. Actualizar precio y descripción mediante el CRUD con una ficha abierta y comprobar la actualización.
 7. Revisar los enlaces de regreso, el historial del navegador y la distribución en móvil y escritorio.
 
+## Cambio 9 de 17
+
+La ruta `/carrito` muestra `CartPage` con artículos, cantidades, subtotales y total en CLP.
+Desde cada ficha se puede elegir la cantidad y añadir el producto al carrito.
+Si ya existe, se suman las unidades en la misma línea. El enlace de cabecera muestra el total de unidades.
+
+### Datos y componentes
+
+- `src/data/cart.js`: `getCart`, `addToCart`, `updateCartQuantity`, `removeFromCart`, `clearCart` y `subscribeToCart`.
+- `QuantityControl`: selector y botones de incremento/decremento compartidos entre ficha y carrito.
+- `CartItem`: artículo del carrito, enlazado a su ficha mediante `Link`.
+- `CartLink`: contador de unidades suscrito a los cambios del carrito.
+- `CartPage`: vista responsiva con edición, eliminación, vaciado, resumen y estado vacío.
+
+El carrito se guarda en `jarodandre.cart` con formato `{ version: 1, items: [{ productId, quantity }] }`.
+Los nombres, imágenes, precios y disponibilidad se consultan desde la fuente actual de productos;
+las actualizaciones del catálogo también notifican a los componentes del carrito.
+`getCart()` devuelve las líneas con producto, disponibilidad y subtotal, además de `total` y `totalQuantity`.
+La cantidad debe ser un entero entre 1 y 99 por producto; este límite de interfaz no representa inventario.
+
+Un producto eliminado, o con disponibilidad `Agotado`, `Sin stock` o `No disponible` (sin distinguir mayúsculas),
+no puede añadirse ni cambiar de cantidad. Si ya estaba en el carrito, se muestra para poder eliminarlo,
+pero no aporta al total. El contador incluye todas las unidades guardadas, también las no disponibles.
+Los productos sin información de disponibilidad pueden añadirse al carrito simulado.
+
+Las escrituras se realizan antes de actualizar el estado; si fallan, la interfaz informa del error
+y conserva los datos anteriores. Los datos inválidos guardados se ignoran sin sobrescribirlos durante la lectura.
+Las suscripciones se cancelan al desmontar y la suscripción al catálogo se libera cuando no quedan consumidores del carrito.
+La sincronización es dentro de la misma instancia de la aplicación; las otras pestañas recuperan el carrito al recargar.
+
+Los totales corresponden a productos, sin envío ni descuentos. La confirmación y persistencia de pedidos
+se implementarán en el cambio 10. No se agregan hooks ni pruebas unitarias en esta etapa.
+
+### Revisión manual del cambio 9
+
+1. Abrir `/productos/3`, seleccionar dos unidades y añadirlas. Comprobar el mensaje y el contador de cabecera.
+2. Volver a añadir una unidad del mismo producto: debe quedar una sola línea con tres unidades.
+3. Abrir `/carrito`, cambiar cantidades y comprobar subtotales y total. Recargar y comprobar persistencia.
+4. Eliminar un artículo y vaciar el carrito; comprobar el estado vacío y «Seguir comprando».
+5. Alcanzar el límite de 99 unidades y comprobar que no se puede superar al añadir más.
+6. Actualizar el precio mediante el CRUD con el carrito abierto: el total debe recalcularse.
+7. Marcar un producto como agotado o eliminarlo desde el CRUD: su línea queda no disponible y excluida del total.
+8. Revisar controles con teclado y distribución en móvil y escritorio.
+
 ## Secuencia propuesta
 
 1. Base React, navegación y layout.

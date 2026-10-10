@@ -4,6 +4,8 @@ import { getProductById, subscribeToProducts } from '../data/products'
 import ProductRating from '../components/products/ProductRating'
 import { formatPrice } from '../utils/formatPrice'
 import { routes } from '../navigation/routes'
+import { addToCart, isProductAvailable } from '../data/cart'
+import QuantityControl from '../components/cart/QuantityControl'
 
 function findProduct(productId) {
   if (!/^[1-9]\d*$/.test(productId)) return null
@@ -12,7 +14,7 @@ function findProduct(productId) {
 }
 
 class ProductDetailsPage extends Component {
-  state = { product: findProduct(this.props.productId) }
+  state = { product: findProduct(this.props.productId), quantity: 1, error: '', message: '' }
 
   componentDidMount() {
     this.unsubscribe = subscribeToProducts(this.refreshProduct)
@@ -24,7 +26,17 @@ class ProductDetailsPage extends Component {
   }
 
   refreshProduct = () => {
-    this.setState({ product: findProduct(this.props.productId) })
+    this.setState({ product: findProduct(this.props.productId), error: '', message: '' })
+  }
+
+  handleAddToCart = (event) => {
+    event.preventDefault()
+    try {
+      addToCart(Number(this.props.productId), this.state.quantity)
+      this.setState({ error: '', message: 'Producto añadido al carrito.' })
+    } catch (error) {
+      this.setState({ error: error.message, message: '' })
+    }
   }
 
   render() {
@@ -71,6 +83,13 @@ class ProductDetailsPage extends Component {
                 {product.category && <><dt>Categoría</dt><dd>{product.category}</dd></>}
                 {product.tags && <><dt>Etiquetas</dt><dd>{product.tags}</dd></>}
               </dl>
+              <form onSubmit={this.handleAddToCart} className="mt-4">
+                <QuantityControl id="product-quantity" quantity={this.state.quantity} disabled={!isProductAvailable(product)} onChange={(quantity) => this.setState({ quantity, error: '', message: '' })} />
+                <button className="btn btn-dark mt-3" type="submit" disabled={!isProductAvailable(product)}>Añadir al carrito</button>
+              </form>
+              {this.state.error && <p className="alert alert-danger mt-3" role="alert">{this.state.error}</p>}
+              <p className="text-success mt-3" role="status">{this.state.message}</p>
+              {this.state.message && <Link className="btn btn-outline-dark" to={routes.cart}>Ver carrito</Link>}
               <div className="d-flex flex-wrap gap-2 mt-4">
                 <Link className="btn btn-dark" to={routes.shop}>Volver a productos</Link>
                 <Link className="btn btn-outline-dark" to={routes.contact}>Consultar sobre el producto</Link>

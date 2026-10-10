@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import logo from '../../assets/logo.jpg'
 import { routes } from '../../navigation/routes'
+import CartLink from '../cart/CartLink'
 
 const menuItems = [
   { to: routes.home, label: 'Inicio' },
@@ -8,7 +9,6 @@ const menuItems = [
   { to: routes.about, label: 'Sobre nosotros' },
   { to: routes.blog, label: 'Blog' },
   { to: routes.contact, label: 'Contacto' },
-  { to: routes.cart, label: 'Carrito' },
 ]
 
 function Header() {
@@ -32,6 +32,7 @@ function Header() {
                 <Link className="nav-link text-dark" to={to}>{label}</Link>
               </li>
             ))}
+            <li className="nav-item"><CartLink /></li>
           </ul>
         </nav>
       </div>
