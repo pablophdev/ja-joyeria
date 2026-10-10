@@ -448,6 +448,51 @@ Esta etapa ofrece gestión local de las cuentas del navegador; el panel de admin
 7. Eliminar una cuenta y comprobar la vuelta al listado, sus métricas y el estado no encontrado de su antigua URL.
 8. Revisar el registro original, los campos compartidos y la distribución en móvil y escritorio.
 
+## Cambio 13 de 17
+
+Panel de administración y gestión de productos conectado a las fuentes de datos existentes.
+
+### Rutas
+
+- `/admin`: resumen con cantidades reales de productos, destacados, usuarios y cuentas activas.
+- `/admin/productos`: listado con búsqueda por nombre y acciones para ver, editar y eliminar.
+- `/admin/productos/nuevo`: formulario para crear un producto.
+- `/admin/productos/:productId/editar`: edición de un producto existente.
+
+Las rutas anidadas usan `AdminLayout`, con navegación mediante `Link` y contenido mediante `Outlet`.
+La cabecera incorpora el enlace Administración; el panel enlaza también a usuarios, tienda y pedidos de la sesión.
+Se mantiene el modelo de gestión local del navegador de la etapa anterior.
+
+### Componentes y datos
+
+`ProductForm` se comparte entre creación y edición. Permite modificar nombre, precio en CLP, categoría,
+etiquetas, disponibilidad, grupo, promoción, valoración, reseñas, descripción, imagen y visibilidad en destacados.
+Los campos numéricos se convierten antes de llamar al CRUD y sus validaciones se mantienen en la fuente de datos.
+El formulario informa errores de validación y de almacenamiento sin perder los valores ingresados.
+Los productos nuevos reciben su ID desde `createProduct`; editar conserva el ID.
+
+`getProductImageOptions()` ofrece las catorce imágenes originales importadas desde `src/assets/products/`.
+También se puede indicar una URL o ruta de imagen pública. `ProductImagePreview` muestra la imagen o un error de carga.
+No se almacenan archivos nuevos: las imágenes del proyecto mantienen sus referencias estables al persistir.
+La disponibilidad admite las opciones En stock y Agotado, además de texto personalizado.
+
+`AdminProductsPage` y `AdminPage` se suscriben a sus fuentes de datos y liberan las suscripciones al desmontarse.
+El editor usa el adaptador de `useParams` existente como patrón y maneja el formulario mediante una clase.
+Crear, editar o eliminar se refleja en catálogo, portada, ficha y carrito mediante suscripciones;
+los pedidos ya confirmados conservan su copia histórica.
+Los IDs inválidos o eliminados muestran el estado Producto no encontrado.
+
+### Revisión manual del cambio 13
+
+1. Abrir Administración desde la cabecera y revisar las métricas y enlaces del panel.
+2. Crear un producto con imagen, precio y descripción; activar Destacado y comprobar su ficha y aparición en inicio.
+3. Editarlo, cambiar precio/disponibilidad y desactivar Destacado; revisar catálogo, ficha, portada y carrito.
+4. Recargar para comprobar que los cambios se conservan.
+5. Buscar por nombre en la gestión de productos y usar los enlaces Ver y Editar.
+6. Introducir un precio negativo o una valoración fuera de 0–5 y comprobar el rechazo del dato.
+7. Eliminar un producto, comprobar el listado y visitar su URL anterior: debe mostrarse el estado no encontrado.
+8. Revisar el formulario en móvil y escritorio, incluyendo selección y vista previa de imágenes.
+
 ## Secuencia propuesta
 
 1. Base React, navegación y layout.

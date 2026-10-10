@@ -11,6 +11,11 @@ import OrdersPage from '../pages/OrdersPage'
 import AuthPage from '../pages/AuthPage'
 import UsersPage from '../pages/UsersPage'
 import UserEditRoute from './UserEditRoute'
+import AdminLayout from '../components/admin/AdminLayout'
+import AdminPage from '../pages/AdminPage'
+import AdminProductsPage from '../pages/AdminProductsPage'
+import AdminProductEditorPage from '../pages/AdminProductEditorPage'
+import AdminProductEditRoute from './AdminProductEditRoute'
 
 function AppRouter() {
   return (
@@ -26,6 +31,12 @@ function AppRouter() {
           <Route path={routes.users} element={<UsersPage />} />
           <Route path={routes.userEdit} element={<UserEditRoute />} />
           <Route path={routes.productDetails} element={<ProductDetailsRoute />} />
+          <Route path={routes.admin} element={<AdminLayout />}>
+            <Route index element={<AdminPage />} />
+            <Route path={routes.adminProducts} element={<AdminProductsPage />} />
+            <Route path={routes.adminProductNew} element={<AdminProductEditorPage key="new" />} />
+            <Route path={routes.adminProductEdit} element={<AdminProductEditRoute />} />
+          </Route>
           {pendingPages.map(({ path, title }) => (
             <Route key={path} path={path} element={<PendingPage title={title} />} />
           ))}

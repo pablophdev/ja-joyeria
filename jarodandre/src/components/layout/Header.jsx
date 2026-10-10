@@ -20,6 +20,7 @@ function Header() {
           <AuthLinks />
           <Link className="text-white" to={routes.orders}>Pedidos</Link>
           <Link className="text-white" to={routes.users}>Usuarios</Link>
+          <Link className="text-white" to={routes.admin}>Administración</Link>
         </div>
       </div>
       <div className="container py-3 d-flex flex-column flex-lg-row align-items-center gap-3">

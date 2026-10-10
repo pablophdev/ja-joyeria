@@ -45,6 +45,10 @@ let currentStorageVersion = storageVersion
 // Guardar referencias estables evita persistir las URLs con hash generadas por Vite.
 const productImages = Object.fromEntries(products.map((product) => [`asset:product-${product.id}`, product.image]))
 
+export function getProductImageOptions() {
+  return Object.entries(productImages).map(([reference, image]) => ({ image, label: `Imagen ${reference.replace('asset:product-', '')}` }))
+}
+
 function serializeImage(image) {
   return Object.entries(productImages).find(([, url]) => url === image)?.[0] ?? image
 }
