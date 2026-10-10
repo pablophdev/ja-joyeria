@@ -10,7 +10,6 @@ export const routes = {
 }
 
 export const pendingPages = [
-  { path: routes.shop, title: 'Productos' },
   { path: routes.about, title: 'Sobre nosotros' },
   { path: routes.cart, title: 'Carrito' },
   { path: routes.blog, title: 'Blog' },

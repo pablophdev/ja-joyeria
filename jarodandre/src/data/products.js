@@ -6,6 +6,12 @@ import product5 from '../assets/products/product-5.jpg'
 import product6 from '../assets/products/product-6.jpg'
 import product7 from '../assets/products/product-7.jpg'
 import product8 from '../assets/products/product-8.jpg'
+import product9 from '../assets/products/product-9.jpg'
+import product10 from '../assets/products/product-10.jpg'
+import product11 from '../assets/products/product-11.jpg'
+import product12 from '../assets/products/product-12.jpg'
+import product13 from '../assets/products/product-13.jpg'
+import product14 from '../assets/products/product-14.jpg'
 import { readStoredData, writeStoredData } from './persistence'
 
 // Base simulada, restaurada desde localStorage en la primera consulta.
@@ -19,13 +25,21 @@ let products = [
   { id: 6, name: 'Anillo Halo Zafiro Azul en Plata', price: 95990, image: product6, group: 'popular', badge: 'Oferta', rating: 4, featured: true },
   { id: 7, name: 'Anillo Solitario Doble Halo Circonias', price: 200990, image: product7, group: 'new', badge: '', rating: 0, featured: true },
   { id: 8, name: 'Anillo Compromiso Oro Blanco y Rosa', price: 189990, image: product8, group: 'popular', badge: '', rating: 0, featured: true },
+  { id: 9, name: 'Grillz Set Completo Chrome Black & Silver (8 Piezas)', price: 180990, image: product9, group: 'new', badge: '', rating: 0, featured: false },
+  { id: 10, name: 'Grillz Duo Colmillos Plateados', price: 90990, image: product10, group: 'new', badge: 'Oferta', rating: 4, featured: false },
+  { id: 11, name: 'Grillz Custom Dos Dientes Estilo tribal / Wave', price: 60990, image: product11, group: 'new', badge: '', rating: 0, featured: false },
+  { id: 12, name: 'Anillo Solitario Oro Rosa con Circonia Corte Brillante', price: 150990, image: product12, group: 'new', badge: 'Oferta', rating: 4, featured: false },
+  { id: 13, name: 'Sello San Benito Oro Laminado 18K', price: 210990, image: product13, group: 'new', badge: '', rating: 0, featured: false },
+  { id: 14, name: 'Anillo Signet Oro con Piedra Onix Negra y Circones', price: 230990, image: product14, group: 'new', badge: '', rating: 0, featured: false },
 ]
 
+const catalogAdditions = products.slice(8)
 let nextId = Math.max(...products.map((product) => product.id)) + 1
 let initialized = false
 const listeners = new Set()
 const storageKey = 'jarodandre.products'
-const storageVersion = 1
+const storageVersion = 2
+let currentStorageVersion = storageVersion
 
 // Guardar referencias estables evita persistir las URLs con hash generadas por Vite.
 const productImages = Object.fromEntries(products.map((product) => [`asset:product-${product.id}`, product.image]))
@@ -49,7 +63,7 @@ function initializeProducts() {
   if (stored === null) return
 
   try {
-    if (stored.version !== storageVersion || !Array.isArray(stored.products)) {
+    if (![1, storageVersion].includes(stored.version) || !Array.isArray(stored.products)) {
       throw new Error('El formato de los productos guardados no es compatible.')
     }
 
@@ -70,21 +84,34 @@ function initializeProducts() {
 
     products = restoredProducts
     nextId = stored.nextId
+    currentStorageVersion = stored.version
+
+    if (stored.version === 1) {
+      // Respetar una colección vaciada y asignar IDs nuevos sin pisar productos creados por el usuario.
+      const additions = products.length ? catalogAdditions.map((product, index) => ({ ...product, id: nextId + index })) : []
+      try {
+        validateId(nextId + additions.length)
+        saveProducts([...products, ...additions], nextId + additions.length, storageVersion)
+      } catch (error) {
+        console.warn('No se pudo ampliar el catálogo guardado. Se conserva la colección anterior.', error)
+      }
+    }
   } catch (error) {
     // No sobrescribir el contenido inválido durante la lectura.
     console.warn('Los productos guardados no son válidos. Se usarán los datos iniciales.', error)
   }
 }
 
-function saveProducts(updatedProducts, updatedNextId = nextId) {
+function saveProducts(updatedProducts, updatedNextId = nextId, version = currentStorageVersion) {
   // Persistir primero: si el navegador rechaza la escritura, no cambia la colección.
   writeStoredData(storageKey, {
-    version: storageVersion,
+    version,
     nextId: updatedNextId,
     products: updatedProducts.map((product) => ({ ...product, image: serializeImage(product.image) })),
   })
   products = updatedProducts
   nextId = updatedNextId
+  currentStorageVersion = version
 
   for (const listener of listeners) {
     try {

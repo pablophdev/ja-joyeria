@@ -130,7 +130,7 @@ Se conservan las eliminaciones, una colección vacía y el contador de IDs despu
 Las imágenes incluidas en el proyecto se guardan como referencias estables y se resuelven a sus URLs actuales al cargar.
 Las imágenes personalizadas conservan la URL proporcionada.
 
-Si no hay datos guardados se utilizan los ocho productos iniciales; el primer cambio del CRUD guarda la colección.
+Si no hay datos guardados se utilizan los productos iniciales (ocho en el cambio 5, catorce desde el cambio 6); el primer cambio del CRUD guarda la colección.
 Si el JSON o sus datos no son válidos, se usan los productos iniciales y se informa en la consola,
 sin sobrescribir el almacenamiento durante la lectura. Una operación CRUD posterior guardará la colección válida.
 Si una escritura falla por falta de espacio o permisos, el CRUD lanza un error y conserva el estado anterior.
@@ -162,6 +162,38 @@ productsDb.deleteProduct(sample.id)
 Para comprobar la limpieza de suscripciones, navegar a Productos y volver al inicio;
 repetir una actualización y verificar la portada. Los filtros conservan su selección al cambiar los datos.
 No se agregaron hooks ni pruebas unitarias.
+
+## Cambio 6 de 17
+
+La ruta `/productos` muestra `ShopPage`, reemplazando su vista provisional.
+El catálogo consulta todos los productos y se suscribe al CRUD con el mismo ciclo de montaje y limpieza que la portada.
+Incluye navegación Inicio / Productos con `Link`, contador de productos, cuadrícula Bootstrap y estado vacío.
+
+`ProductGrid` y `ProductCard` se reutilizan en inicio y catálogo. Los estilos de las imágenes
+pertenecen ahora a `ProductCard.css`, para que la tarjeta funcione sin depender de los estilos del inicio.
+En el catálogo se oculta el enlace «Ver catálogo» para evitar enlaces a la propia página.
+La búsqueda y los filtros se incorporarán en el cambio 7; los detalles y el carrito en sus etapas previstas.
+
+Se incorporaron seis productos de `shop.html` con sus nombres, precios, etiquetas e imágenes originales.
+La colección inicial reúne catorce productos únicos de inicio y tienda; ocho siguen siendo destacados.
+Las seis imágenes adicionales se importan desde `src/assets/products/`.
+
+### Actualización de los datos guardados
+
+El almacenamiento pasa a la versión 2. Una colección guardada con versión 1 se amplía una sola vez
+con los seis productos nuevos, asignando IDs desde su contador para conservar los productos creados por el usuario.
+Se respetan las ediciones y eliminaciones anteriores. Una colección vaciada por completo permanece vacía.
+La versión 2 se guarda al completar la ampliación, evitando duplicados al recargar.
+Si el almacenamiento rechaza la actualización, se conserva la colección y versión anteriores y se reintenta al recargar.
+
+### Revisión manual del cambio 6
+
+1. Abrir `/productos` directamente y desde los enlaces del menú, hero y tarjetas de inicio.
+2. Sin datos previos, comprobar catorce tarjetas y ocho destacados en la portada.
+3. Revisar imágenes, precios en CLP y distribución en móvil, tableta y escritorio.
+4. Actualizar un precio mediante el CRUD desde la consola: el catálogo debe reflejarlo sin recargar.
+5. Navegar entre inicio y catálogo, y recargar para comprobar la persistencia.
+6. Con datos guardados de la etapa anterior, comprobar que se agregan seis productos una sola vez y se mantienen los cambios existentes.
 
 ## Secuencia propuesta
 

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { routes } from '../../navigation/routes'
+import './ProductCard.css'
 
 const currencyFormatter = new Intl.NumberFormat('es-CL', {
   style: 'currency',
@@ -7,12 +8,12 @@ const currencyFormatter = new Intl.NumberFormat('es-CL', {
   maximumFractionDigits: 0,
 })
 
-function ProductCard({ product }) {
+function ProductCard({ product, showCatalogLink = true }) {
   return (
-    <article className="card h-100 border-0 home-product">
+    <article className="card h-100 border-0">
       <div className="position-relative">
         <img
-          className="card-img-top home-product__image"
+          className="card-img-top product-card__image"
           src={product.image}
           alt={product.name}
           loading="lazy"
@@ -35,7 +36,9 @@ function ProductCard({ product }) {
           </span>
         </p>
         <p className="fw-bold fs-5">{currencyFormatter.format(product.price)}</p>
-        <Link className="btn btn-outline-dark mt-auto" to={routes.shop}>Ver catálogo</Link>
+        {showCatalogLink && (
+          <Link className="btn btn-outline-dark mt-auto" to={routes.shop}>Ver catálogo</Link>
+        )}
       </div>
     </article>
   )

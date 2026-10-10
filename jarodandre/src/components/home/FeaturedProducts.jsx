@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import ProductCard from '../products/ProductCard'
+import ProductGrid from '../products/ProductGrid'
 
 class FeaturedProducts extends Component {
   state = { activeFilter: 'all' }
@@ -29,15 +29,8 @@ class FeaturedProducts extends Component {
         <p className="text-center text-secondary" role="status">
           {visibleProducts.length} productos · {filters.find((filter) => filter.id === activeFilter)?.label}
         </p>
-        <div className="row g-4" id="featured-products">
-          {visibleProducts.length === 0 && (
-            <p className="text-center text-secondary py-4">No hay productos destacados para este filtro.</p>
-          )}
-          {visibleProducts.map((product) => (
-            <div className="col-sm-6 col-lg-3" key={product.id}>
-              <ProductCard product={product} />
-            </div>
-          ))}
+        <div id="featured-products">
+          <ProductGrid products={visibleProducts} emptyMessage="No hay productos destacados para este filtro." />
         </div>
       </section>
     )
