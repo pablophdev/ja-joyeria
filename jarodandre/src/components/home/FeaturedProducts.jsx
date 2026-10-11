@@ -11,8 +11,8 @@ class FeaturedProducts extends Component {
 
     return (
       <section className="home-section container pt-0" aria-labelledby="featured-title">
-        <h2 id="featured-title" className="text-center mb-4">Productos destacados</h2>
-        <div className="d-flex flex-wrap justify-content-center gap-2 mb-4" role="group" aria-label="Filtrar productos destacados">
+        <h2 id="featured-title" className="text-center mb-4" data-reveal>Productos destacados</h2>
+        <div className="d-flex flex-wrap justify-content-center gap-2 mb-4" role="group" aria-label="Filtrar productos destacados" data-reveal style={{ '--reveal-delay': '100ms' }}>
           {filters.map((filter) => (
             <button
               className={`btn ${activeFilter === filter.id ? 'btn-dark' : 'btn-outline-dark'}`}

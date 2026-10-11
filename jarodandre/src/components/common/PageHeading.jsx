@@ -3,7 +3,7 @@ import { routes } from '../../navigation/routes'
 
 function PageHeading({ title }) {
   return (
-    <div className="bg-light py-4">
+    <div className="bg-light py-4" data-reveal>
       <div className="container">
         <h1>{title}</h1>
         <nav aria-label="Ruta de navegación">

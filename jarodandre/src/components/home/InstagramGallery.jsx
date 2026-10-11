@@ -6,7 +6,7 @@ function InstagramGallery({ images }) {
           <div className="col-lg-8">
             <div className="row g-2">
               {images.map((image, index) => (
-                <div className="col-6 col-sm-4" key={image}>
+                <div className="col-6 col-sm-4" key={image} data-reveal="scale" style={{ '--reveal-delay': `${index * 70}ms` }}>
                   <img
                     className="instagram-gallery__image rounded"
                     src={image}
@@ -20,7 +20,7 @@ function InstagramGallery({ images }) {
               ))}
             </div>
           </div>
-          <div className="col-lg-4">
+          <div className="col-lg-4" data-reveal="right">
             <h2 id="instagram-title">Jarodandre_</h2>
             <p className="mt-3">
               Observa cuidadosamente el proceso detrás de cada pieza. En nuestro Instagram mostramos

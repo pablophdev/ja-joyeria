@@ -48,12 +48,12 @@ class ShopPage extends Component {
           </div>
         </div>
         <section className="container py-5" aria-labelledby="catalog-title">
-          <h2 id="catalog-title" className="h3 mb-4">Catálogo de joyería</h2>
+          <h2 id="catalog-title" className="h3 mb-4" data-reveal>Catálogo de joyería</h2>
           <div className="row g-4">
             <div className="col-lg-3">
               <CatalogFilters filters={filters} onFilterChange={this.handleFilterChange} onReset={this.resetFilters} />
             </div>
-            <div className="col-lg-9">
+            <div className="col-lg-9" data-reveal="right">
               <p className="text-secondary mb-4" role="status" aria-atomic="true">
                 Mostrando {visibleProducts.length} de {products.length} {products.length === 1 ? 'producto' : 'productos'}
               </p>

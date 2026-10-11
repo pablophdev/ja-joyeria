@@ -4,10 +4,10 @@ import { routes } from '../../navigation/routes'
 function CollectionBanners({ collections }) {
   return (
     <section className="home-section container" aria-labelledby="collections-title">
-      <h2 id="collections-title" className="text-center mb-5">Nuestras colecciones</h2>
+      <h2 id="collections-title" className="text-center mb-5" data-reveal>Nuestras colecciones</h2>
       <div className="row g-4">
-        {collections.map((collection) => (
-          <div className="col-md-6 col-lg-4" key={collection.id}>
+        {collections.map((collection, index) => (
+          <div className="col-md-6 col-lg-4" key={collection.id} data-reveal style={{ '--reveal-delay': `${index * 120}ms` }}>
             <article className="h-100">
               <video
                 className="collection-video border rounded"

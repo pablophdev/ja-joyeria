@@ -7,8 +7,13 @@ function ProductGrid({ products, emptyMessage = 'No hay productos disponibles.',
 
   return (
     <div className="row g-4">
-      {products.map((product) => (
-        <div className={columnClass} key={product.id}>
+      {products.map((product, index) => (
+        <div
+          className={columnClass}
+          key={product.id}
+          data-reveal="scale"
+          style={{ '--reveal-delay': `${(index % 4) * 90}ms` }}
+        >
           <ProductCard product={product} />
         </div>
       ))}
