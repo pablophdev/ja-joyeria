@@ -27,7 +27,7 @@ class HomePage extends Component {
   render() {
     return (
       <>
-        <h1 className="visually-hidden">JA Joyería — Alta joyería urbana</h1>
+        <h1 className="visually-hidden">jarodandre — Alta joyería urbana</h1>
         <HeroCarousel slides={heroSlides} />
         <CollectionBanners collections={collectionBanners} />
         <FeaturedProducts products={this.state.featuredProducts} filters={productFilters} />

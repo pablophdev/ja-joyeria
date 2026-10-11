@@ -41,7 +41,7 @@ function Preloader() {
       className={`preloader${phase === 'leaving' ? ' preloader--leaving' : ''}`}
       role="status"
       aria-live="polite"
-      aria-label="Cargando JA Joyería"
+      aria-label="Cargando jarodandre"
     >
       <div className="preloader__inner">
         <img className="preloader__logo" src={wordmark} alt="" width="240" height="80" />

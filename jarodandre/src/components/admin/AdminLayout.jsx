@@ -16,7 +16,7 @@ function AdminLayout() {
       <div className="row g-4">
         <aside className="col-lg-3">
           <nav className="bg-light rounded p-3" aria-label="Administración">
-            <p className="fw-bold">JA Joyería · Administración</p>
+            <p className="fw-bold">jarodandre · Administración</p>
             <ul className="nav flex-column">
               {links.map(({ to, label }) => <li className="nav-item" key={to}><Link className="nav-link text-dark px-0" to={to}>{label}</Link></li>)}
             </ul>

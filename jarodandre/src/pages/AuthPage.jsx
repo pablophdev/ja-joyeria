@@ -58,7 +58,7 @@ class AuthPage extends Component {
       <section className="container py-5">
         <div className="row justify-content-center"><div className="col-md-8 col-lg-6">
           <h1>{isRegister ? 'Crea tu cuenta' : 'Iniciar sesión'}</h1>
-          <p>{isRegister ? 'Regístrate en JA Joyería.' : 'Bienvenido a JA Joyería. Ingresa tus datos para acceder.'}</p>
+          <p>{isRegister ? 'Regístrate en jarodandre.' : 'Bienvenido a jarodandre. Ingresa tus datos para acceder.'}</p>
           <p className="small text-secondary">Cuenta y sesión de demostración guardadas en este navegador.</p>
           {error && <p className="alert alert-danger" role="alert">{error}</p>}
           {user ? (

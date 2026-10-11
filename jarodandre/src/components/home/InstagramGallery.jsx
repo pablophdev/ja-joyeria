@@ -10,7 +10,7 @@ function InstagramGallery({ images }) {
                   <img
                     className="instagram-gallery__image rounded"
                     src={image}
-                    alt={`Galería de JA Joyería, fotografía ${index + 1}`}
+                    alt={`Galería de jarodandre, fotografía ${index + 1}`}
                     width="320"
                     height="320"
                     loading="lazy"

@@ -44,7 +44,7 @@ class Header extends Component {
     return (
       <header className="site-header border-bottom">
         <div className="container py-3 d-flex align-items-center gap-3">
-          <Link className="d-flex align-items-center text-decoration-none" to={routes.home} aria-label="JA Joyería, ir al inicio">
+          <Link className="d-flex align-items-center text-decoration-none" to={routes.home} aria-label="jarodandre, ir al inicio">
             <img className="brand-wordmark" src={wordmark} alt="jarodandre" width="168" height="56" />
           </Link>
           <nav className="ms-auto d-none d-lg-block" aria-label="Navegación principal">

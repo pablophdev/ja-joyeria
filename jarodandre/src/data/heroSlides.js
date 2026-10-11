@@ -7,7 +7,7 @@ export const heroSlides = [
     id: 'anillos',
     category: 'Anillos',
     title: 'Anillos - Colecciones 2026',
-    description: 'Especialistas en alta joyería urbana. En JA hacemos anillos y grillz únicos. Los fabricamos con cuidado y con una dedicación total a la calidad y a los detalles perfectos.',
+    description: 'Especialistas en alta joyería urbana. En jarodandre hacemos anillos y grillz únicos. Los fabricamos con cuidado y con una dedicación total a la calidad y a los detalles perfectos.',
     image: ringsImage,
     imageAlt: 'Anillo plateado con una figura religiosa y piedras rojas',
     to: routes.shop,
