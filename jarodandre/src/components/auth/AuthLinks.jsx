@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import { Link } from 'react-router-dom'
+import loginIcon from '../../assets/login.svg'
 import { getCurrentUser, logout, subscribeToAuth } from '../../data/auth'
 import { routes } from '../../navigation/routes'
 
@@ -24,13 +25,15 @@ class AuthLinks extends Component {
       <>
         {this.state.user ? (
           <>
-            <span className="text-white">Hola, {this.state.user.name}</span>
-            <button className="btn btn-link text-white p-0 align-baseline" type="button" onClick={this.handleLogout}>Cerrar sesión</button>
+            <span className="nav-link text-dark px-0">Hola, {this.state.user.name}</span>
+            <button className="btn btn-link nav-link text-dark p-0" type="button" onClick={this.handleLogout}>Cerrar sesión</button>
           </>
         ) : (
-          <><Link className="text-white" to={routes.register}>Registrarse</Link><Link className="text-white" to={routes.login}>Iniciar sesión</Link></>
+          <Link className="nav-link text-dark d-inline-flex align-items-center" to={routes.login} aria-label="Iniciar sesión">
+            <img src={loginIcon} alt="" width="20" height="20" />
+          </Link>
         )}
-        {this.state.error && <span className="text-white w-100 text-end" role="alert">{this.state.error}</span>}
+        {this.state.error && <span className="nav-link text-danger px-0" role="alert">{this.state.error}</span>}
       </>
     )
   }
