@@ -1,17 +1,14 @@
 import { Link } from 'react-router-dom'
 import { routes } from '../../navigation/routes'
-import { getProductImageOptions } from '../../data/products'
 import ProductImagePreview from './ProductImagePreview'
 
-const imageOptions = getProductImageOptions()
 const textFields = [
   { name: 'name', label: 'Nombre', required: true },
   { name: 'category', label: 'Categoría' },
   { name: 'tags', label: 'Etiquetas (separadas por comas)' },
 ]
 
-function ProductForm({ values, onChange, onSubmit, isEditing }) {
-  const selectedImage = imageOptions.some((option) => option.image === values.image) ? values.image : ''
+function ProductForm({ values, onChange, onImageChange, imageLoading, imageError, imageName, onSubmit, isEditing }) {
   return (
     <form onSubmit={onSubmit}>
       <div className="row g-3">
@@ -24,15 +21,16 @@ function ProductForm({ values, onChange, onSubmit, isEditing }) {
         <div className="col-md-6"><label className="form-label" htmlFor="product-reviewCount">Cantidad de reseñas</label><input className="form-control" id="product-reviewCount" name="reviewCount" type="number" min="0" max={Number.MAX_SAFE_INTEGER} step="1" required value={values.reviewCount} onChange={onChange} /></div>
         <div className="col-12"><label className="form-label" htmlFor="product-description">Descripción</label><textarea className="form-control" id="product-description" name="description" rows="4" value={values.description} onChange={onChange} /></div>
         <div className="col-md-6">
-          <label className="form-label" htmlFor="product-image-select">Imagen del proyecto</label>
-          <select className="form-select mb-3" id="product-image-select" name="image" value={selectedImage} onChange={onChange}><option value="" disabled>Selecciona una imagen</option>{imageOptions.map(({ image, label }) => <option value={image} key={image}>{label}</option>)}</select>
-          <label className="form-label" htmlFor="product-image">Ruta o URL de imagen</label><input className="form-control" id="product-image" name="image" required value={values.image} onChange={onChange} aria-describedby="product-image-help" />
-          <p className="form-text" id="product-image-help">Elige una imagen existente o escribe una URL o ruta pública. No se suben archivos.</p>
+          <label className="form-label" htmlFor="product-image">Imagen del producto</label>
+          <input className="form-control" id="product-image" name="imageFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required={!values.image} onChange={onImageChange} aria-invalid={Boolean(imageError)} aria-describedby="product-image-help product-image-status" />
+          <p className="form-text" id="product-image-help">Selecciona una imagen JPG, PNG o WebP desde tu computador (máximo 10 MB). Se optimizará a un máximo de 1200 píxeles y se guardará localmente con el producto.</p>
+          {isEditing && <p className="small text-secondary">Si no eliges otra imagen, se conservará la actual.</p>}
+          <p id="product-image-status" className={imageError ? 'text-danger' : 'text-secondary'} role="status">{imageLoading ? 'Preparando imagen…' : imageError || (imageName ? `Imagen seleccionada: ${imageName}` : '')}</p>
         </div>
         <div className="col-md-6"><ProductImagePreview key={values.image} src={values.image} /></div>
         <div className="col-12"><div className="form-check"><input className="form-check-input" id="product-featured" name="featured" type="checkbox" checked={values.featured} onChange={onChange} /><label className="form-check-label" htmlFor="product-featured">Mostrar como producto destacado en el inicio</label></div></div>
       </div>
-      <div className="d-flex flex-wrap gap-2 mt-4"><button className="btn btn-dark" type="submit">{isEditing ? 'Guardar cambios' : 'Crear producto'}</button><Link className="btn btn-outline-secondary" to={routes.adminProducts}>Cancelar</Link></div>
+      <div className="d-flex flex-wrap gap-2 mt-4"><button className="btn btn-dark" type="submit" disabled={imageLoading || Boolean(imageError)}>{imageLoading ? 'Preparando imagen…' : isEditing ? 'Guardar cambios' : 'Crear producto'}</button><Link className="btn btn-outline-secondary" to={routes.adminProducts}>Cancelar</Link></div>
     </form>
   )
 }

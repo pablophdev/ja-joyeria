@@ -4,21 +4,26 @@ import { createProduct, getProductById, subscribeToProducts, updateProduct } fro
 import { getProductFormData, getProductFormValues } from '../utils/productForm'
 import { getAdminProductEditPath, getProductDetailsPath, routes } from '../navigation/routes'
 import ProductForm from '../components/admin/ProductForm'
+import { readProductImage } from '../utils/productImage'
 
 function findProduct(id) {
   return /^[1-9]\d*$/.test(id) && Number.isSafeInteger(Number(id)) ? getProductById(Number(id)) : null
 }
 
 class AdminProductEditorPage extends Component {
-  state = { product: this.props.productId ? findProduct(this.props.productId) : null, values: getProductFormValues(this.props.productId ? findProduct(this.props.productId) : null), error: '', message: '', createdId: null }
+  state = { product: this.props.productId ? findProduct(this.props.productId) : null, values: getProductFormValues(this.props.productId ? findProduct(this.props.productId) : null), error: '', message: '', createdId: null, imageLoading: false, imageError: '' }
   saving = false
+  imageRequest = 0
 
   componentDidMount() {
     this.unsubscribe = subscribeToProducts(this.refreshProduct)
     this.refreshProduct()
   }
 
-  componentWillUnmount() { this.unsubscribe?.() }
+  componentWillUnmount() {
+    this.unsubscribe?.()
+    this.imageRequest += 1
+  }
 
   refreshProduct = () => {
     if (!this.props.productId) return
@@ -31,9 +36,25 @@ class AdminProductEditorPage extends Component {
     this.setState(({ values }) => ({ values: { ...values, [name]: type === 'checkbox' ? checked : value }, error: '', message: '' }))
   }
 
+  handleImageChange = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    event.target.value = ''
+    const request = ++this.imageRequest
+    this.setState({ imageLoading: true, imageError: '', error: '', message: '' })
+    try {
+      const image = await readProductImage(file)
+      if (request !== this.imageRequest) return
+      this.setState(({ values }) => ({ values: { ...values, image }, imageLoading: false, imageName: file.name }))
+    } catch (error) {
+      if (request !== this.imageRequest) return
+      this.setState({ imageLoading: false, imageError: error.message })
+    }
+  }
+
   handleSubmit = (event) => {
     event.preventDefault()
-    if (this.saving || this.state.createdId) return
+    if (this.saving || this.state.createdId || this.state.imageLoading || this.state.imageError) return
     this.saving = true
     try {
       const data = getProductFormData(this.state.values)
@@ -57,9 +78,9 @@ class AdminProductEditorPage extends Component {
           <div className="d-flex flex-wrap gap-2">
             <Link className="btn btn-dark" to={getProductDetailsPath(createdId)}>Ver producto</Link>
             <Link className="btn btn-outline-dark" to={getAdminProductEditPath(createdId)}>Editar producto</Link>
-            <button className="btn btn-outline-dark" type="button" onClick={() => this.setState({ product: null, values: getProductFormValues(), createdId: null, message: '', error: '' })}>Crear otro producto</button>
+            <button className="btn btn-outline-dark" type="button" onClick={() => this.setState({ product: null, values: getProductFormValues(), createdId: null, message: '', error: '', imageName: '' })}>Crear otro producto</button>
           </div>
-        ) : <ProductForm values={values} onChange={this.handleChange} onSubmit={this.handleSubmit} isEditing={Boolean(this.props.productId)} />}
+        ) : <ProductForm values={values} onChange={this.handleChange} onImageChange={this.handleImageChange} imageLoading={this.state.imageLoading} imageError={this.state.imageError} imageName={this.state.imageName} onSubmit={this.handleSubmit} isEditing={Boolean(this.props.productId)} />}
         <Link className="d-inline-block mt-4" to={routes.adminProducts}>Volver a la gestión de productos</Link>
       </section>
     )
