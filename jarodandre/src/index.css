@@ -75,3 +75,122 @@ a {
   letter-spacing: 0.15em;
   text-transform: uppercase;
 }
+
+.btn {
+  --bs-btn-border-radius: 0;
+  padding: 0.7rem 1.6rem;
+  border-radius: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease, opacity 250ms ease;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+}
+
+.btn-dark {
+  --bs-btn-bg: #ffffff;
+  --bs-btn-border-color: #ffffff;
+  --bs-btn-color: #000000;
+  --bs-btn-hover-bg: transparent;
+  --bs-btn-hover-border-color: #ffffff;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-active-bg: transparent;
+  --bs-btn-active-border-color: #ffffff;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-disabled-bg: #ffffff;
+  --bs-btn-disabled-border-color: #ffffff;
+  --bs-btn-disabled-color: #000000;
+  border: 1px solid #ffffff;
+}
+
+.btn-dark:hover {
+  background-color: transparent;
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.btn-dark:disabled {
+  opacity: 0.4;
+}
+
+.btn-outline-dark,
+.btn-outline-light {
+  --bs-btn-border-color: rgb(255 255 255 / 40%);
+  --bs-btn-color: #ffffff;
+  --bs-btn-hover-bg: #ffffff;
+  --bs-btn-hover-border-color: #ffffff;
+  --bs-btn-hover-color: #000000;
+  --bs-btn-active-bg: #ffffff;
+  --bs-btn-active-border-color: #ffffff;
+  --bs-btn-active-color: #000000;
+  border: 1px solid rgb(255 255 255 / 40%);
+  color: #ffffff;
+  background-color: transparent;
+}
+
+.btn-outline-dark:hover,
+.btn-outline-light:hover {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+.btn-outline-secondary {
+  --bs-btn-border-color: rgb(255 255 255 / 25%);
+  --bs-btn-color: rgb(255 255 255 / 70%);
+  --bs-btn-hover-bg: transparent;
+  --bs-btn-hover-border-color: rgb(255 255 255 / 55%);
+  --bs-btn-hover-color: #ffffff;
+  border: 1px solid rgb(255 255 255 / 25%);
+  color: rgb(255 255 255 / 70%);
+  background-color: transparent;
+}
+
+.btn-outline-secondary:hover {
+  border-color: rgb(255 255 255 / 55%);
+  color: #ffffff;
+  background-color: transparent;
+}
+
+.btn-outline-danger {
+  --bs-btn-border-color: rgb(255 255 255 / 40%);
+  --bs-btn-color: #ffffff;
+  --bs-btn-hover-bg: #ffffff;
+  --bs-btn-hover-border-color: #ffffff;
+  --bs-btn-hover-color: #000000;
+  --bs-btn-active-bg: #ffffff;
+  --bs-btn-active-border-color: #ffffff;
+  --bs-btn-active-color: #000000;
+  border: 1px solid rgb(255 255 255 / 40%);
+  color: #ffffff;
+  background-color: transparent;
+}
+
+.btn-outline-danger:hover {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+.btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+.btn-link {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

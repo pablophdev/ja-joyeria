@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { routes } from '../../navigation/routes'
-import logo from '../../assets/logo.jpg'
+import wordmark from '../../assets/jarodandre-blanco-transparente.webp'
 import { socialLinks } from '../../data/homeContent'
 import NewsletterForm from './NewsletterForm'
 
@@ -10,8 +10,8 @@ function Footer() {
       <div className="container">
         <div className="row g-4 py-3">
           <div className="col-sm-6 col-lg-3">
-            <Link className="text-white" to={routes.home} aria-label="JA Joyería, ir al inicio">
-              <img className="brand-logo" src={logo} width="100" height="100" alt="JA Joyería" loading="lazy" />
+            <Link className="text-white d-inline-block" to={routes.home} aria-label="JA Joyería, ir al inicio">
+              <img className="brand-wordmark" src={wordmark} alt="jarodandre" width="168" height="56" loading="lazy" />
             </Link>
           </div>
           <div className="col-sm-6 col-lg-2">
