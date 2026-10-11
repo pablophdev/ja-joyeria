@@ -20,6 +20,8 @@ import AboutPage from '../pages/AboutPage'
 import ContactPage from '../pages/ContactPage'
 import BlogPage from '../pages/BlogPage'
 import BlogDetailsPage from '../pages/BlogDetailsPage'
+import CheckoutPage from '../pages/CheckoutPage'
+import PaymentResultPage from '../pages/PaymentResultPage'
 
 function AppRouter() {
   return (
@@ -33,6 +35,8 @@ function AppRouter() {
           <Route path={routes.blog} element={<BlogPage />} />
           <Route path={routes.blogDetails} element={<BlogDetailsPage />} />
           <Route path={routes.cart} element={<CartPage />} />
+          <Route path={routes.checkout} element={<CheckoutPage />} />
+          <Route path={routes.paymentResult} element={<PaymentResultPage />} />
           <Route path={routes.orders} element={<OrdersPage />} />
           <Route path={routes.login} element={<AuthPage key="login" mode="login" />} />
           <Route path={routes.register} element={<AuthPage key="register" mode="register" />} />

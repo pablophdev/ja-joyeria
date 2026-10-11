@@ -8,26 +8,25 @@ const customerFields = [
 ]
 
 class CheckoutForm extends Component {
-  state = { name: '', email: '', address: '', city: '' }
+  state = { name: '', email: '', address: '', city: '', ...this.props.initialCustomer }
 
   handleSubmit = (event) => {
     event.preventDefault()
-    this.props.onConfirm({ ...this.state })
+    this.props.onContinue({ ...this.state })
   }
 
   render() {
     return (
       <form className="mt-4" onSubmit={this.handleSubmit}>
         <fieldset disabled={this.props.disabled}>
-          <legend className="h5">Datos del pedido</legend>
+          <legend className="h5">Datos de contacto y entrega</legend>
           {customerFields.map(({ name, label, ...inputProps }) => (
             <div className="mb-3" key={name}>
               <label className="form-label" htmlFor={`checkout-${name}`}>{label}</label>
               <input {...inputProps} className="form-control" id={`checkout-${name}`} name={name} required value={this.state[name]} onChange={(event) => this.setState({ [name]: event.target.value })} />
             </div>
           ))}
-          <p className="small" id="checkout-note">Confirmación simulada: se guardará un pedido en este navegador. No se realizan cobros ni envíos.</p>
-          <button className="btn btn-dark w-100" type="submit" aria-describedby="checkout-note">Confirmar pedido</button>
+          <button className="btn btn-dark w-100" type="submit">Continuar al pago</button>
         </fieldset>
       </form>
     )

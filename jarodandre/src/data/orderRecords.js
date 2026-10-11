@@ -1,3 +1,9 @@
+export const paymentStatuses = {
+  pending: { label: 'Pago pendiente', badge: 'text-bg-warning' },
+  paid: { label: 'Pago realizado', badge: 'text-bg-success' },
+  failed: { label: 'Pago no realizado', badge: 'text-bg-danger' },
+}
+
 export function normalizeCustomer(customer) {
   if (!customer || typeof customer !== 'object') throw new Error('Completa los datos de contacto y entrega.')
   const fields = { name: 120, email: 254, address: 250, city: 100 }
@@ -20,6 +26,8 @@ export function normalizeOrder(order, maxQuantity) {
     throw new Error('El pedido guardado no es válido.')
   }
   const userId = order.userId ?? null
+  const paymentStatus = order.paymentStatus ?? 'pending'
+  if (!Object.hasOwn(paymentStatuses, paymentStatus)) throw new Error('El estado del pago no es válido.')
   if (userId !== null && (!Number.isSafeInteger(userId) || userId < 1)) throw new Error('El usuario del pedido no es válido.')
   const ids = new Set()
   const items = order.items.map((item) => {
@@ -36,7 +44,7 @@ export function normalizeOrder(order, maxQuantity) {
   })
   const total = items.reduce((sum, item) => sum + item.subtotal, 0)
   if (!Number.isSafeInteger(total) || order.total !== total) throw new Error('El total del pedido no es válido.')
-  return { id: order.id, userId, createdAt: order.createdAt, status: order.status, customer: normalizeCustomer(order.customer), items, total }
+  return { id: order.id, userId, createdAt: order.createdAt, status: order.status, paymentStatus, customer: normalizeCustomer(order.customer), items, total }
 }
 
 export function formatOrderId(id) {

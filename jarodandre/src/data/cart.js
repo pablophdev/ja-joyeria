@@ -152,7 +152,8 @@ export function subscribeToOrders(listener) {
   return subscribeToCart(listener)
 }
 
-export function confirmOrder(customer) {
+export function confirmOrder(customer, paymentStatus) {
+  if (!['paid', 'failed'].includes(paymentStatus)) throw new Error('No se pudo determinar el resultado del pago.')
   const normalizedCustomer = normalizeCustomer(customer)
   const cart = getCart()
   if (!cart.items.length) throw new Error('El carrito está vacío.')
@@ -164,10 +165,11 @@ export function confirmOrder(customer) {
     userId: getCurrentUser()?.id ?? null,
     createdAt: new Date().toISOString(),
     status: 'Pendiente',
+    paymentStatus,
     customer: normalizedCustomer,
     items: cart.items.map(({ product, quantity, subtotal }) => ({ productId: product.id, name: product.name, price: product.price, quantity, subtotal })),
     total: cart.total,
   }, MAX_CART_QUANTITY)
-  saveCart([], [...orders, order], nextOrderId + 1)
+  saveCart(paymentStatus === 'paid' ? [] : items, [...orders, order], nextOrderId + 1)
   return normalizeOrder(order, MAX_CART_QUANTITY)
 }

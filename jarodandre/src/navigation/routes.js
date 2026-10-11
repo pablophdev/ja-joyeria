@@ -4,6 +4,8 @@ export const routes = {
   productDetails: '/productos/:productId',
   about: '/nosotros',
   cart: '/carrito',
+  checkout: '/checkout',
+  paymentResult: '/checkout/resultado/:orderId',
   orders: '/pedidos',
   blog: '/blog',
   blogDetails: '/blog/:slug',
@@ -20,6 +22,10 @@ export const routes = {
 
 export function getProductDetailsPath(id) {
   return `${routes.shop}/${encodeURIComponent(id)}`
+}
+
+export function getPaymentResultPath(id) {
+  return `${routes.checkout}/resultado/${encodeURIComponent(id)}`
 }
 
 export function getUserEditPath(id) {
