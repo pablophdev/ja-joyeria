@@ -1,0 +1,56 @@
+.order-receipt {
+  overflow-wrap: anywhere;
+}
+
+@media print {
+  body:has(.order-receipt) {
+    background: white !important;
+    color: black !important;
+  }
+
+  body:has(.order-receipt) .site-layout > header,
+  body:has(.order-receipt) .site-layout > footer,
+  body:has(.order-receipt) .site-layout > a,
+  body:has(.order-receipt) .admin-sidebar,
+  body:has(.order-receipt) .receipt-actions {
+    display: none !important;
+  }
+
+  body:has(.order-receipt) .site-layout {
+    min-height: auto;
+  }
+
+  body:has(.order-receipt) .admin-layout,
+  body:has(.order-receipt) .admin-content {
+    width: 100%;
+    max-width: none;
+    padding: 0 !important;
+  }
+
+  body:has(.order-receipt) .admin-layout > .row {
+    display: block;
+    margin: 0;
+  }
+
+  .order-receipt,
+  .order-receipt * {
+    color: black !important;
+    background: white !important;
+    border-color: #bbb !important;
+    box-shadow: none !important;
+  }
+
+  .order-receipt {
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  .order-receipt .table-responsive {
+    overflow: visible;
+  }
+
+  .order-receipt tr,
+  .order-receipt header {
+    break-inside: avoid;
+  }
+}

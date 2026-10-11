@@ -50,3 +50,7 @@ export function normalizeOrder(order, maxQuantity) {
 export function formatOrderId(id) {
   return `ORD-${String(id).padStart(4, '0')}`
 }
+
+export function formatReceiptId(id) {
+  return `BOL-${String(id).padStart(4, '0')}`
+}

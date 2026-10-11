@@ -31,7 +31,7 @@ class AdminPage extends Component {
     return (
       <section>
         <h1>Panel de administración</h1>
-        <p>Gestiona los productos y las cuentas guardadas en este navegador.</p>
+        <p>Gestiona los productos, las cuentas y las órdenes guardadas en este navegador.</p>
         <div className="row g-3 mb-4">
           {metrics.map(({ label, value }) => <div className="col-sm-6 col-xl-3" key={label}><div className="border rounded p-3 h-100"><h2 className="h6">{label}</h2><p className="fs-3 mb-0">{value}</p></div></div>)}
         </div>
@@ -43,6 +43,10 @@ class AdminPage extends Component {
           <div className="col-md-6"><section className="card h-100"><div className="card-body">
             <h2 className="h4">Usuarios</h2><p>Consulta las cuentas y modifica sus datos, roles y estados.</p>
             <Link className="btn btn-outline-dark" to={routes.users}>Gestionar usuarios</Link>
+          </div></section></div>
+          <div className="col-md-6"><section className="card h-100"><div className="card-body">
+            <h2 className="h4">Órdenes / Boletas</h2><p>Consulta los pedidos de clientes e invitados y muestra las boletas de las compras pagadas.</p>
+            <Link className="btn btn-outline-dark" to={routes.adminOrders}>Ver órdenes y boletas</Link>
           </div></section></div>
         </div>
       </section>

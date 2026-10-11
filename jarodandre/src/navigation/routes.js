@@ -15,6 +15,8 @@ export const routes = {
   users: '/usuarios',
   userEdit: '/usuarios/:userId/editar',
   admin: '/admin',
+  adminOrders: '/admin/ordenes',
+  adminReceipt: '/admin/ordenes/:orderId/boleta',
   adminProducts: '/admin/productos',
   adminProductNew: '/admin/productos/nuevo',
   adminProductEdit: '/admin/productos/:productId/editar',
@@ -34,6 +36,10 @@ export function getUserEditPath(id) {
 
 export function getAdminProductEditPath(id) {
   return `${routes.adminProducts}/${encodeURIComponent(id)}/editar`
+}
+
+export function getAdminReceiptPath(id) {
+  return `${routes.adminOrders}/${encodeURIComponent(id)}/boleta`
 }
 
 export function getBlogDetailsPath(slug) {

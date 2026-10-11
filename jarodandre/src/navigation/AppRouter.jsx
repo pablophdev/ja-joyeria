@@ -22,6 +22,8 @@ import BlogPage from '../pages/BlogPage'
 import BlogDetailsPage from '../pages/BlogDetailsPage'
 import CheckoutPage from '../pages/CheckoutPage'
 import PaymentResultPage from '../pages/PaymentResultPage'
+import AdminOrdersPage from '../pages/AdminOrdersPage'
+import AdminReceiptPage from '../pages/AdminReceiptPage'
 
 function AppRouter() {
   return (
@@ -45,6 +47,8 @@ function AppRouter() {
           <Route path={routes.productDetails} element={<ProductDetailsRoute />} />
           <Route path={routes.admin} element={<AdminRoute><AdminLayout /></AdminRoute>}>
             <Route index element={<AdminPage />} />
+            <Route path={routes.adminOrders} element={<AdminOrdersPage />} />
+            <Route path={routes.adminReceipt} element={<AdminReceiptPage />} />
             <Route path={routes.adminProducts} element={<AdminProductsPage />} />
             <Route path={routes.adminProductNew} element={<AdminProductEditorPage key="new" />} />
             <Route path={routes.adminProductEdit} element={<AdminProductEditRoute />} />
