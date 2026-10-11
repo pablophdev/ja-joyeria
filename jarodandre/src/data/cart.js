@@ -1,7 +1,7 @@
 import { getProductById, getProducts, subscribeToProducts } from './products'
 import { readStoredData, writeStoredData } from './persistence'
 import { normalizeCustomer, normalizeOrder } from './orderRecords'
-import { getCurrentUser, isAdminEmail } from './auth'
+import { getCurrentUser, isAdminEmail, subscribeToAuth } from './auth'
 
 export const MAX_CART_QUANTITY = 99
 const storageKey = 'jarodandre.cart'
@@ -27,11 +27,35 @@ export function isProductAvailable(product) {
   return Boolean(product) && !['agotado', 'sin stock', 'no disponible'].includes(availability)
 }
 
+let unsubscribeAuth
+
+function normalizeEmail(value) {
+  return value.trim().toLocaleLowerCase('es')
+}
+
+// Al iniciar sesión, los pedidos de invitado hechos con el mismo correo de la
+// cuenta pasan a ser del usuario. Así cada cliente ve solo sus propias compras.
+function tryClaimGuestOrders() {
+  const user = getCurrentUser()
+  if (!user) return
+  const email = normalizeEmail(user.email)
+  let changed = false
+  const claimed = orders.map((order) => {
+    if (order.userId !== null || normalizeEmail(order.customer.email) !== email) return order
+    changed = true
+    return { ...order, userId: user.id }
+  })
+  if (changed) saveCart(items, claimed, nextOrderId)
+}
+
 function initializeCart() {
   if (initialized) return
   initialized = true
   const stored = readStoredData(storageKey)
-  if (stored === null) return
+  if (stored === null) {
+    if (!unsubscribeAuth) unsubscribeAuth = subscribeToAuth(tryClaimGuestOrders)
+    return
+  }
 
   try {
     if (![1, 2].includes(stored.version) || !Array.isArray(stored.items)) throw new Error('Formato de carrito no válido.')
@@ -59,6 +83,8 @@ function initializeCart() {
   } catch (error) {
     console.warn('No se pudieron restaurar el carrito y sus pedidos. Se mostrarán vacíos.', error)
   }
+  if (!unsubscribeAuth) unsubscribeAuth = subscribeToAuth(tryClaimGuestOrders)
+  try { tryClaimGuestOrders() } catch (error) { console.warn('No se pudieron asociar pedidos de invitado a la sesión actual.', error) }
 }
 
 function notifyCart() {
