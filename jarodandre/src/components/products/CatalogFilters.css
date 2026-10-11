@@ -1,0 +1,14 @@
+.catalog-filters {
+  position: sticky;
+  top: 1.5rem;
+}
+
+.catalog-filters__title {
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #333333;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}

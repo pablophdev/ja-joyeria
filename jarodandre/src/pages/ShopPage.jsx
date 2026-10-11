@@ -49,17 +49,24 @@ class ShopPage extends Component {
         </div>
         <section className="container py-5" aria-labelledby="catalog-title">
           <h2 id="catalog-title" className="h3 mb-4">Catálogo de joyería</h2>
-          <CatalogFilters filters={filters} onFilterChange={this.handleFilterChange} onReset={this.resetFilters} />
-          <p className="text-secondary mb-4" role="status" aria-atomic="true">
-            Mostrando {visibleProducts.length} de {products.length} {products.length === 1 ? 'producto' : 'productos'}
-          </p>
-          <div id="catalog-results">
-            <ProductGrid
-              products={visibleProducts}
-              emptyMessage={products.length === 0
-                ? 'No hay productos disponibles.'
-                : 'No encontramos productos con estos criterios. Prueba otra búsqueda o restablece los filtros.'}
-            />
+          <div className="row g-4">
+            <div className="col-lg-3">
+              <CatalogFilters filters={filters} onFilterChange={this.handleFilterChange} onReset={this.resetFilters} />
+            </div>
+            <div className="col-lg-9">
+              <p className="text-secondary mb-4" role="status" aria-atomic="true">
+                Mostrando {visibleProducts.length} de {products.length} {products.length === 1 ? 'producto' : 'productos'}
+              </p>
+              <div id="catalog-results">
+                <ProductGrid
+                  products={visibleProducts}
+                  columnClass="col-6 col-xl-4"
+                  emptyMessage={products.length === 0
+                    ? 'No hay productos disponibles.'
+                    : 'No encontramos productos con estos criterios. Prueba otra búsqueda o restablece los filtros.'}
+                />
+              </div>
+            </div>
           </div>
         </section>
       </>
