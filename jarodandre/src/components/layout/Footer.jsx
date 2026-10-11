@@ -35,7 +35,7 @@ function Footer() {
             <NewsletterForm />
           </div>
         </div>
-        <p className="mb-0 mt-4 pt-4 border-top text-center">© {new Date().getFullYear()} jarodandre. Proyecto informática.</p>
+        <p className="mb-0 mt-4 pt-4 border-top text-center">© {new Date().getFullYear()} jarodandre. Todos los derechos reservados.</p>
       </div>
     </footer>
   )
