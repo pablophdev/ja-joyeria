@@ -7,6 +7,7 @@ const links = [
   { to: routes.adminProductNew, label: 'Nuevo producto' },
   { to: routes.users, label: 'Gestionar usuarios' },
   { to: routes.adminOrders, label: 'Órdenes / Boletas' },
+  { to: routes.adminReports, label: 'Reportes' },
   { to: routes.shop, label: 'Ver tienda' },
 ]
 

@@ -24,6 +24,7 @@ import CheckoutPage from '../pages/CheckoutPage'
 import PaymentResultPage from '../pages/PaymentResultPage'
 import AdminOrdersPage from '../pages/AdminOrdersPage'
 import AdminReceiptPage from '../pages/AdminReceiptPage'
+import AdminReportsPage from '../pages/AdminReportsPage'
 
 function AppRouter() {
   return (
@@ -49,6 +50,7 @@ function AppRouter() {
             <Route index element={<AdminPage />} />
             <Route path={routes.adminOrders} element={<AdminOrdersPage />} />
             <Route path={routes.adminReceipt} element={<AdminReceiptPage />} />
+            <Route path={routes.adminReports} element={<AdminReportsPage />} />
             <Route path={routes.adminProducts} element={<AdminProductsPage />} />
             <Route path={routes.adminProductNew} element={<AdminProductEditorPage key="new" />} />
             <Route path={routes.adminProductEdit} element={<AdminProductEditRoute />} />

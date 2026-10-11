@@ -17,6 +17,7 @@ export const routes = {
   admin: '/admin',
   adminOrders: '/admin/ordenes',
   adminReceipt: '/admin/ordenes/:orderId/boleta',
+  adminReports: '/admin/reportes',
   adminProducts: '/admin/productos',
   adminProductNew: '/admin/productos/nuevo',
   adminProductEdit: '/admin/productos/:productId/editar',

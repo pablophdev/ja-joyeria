@@ -48,6 +48,10 @@ class AdminPage extends Component {
             <h2 className="h4">Órdenes / Boletas</h2><p>Consulta los pedidos de clientes e invitados y muestra las boletas de las compras pagadas.</p>
             <Link className="btn btn-outline-dark" to={routes.adminOrders}>Ver órdenes y boletas</Link>
           </div></section></div>
+          <div className="col-md-6"><section className="card h-100"><div className="card-body">
+            <h2 className="h4">Reportes</h2><p>Resume ingresos, productos más vendidos, clientes y cuentas del catálogo local.</p>
+            <Link className="btn btn-outline-dark" to={routes.adminReports}>Ver reportes</Link>
+          </div></section></div>
         </div>
       </section>
     )
