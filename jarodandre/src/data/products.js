@@ -39,7 +39,7 @@ let nextId = Math.max(...products.map((product) => product.id)) + 1
 let initialized = false
 const listeners = new Set()
 const storageKey = 'jarodandre.products'
-const storageVersion = 2
+const storageVersion = 3
 let currentStorageVersion = storageVersion
 
 // Guardar referencias estables evita persistir las URLs con hash generadas por Vite.
@@ -68,7 +68,7 @@ function initializeProducts() {
   if (stored === null) return
 
   try {
-    if (![1, storageVersion].includes(stored.version) || !Array.isArray(stored.products)) {
+    if (![1, 2, storageVersion].includes(stored.version) || !Array.isArray(stored.products)) {
       throw new Error('El formato de los productos guardados no es compatible.')
     }
 
@@ -79,6 +79,12 @@ function initializeProducts() {
       ids.add(product.id)
       const { id, ...values } = product
       validateInput(values)
+      // Completar solo categorías vacías del catálogo original en versiones anteriores.
+      // Conservar las categorías y productos personalizados del usuario.
+      if (stored.version < 3 && !values.category) {
+        const original = products.find((item) => item.id === id && item.name === values.name)
+        if (original) values.category = original.category
+      }
       return { id, ...normalizeProduct({ ...initialProductDetails[id], ...values, image: restoreImage(values.image) }) }
     })
 
@@ -91,14 +97,14 @@ function initializeProducts() {
     nextId = stored.nextId
     currentStorageVersion = stored.version
 
-    if (stored.version === 1) {
+    if (stored.version < storageVersion) {
       // Respetar una colección vaciada y asignar IDs nuevos sin pisar productos creados por el usuario.
-      const additions = products.length ? catalogAdditions.map((product, index) => ({ ...product, id: nextId + index })) : []
+      const additions = stored.version === 1 && products.length ? catalogAdditions.map((product, index) => ({ ...product, id: nextId + index })) : []
       try {
         validateId(nextId + additions.length)
         saveProducts([...products, ...additions], nextId + additions.length, storageVersion)
       } catch (error) {
-        console.warn('No se pudo ampliar el catálogo guardado. Se conserva la colección anterior.', error)
+        console.warn('No se pudo guardar la actualización del catálogo local.', error)
       }
     }
   } catch (error) {

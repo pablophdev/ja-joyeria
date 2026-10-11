@@ -1,5 +1,8 @@
+import { getProductCategoryKey } from './productCategories'
+
 export const defaultCatalogFilters = Object.freeze({
   query: '',
+  category: 'all',
   group: 'all',
   badge: 'all',
   priceRange: 'all',
@@ -53,7 +56,7 @@ function normalizeSearch(value) {
 }
 
 export function filterCatalogProducts(products, filters = defaultCatalogFilters) {
-  const { query, group, badge, priceRange, sort } = { ...defaultCatalogFilters, ...filters }
+  const { query, category, group, badge, priceRange, sort } = { ...defaultCatalogFilters, ...filters }
   const terms = normalizeSearch(query).split(/\s+/u).filter(Boolean)
   const matchesPrice = priceRanges[priceRange] ?? priceRanges.all
 
@@ -61,6 +64,7 @@ export function filterCatalogProducts(products, filters = defaultCatalogFilters)
   const visibleProducts = products.filter((product) => {
     const name = normalizeSearch(product.name)
     return terms.every((term) => name.includes(term))
+      && (category === 'all' || getProductCategoryKey(product) === category)
       && (group === 'all' || product.group === group)
       && (badge === 'all' || product.badge === badge)
       && matchesPrice(product.price)

@@ -2,9 +2,11 @@ import { Component } from 'react'
 import { Link } from 'react-router-dom'
 import ProductGrid from '../components/products/ProductGrid'
 import CatalogFilters from '../components/products/CatalogFilters'
+import CatalogCategories from '../components/products/CatalogCategories'
 import { getProducts, subscribeToProducts } from '../data/products'
 import { routes } from '../navigation/routes'
 import { defaultCatalogFilters, filterCatalogProducts } from '../utils/catalogFilters'
+import { getProductCategories } from '../utils/productCategories'
 
 class ShopPage extends Component {
   state = { products: getProducts(), filters: { ...defaultCatalogFilters } }
@@ -19,7 +21,14 @@ class ShopPage extends Component {
   }
 
   refreshProducts = () => {
-    this.setState({ products: getProducts() })
+    const products = getProducts()
+    const categories = getProductCategories(products)
+    this.setState(({ filters }) => ({
+      products,
+      filters: filters.category === 'all' || categories.some((category) => category.value === filters.category)
+        ? filters
+        : { ...filters, category: 'all' },
+    }))
   }
 
   handleFilterChange = (name, value) => {
@@ -33,6 +42,8 @@ class ShopPage extends Component {
   render() {
     const { products, filters } = this.state
     const visibleProducts = filterCatalogProducts(products, filters)
+    const categories = getProductCategories(products)
+    const selectedCategory = categories.find((category) => category.value === filters.category)
 
     return (
       <>
@@ -49,13 +60,21 @@ class ShopPage extends Component {
         </div>
         <section className="container py-5" aria-labelledby="catalog-title">
           <h2 id="catalog-title" className="h3 mb-4" data-reveal>Catálogo de joyería</h2>
+          <CatalogCategories
+            categories={categories}
+            selectedCategory={filters.category}
+            total={products.length}
+            onSelect={(value) => this.handleFilterChange('category', value)}
+          />
           <div className="row g-4">
             <div className="col-lg-3">
               <CatalogFilters filters={filters} onFilterChange={this.handleFilterChange} onReset={this.resetFilters} />
             </div>
             <div className="col-lg-9" data-reveal="right">
+              <h3 className="h4">{selectedCategory?.label || 'Todos los productos'}</h3>
               <p className="text-secondary mb-4" role="status" aria-atomic="true">
-                Mostrando {visibleProducts.length} de {products.length} {products.length === 1 ? 'producto' : 'productos'}
+                Mostrando {visibleProducts.length} de {selectedCategory?.count ?? products.length} productos
+                {selectedCategory && ` en ${selectedCategory.label}`}
               </p>
               <div id="catalog-results">
                 <ProductGrid

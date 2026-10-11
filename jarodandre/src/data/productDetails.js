@@ -1,5 +1,6 @@
-// Contenido de las tres fichas HTML originales, aplicado a sus productos iniciales.
+// Categorías del catálogo y contenido de las tres fichas HTML originales.
 export const initialProductDetails = {
+  1: { category: 'Grillz' },
   2: {
     description: 'Exclusivo Grillz de plata que destaca por sus intrincados detalles de flor y media luna. Diseñado para un ajuste cómodo y seguro, esta pieza única añade un toque atrevido y brillante a tu estilo. Fabricado con materiales de alta calidad para garantizar un acabado pulido y espectacular.',
     category: 'Grillz',
@@ -21,4 +22,14 @@ export const initialProductDetails = {
     availability: 'En stock',
     reviewCount: 0,
   },
+  5: { category: 'Collares' },
+  6: { category: 'Anillos' },
+  7: { category: 'Anillos' },
+  8: { category: 'Anillos' },
+  9: { category: 'Grillz' },
+  10: { category: 'Grillz' },
+  11: { category: 'Grillz' },
+  12: { category: 'Anillos' },
+  13: { category: 'Anillos' },
+  14: { category: 'Anillos' },
 }
