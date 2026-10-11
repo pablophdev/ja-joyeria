@@ -2,9 +2,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import SiteLayout from '../components/layout/SiteLayout'
 import HomePage from '../pages/HomePage'
 import ShopPage from '../pages/ShopPage'
-import PendingPage from '../pages/PendingPage'
 import NotFoundPage from '../pages/NotFoundPage'
-import { pendingPages, routes } from './routes'
+import { routes } from './routes'
 import ProductDetailsRoute from './ProductDetailsRoute'
 import CartPage from '../pages/CartPage'
 import OrdersPage from '../pages/OrdersPage'
@@ -19,6 +18,8 @@ import AdminProductEditorPage from '../pages/AdminProductEditorPage'
 import AdminProductEditRoute from './AdminProductEditRoute'
 import AboutPage from '../pages/AboutPage'
 import ContactPage from '../pages/ContactPage'
+import BlogPage from '../pages/BlogPage'
+import BlogDetailsPage from '../pages/BlogDetailsPage'
 
 function AppRouter() {
   return (
@@ -29,6 +30,8 @@ function AppRouter() {
           <Route path={routes.shop} element={<ShopPage />} />
           <Route path={routes.about} element={<AboutPage />} />
           <Route path={routes.contact} element={<ContactPage />} />
+          <Route path={routes.blog} element={<BlogPage />} />
+          <Route path={routes.blogDetails} element={<BlogDetailsPage />} />
           <Route path={routes.cart} element={<CartPage />} />
           <Route path={routes.orders} element={<OrdersPage />} />
           <Route path={routes.login} element={<AuthPage key="login" mode="login" />} />
@@ -42,9 +45,6 @@ function AppRouter() {
             <Route path={routes.adminProductNew} element={<AdminProductEditorPage key="new" />} />
             <Route path={routes.adminProductEdit} element={<AdminProductEditRoute />} />
           </Route>
-          {pendingPages.map(({ path, title }) => (
-            <Route key={path} path={path} element={<PendingPage title={title} />} />
-          ))}
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

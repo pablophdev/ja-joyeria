@@ -6,6 +6,7 @@ export const routes = {
   cart: '/carrito',
   orders: '/pedidos',
   blog: '/blog',
+  blogDetails: '/blog/:slug',
   contact: '/contacto',
   register: '/registro',
   login: '/login',
@@ -29,6 +30,6 @@ export function getAdminProductEditPath(id) {
   return `${routes.adminProducts}/${encodeURIComponent(id)}/editar`
 }
 
-export const pendingPages = [
-  { path: routes.blog, title: 'Blog' },
-]
+export function getBlogDetailsPath(slug) {
+  return `${routes.blog}/${encodeURIComponent(slug)}`
+}
