@@ -1,7 +1,7 @@
 import { getProductById, getProducts, subscribeToProducts } from './products'
 import { readStoredData, writeStoredData } from './persistence'
 import { normalizeCustomer, normalizeOrder } from './orderRecords'
-import { getCurrentUser, isAdminEmail, subscribeToAuth } from './auth'
+import { getCurrentUser, isAdmin, subscribeToAuth } from './auth'
 
 export const MAX_CART_QUANTITY = 99
 const storageKey = 'jarodandre.cart'
@@ -176,7 +176,7 @@ export function getOrders() {
 
 export function getAdminOrders() {
   initializeCart()
-  if (!isAdminEmail(getCurrentUser())) return []
+  if (!isAdmin(getCurrentUser())) return []
   return orders.map((order) => normalizeOrder(order, MAX_CART_QUANTITY)).sort((first, second) => second.id - first.id)
 }
 

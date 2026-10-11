@@ -89,12 +89,20 @@ export function getCurrentUser() {
   return user ? publicUser(user) : null
 }
 
-export function isAdminEmail(user) {
-  return Boolean(user && user.email && user.email.toLowerCase().includes('@duoc.cl'))
+export function isAdmin(user) {
+  if (!user) return false
+  if (user.role === 'admin') return true
+  const email = user.email.toLowerCase()
+  return email.endsWith('@duoc.cl') || email.endsWith('@profesor.duoc.cl')
+}
+
+function requireAdmin() {
+  if (!isAdmin(getCurrentUser())) throw new Error('Se requiere cuenta de administrador.')
 }
 
 export function getUsers() {
   initializeAuth()
+  requireAdmin()
   return users.map(publicUser)
 }
 
@@ -148,6 +156,7 @@ export function getUserById(id) {
 
 export async function updateUser(id, changes) {
   initializeAuth()
+  requireAdmin()
   validateUserId(id)
   const user = users.find((item) => item.id === id)
   if (!user) return null
@@ -179,6 +188,7 @@ export async function updateUser(id, changes) {
 
 export function deleteUser(id) {
   initializeAuth()
+  requireAdmin()
   validateUserId(id)
   const user = users.find((item) => item.id === id)
   if (!user) return null

@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { getCurrentUser, isAdminEmail, login, registerUser, subscribeToAuth } from '../data/auth'
+import { getCurrentUser, isAdmin, login, registerUser, subscribeToAuth } from '../data/auth'
 import AuthForm from '../components/auth/AuthForm'
 import { routes } from '../navigation/routes'
 
@@ -53,7 +53,7 @@ class AuthPage extends Component {
   render() {
     const isRegister = this.props.mode === 'register'
     const { user, registered, error, busy, values } = this.state
-    if (isAdminEmail(user)) return <Navigate to={routes.admin} replace />
+    if (isAdmin(user)) return <Navigate to={routes.admin} replace />
     return (
       <section className="container py-5">
         <div className="row justify-content-center"><div className="col-md-8 col-lg-6">
@@ -62,7 +62,7 @@ class AuthPage extends Component {
           <p className="small text-secondary">Cuenta y sesión de demostración guardadas en este navegador.</p>
           {error && <p className="alert alert-danger" role="alert">{error}</p>}
           {user ? (
-            <div><p className="alert alert-success" role="status">Sesión iniciada como {user.name}.</p><Link className="btn btn-dark me-2" to={routes.shop}>Ir al catálogo</Link><Link className="btn btn-outline-dark" to={routes.orders}>Mis pedidos</Link></div>
+            <div><Link className="btn btn-dark me-2" to={routes.shop}>Ir al catálogo</Link><Link className="btn btn-outline-dark" to={routes.orders}>Mis pedidos</Link></div>
           ) : registered ? (
             <div><p className="alert alert-success" role="status">Cuenta creada correctamente. Ya puedes iniciar sesión.</p><Link className="btn btn-dark" to={routes.login}>Iniciar sesión</Link></div>
           ) : (

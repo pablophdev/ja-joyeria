@@ -42,8 +42,8 @@ function AppRouter() {
           <Route path={routes.orders} element={<OrdersPage />} />
           <Route path={routes.login} element={<AuthPage key="login" mode="login" />} />
           <Route path={routes.register} element={<AuthPage key="register" mode="register" />} />
-          <Route path={routes.users} element={<UsersPage />} />
-          <Route path={routes.userEdit} element={<UserEditRoute />} />
+          <Route path={routes.users} element={<AdminRoute><UsersPage /></AdminRoute>} />
+          <Route path={routes.userEdit} element={<AdminRoute><UserEditRoute /></AdminRoute>} />
           <Route path={routes.productDetails} element={<ProductDetailsRoute />} />
           <Route path={routes.admin} element={<AdminRoute><AdminLayout /></AdminRoute>}>
             <Route index element={<AdminPage />} />
