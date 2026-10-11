@@ -64,6 +64,11 @@ a {
   border-radius: 50%;
 }
 
+.brand-wordmark {
+  height: 2.75rem;
+  width: auto;
+}
+
 .collection-label {
   font-size: 0.875rem;
   font-weight: 700;
