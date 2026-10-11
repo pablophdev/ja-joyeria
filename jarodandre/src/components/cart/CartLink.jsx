@@ -19,8 +19,16 @@ class CartLink extends Component {
   refreshCart = () => this.setState({ quantity: getCart().totalQuantity })
 
   render() {
+    const { onNavigate, tabIndex } = this.props
+
     return (
-      <Link className="nav-link text-dark d-inline-flex align-items-center gap-1" to={routes.cart} aria-label={`Carrito, ${this.state.quantity} unidades`}>
+      <Link
+        className="nav-link text-dark d-inline-flex align-items-center gap-1"
+        to={routes.cart}
+        aria-label={`Carrito, ${this.state.quantity} unidades`}
+        onClick={onNavigate}
+        tabIndex={tabIndex}
+      >
         <img src={cartIcon} alt="" width="20" height="20" />
         {this.state.quantity > 0 && <span className="badge text-bg-dark">{this.state.quantity}</span>}
       </Link>

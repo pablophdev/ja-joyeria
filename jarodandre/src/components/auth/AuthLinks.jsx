@@ -21,6 +21,8 @@ class AuthLinks extends Component {
   }
 
   render() {
+    const { onNavigate, variant } = this.props
+
     return (
       <>
         {this.state.user ? (
@@ -28,8 +30,10 @@ class AuthLinks extends Component {
             <span className="nav-link text-dark px-0">Hola, {this.state.user.name}</span>
             <button className="btn btn-link nav-link text-dark p-0" type="button" onClick={this.handleLogout}>Cerrar sesión</button>
           </>
+        ) : variant === 'text' ? (
+          <Link className="nav-link text-dark" to={routes.login} onClick={onNavigate}>Iniciar sesión</Link>
         ) : (
-          <Link className="nav-link text-dark d-inline-flex align-items-center" to={routes.login} aria-label="Iniciar sesión">
+          <Link className="nav-link text-dark d-inline-flex align-items-center" to={routes.login} aria-label="Iniciar sesión" onClick={onNavigate}>
             <img src={loginIcon} alt="" width="20" height="20" />
           </Link>
         )}
