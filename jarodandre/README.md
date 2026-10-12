@@ -1,6 +1,85 @@
 # JA Joyería — React
 
-Migración incremental del sitio HTML a React, en 17 commits. Proyecto creado con Vite.
+Migración del sitio HTML a React, creada con Vite. Toda la lógica de datos se implementa
+en JavaScript dentro de `src/data/`, con persistencia en `localStorage`.
+No requiere servidor de backend, base de datos externa ni pruebas unitarias.
+
+## Estado actual
+
+- Inicio, catálogo de 14 productos iniciales, categorías, filtros y fichas dinámicas.
+- Compra rápida desde las tarjetas de inicio y catálogo, además de compra desde la ficha.
+- Carrito, checkout de entrega, pago simulado, resultado e historial por cuenta.
+- Administración de productos con creación, edición y **eliminación persistente**.
+- Administración de usuarios con creación, edición, roles, estados y eliminación.
+- Órdenes, comprobantes imprimibles y reportes calculados con los registros locales.
+- Estados de entrega editables: Pendiente, Enviado y Completado, independientes del pago.
+- Nueve artículos completos del blog y descripciones para los 14 productos iniciales.
+- Bandeja administrativa de contacto con búsqueda, filtro, lectura y eliminación.
+- Newsletter con suscripción persistente, deduplicación de correos y bajas administrativas.
+
+Las descripciones nuevas no establecen tallas, quilatajes ni existencias que no estaban
+documentados. Los productos sin stock confirmado muestran «Consultar disponibilidad»;
+la demo permite añadirlos al carrito, igual que antes.
+
+### Acceso a administración
+
+Registra una cuenta con un RUT válido y un correo `@duoc.cl` o `@profesor.duoc.cl`,
+e inicia sesión para acceder al panel. Se conserva esta regla de la demo académica:
+`isAdmin(user)` reconoce tanto el rol `admin` como esos dominios.
+Solo las cuentas activas pueden iniciar sesión.
+
+El listado muestra el rol asignado y señala el acceso por dominio cuando corresponde.
+Las métricas de «Cuentas con perfil administrativo» usan el mismo criterio e incluyen
+las cuentas de ese perfil aunque estén pendientes o inactivas; no representan sesiones activas.
+Un administrador puede crear otras cuentas eligiendo rol y estado sin cambiar su sesión.
+El registro público continúa creando clientes activos.
+
+### Rutas administrativas
+
+| Ruta | Función |
+| --- | --- |
+| `/admin` | Resumen y accesos de gestión. |
+| `/admin/productos` | Consultar, buscar y eliminar productos. |
+| `/admin/productos/nuevo` | Crear producto. |
+| `/admin/productos/:productId/editar` | Editar producto. |
+| `/usuarios` | Consultar y buscar cuentas. |
+| `/usuarios/nuevo` | Crear cuenta con rol y estado. |
+| `/usuarios/:userId/editar` | Editar o eliminar cuenta. |
+| `/admin/ordenes` | Buscar pedidos, filtrar pago/entrega y guardar estado de entrega. |
+| `/admin/ordenes/:orderId/boleta` | Consultar e imprimir orden o comprobante local. |
+| `/admin/reportes` | Resumen de ventas y cuentas. |
+| `/admin/mensajes` | Leer y administrar mensajes del formulario de contacto. |
+| `/admin/suscriptores` | Buscar suscriptores y dar de baja correos. |
+
+### Datos y persistencia actuales
+
+| Clave de `localStorage` | Contenido |
+| --- | --- |
+| `jarodandre.products` | Catálogo, versión 5 y siguiente ID. |
+| `jarodandre.auth` | Cuentas, credenciales derivadas y sesión local. |
+| `jarodandre.cart` | Carrito, pedidos, pago y entrega. |
+| `jarodandre.contactMessages` | Mensajes, fecha y estado de lectura. |
+| `jarodandre.newsletter` | Correos normalizados y fecha de suscripción. |
+
+- La migración de productos conserva ediciones, eliminaciones y catálogos vacíos.
+  Completa descripciones, etiquetas y disponibilidad vacías únicamente cuando coinciden
+  el ID y el nombre de un producto original. La versión 1 incorpora los seis productos
+  adicionales usando IDs libres. No se restauran productos borrados de versiones 2–4.
+- Eliminar un producto guarda primero la colección actualizada; si falla el almacenamiento,
+  el producto permanece visible. Los pedidos conservan su copia histórica.
+- `createUser()` exige sesión administrativa, valida duplicados y conserva la sesión actual.
+- `updateOrderStatus()` exige sesión administrativa y pago realizado para enviar o completar.
+  El nuevo estado aparece en el historial del cliente y en el comprobante.
+- `getContactMessages()`, lectura/borrado de mensajes y consulta/baja de suscriptores
+  requieren sesión administrativa. Los visitantes pueden enviar mensajes y suscribirse.
+- Los mensajes anteriores se interpretan como no leídos. La newsletter acepta correos
+  válidos de cualquier dominio y evita duplicados sin distinguir mayúsculas.
+- Los cambios se notifican dentro de la misma instancia; otras pestañas los recuperan
+  al recargar. Borrar los datos del sitio elimina la información local.
+
+El checkout no realiza cobros, las boletas son comprobantes de demostración y los
+formularios no envían correos. El envío, los cupones y el inventario numérico no están
+implementados. No se incorporan servicios externos ni un backend real.
 
 ## Desarrollo
 
@@ -20,6 +99,34 @@ Al desplegar, el alojamiento debe redirigir las rutas de la aplicación a `index
 - `src/data/`: contenido de la portada y fuente simulada de productos con funciones CRUD.
 - `src/assets/`: recursos importados por los componentes, como el logo original.
 - `public/`: archivos servidos directamente, como el favicon y los videos de `public/videos/`.
+
+## Revisión manual de los flujos actuales
+
+1. Registrar una cuenta Duoc válida e iniciar sesión; abrir Administración.
+2. Crear un cliente desde Usuarios → Crear usuario. Comprobar rol, estado y mensaje
+   de éxito; la cabecera debe conservar la sesión administrativa. Intentar repetir
+   correo o RUT y comprobar que se rechaza sin crear una cuenta duplicada.
+3. Crear un producto, editarlo y recargar. Añadirlo al carrito, eliminarlo del panel
+   y recargar: debe seguir eliminado y el carrito debe permitir quitar la línea no disponible.
+4. Añadir productos desde inicio y catálogo. Comprobar cantidades y contador del carrito;
+   un producto agotado no debe poder añadirse.
+5. Como cliente, completar un pago simulado. Como administrador, cambiar su entrega
+   a Enviado y luego Completado. Recargar y volver a la cuenta del cliente: el historial
+   debe conservar el estado y los importes. Una orden sin pago no permite envío.
+6. Enviar un mensaje en Contacto. Abrir Mensajes, buscarlo, marcarlo como leído,
+   recargar y eliminarlo. Revisar el filtro de mensajes sin leer.
+7. Suscribirse desde el pie de página; repetir el correo usando mayúsculas y comprobar
+   que no se duplica. Abrir Suscriptores, buscarlo, darlo de baja y recargar.
+8. Abrir las 14 fichas iniciales y los nueve artículos: todos tienen contenido.
+9. Cerrar sesión e intentar abrir rutas administrativas directamente: deben dirigir a login.
+   Un cliente con correo Gmail debe volver al inicio si intenta acceder al panel.
+10. Revisar los formularios con teclado y en móvil/escritorio; las tablas anchas disponen
+    de desplazamiento horizontal. Comprobar estados vacíos y mensajes de error.
+
+## Historial de la migración
+
+Las etapas siguientes documentan estados anteriores del proyecto. Para el comportamiento
+vigente, prevalecen las secciones «Estado actual» y «Datos y persistencia actuales».
 
 ## Cambio 1 de 17
 
@@ -531,7 +638,7 @@ No se agregaron hooks ni pruebas unitarias.
    recargar y comprobar que se conserva el mensaje.
 6. Revisar ambas vistas en móvil y escritorio, y recorrer el formulario con teclado.
 
-## Secuencia propuesta
+## Secuencia original propuesta
 
 1. Base React, navegación y layout.
 2. Hero con carrusel React y recursos originales de la portada.
@@ -551,6 +658,5 @@ No se agregaron hooks ni pruebas unitarias.
 16. Validaciones e interacciones de formularios.
 17. Revisión final de navegación, recursos y diseño responsivo.
 
-El alcance de cada etapa puede ajustarse según las siguientes instrucciones.
-No hay backend ni pruebas unitarias. Los datos se gestionarán en JavaScript con persistencia local.
+No hay backend real ni pruebas unitarias. Los datos se gestionan en JavaScript con persistencia local.
 Owl Carousel requiere jQuery; el hero utiliza un carrusel propio de React para eliminar esa dependencia.

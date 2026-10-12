@@ -1,6 +1,11 @@
 // Categorías del catálogo y contenido de las tres fichas HTML originales.
 export const initialProductDetails = {
-  1: { category: 'Grillz' },
+  1: {
+    category: 'Grillz',
+    description: 'Diseño de grillz que combina motivos de estrella y corazón en una propuesta de estilo personalizado. Consulta las opciones de ajuste y composición antes de elegir tu pieza; las medidas no están especificadas en este catálogo.',
+    tags: 'Grillz, Estrella, Corazón, Personalizado',
+    availability: 'Consultar disponibilidad',
+  },
   2: {
     description: 'Exclusivo Grillz de plata que destaca por sus intrincados detalles de flor y media luna. Diseñado para un ajuste cómodo y seguro, esta pieza única añade un toque atrevido y brillante a tu estilo. Fabricado con materiales de alta calidad para garantizar un acabado pulido y espectacular.',
     category: 'Grillz',
@@ -22,14 +27,64 @@ export const initialProductDetails = {
     availability: 'En stock',
     reviewCount: 0,
   },
-  5: { category: 'Collares' },
-  6: { category: 'Anillos' },
-  7: { category: 'Anillos' },
-  8: { category: 'Anillos' },
-  9: { category: 'Grillz' },
-  10: { category: 'Grillz' },
-  11: { category: 'Grillz' },
-  12: { category: 'Anillos' },
-  13: { category: 'Anillos' },
-  14: { category: 'Anillos' },
+  5: {
+    category: 'Collares',
+    description: 'Collar de inspiración floral que combina el aspecto nacarado de su motivo central con detalles de color esmeralda. Una opción para acompañar escotes sencillos y dar protagonismo al colgante. Consulta la longitud, el material de la cadena y la composición de los detalles.',
+    tags: 'Collar, Flor, Nácar',
+    availability: 'Consultar disponibilidad',
+  },
+  6: {
+    category: 'Anillos',
+    description: 'Anillo de diseño halo con una pieza central azul rodeada por detalles brillantes. El contraste entre el centro y su contorno resalta la silueta del anillo. Consulta la talla y las especificaciones del metal y de la piedra antes de comprar.',
+    tags: 'Anillo, Halo, Azul',
+    availability: 'Consultar disponibilidad',
+  },
+  7: {
+    category: 'Anillos',
+    description: 'Diseño solitario de doble halo que destaca la pieza central mediante dos contornos decorativos. Su composición aporta presencia y brillo al conjunto. Consulta las tallas disponibles y las medidas de la pieza central para elegir el ajuste adecuado.',
+    tags: 'Anillo, Solitario, Doble halo, Circonias',
+    availability: 'Consultar disponibilidad',
+  },
+  8: {
+    category: 'Anillos',
+    description: 'Anillo de compromiso que combina tonos blanco y rosa en una propuesta de contraste delicado. Puede llevarse como pieza protagonista o junto a una alianza de líneas sencillas. Consulta talla, composición y quilataje; estos datos no están definidos en el catálogo.',
+    tags: 'Anillo, Compromiso, Blanco y rosa',
+    availability: 'Consultar disponibilidad',
+  },
+  9: {
+    category: 'Grillz',
+    description: 'Conjunto de grillz presentado como set de ocho piezas, con contraste visual negro y plateado. Un diseño pensado para destacar la sonrisa. Consulta la distribución de las piezas, su composición y el procedimiento de ajuste personalizado.',
+    tags: 'Grillz, Set, Negro, Plateado',
+    availability: 'Consultar disponibilidad',
+  },
+  10: {
+    category: 'Grillz',
+    description: 'Dúo de grillz de apariencia plateada con una silueta inspirada en colmillos. Su diseño concentra el protagonismo en dos piezas. Consulta compatibilidad, composición y ajuste; no intentes modificar la forma por tu cuenta.',
+    tags: 'Grillz, Dúo, Colmillos',
+    availability: 'Consultar disponibilidad',
+  },
+  11: {
+    category: 'Grillz',
+    description: 'Propuesta de grillz para dos dientes con líneas de inspiración tribal y ondulada. El dibujo aporta movimiento a una composición compacta. Consulta las alternativas de personalización y el método de ajuste antes de encargarla.',
+    tags: 'Grillz, Tribal, Wave, Personalizado',
+    availability: 'Consultar disponibilidad',
+  },
+  12: {
+    category: 'Anillos',
+    description: 'Anillo solitario en tono oro rosa con circonia de corte brillante como protagonista del diseño. Sus líneas permiten combinarlo con otras piezas discretas. Consulta talla, dimensiones y composición del aro antes de seleccionar tu pieza.',
+    tags: 'Anillo, Solitario, Rosa, Circonia',
+    availability: 'Consultar disponibilidad',
+  },
+  13: {
+    category: 'Anillos',
+    description: 'Anillo tipo sello con motivo de San Benito, presentado en el catálogo como oro laminado de 18K. El frente decorativo le da una identidad marcada. Consulta las tallas, el metal base y las indicaciones específicas para conservar su acabado.',
+    tags: 'Anillo, Sello, San Benito, Oro laminado',
+    availability: 'Consultar disponibilidad',
+  },
+  14: {
+    category: 'Anillos',
+    description: 'Anillo tipo signet que combina una piedra central negra con detalles de circones y apariencia dorada. El contraste refuerza el carácter del frente del anillo. Consulta talla, composición del metal y dimensiones para completar la elección.',
+    tags: 'Anillo, Signet, Negro, Circones',
+    availability: 'Consultar disponibilidad',
+  },
 }

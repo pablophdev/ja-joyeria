@@ -1,6 +1,6 @@
 import { getProductById, getProducts, subscribeToProducts } from './products'
 import { readStoredData, writeStoredData } from './persistence'
-import { normalizeCustomer, normalizeOrder } from './orderRecords'
+import { deliveryStatuses, normalizeCustomer, normalizeOrder } from './orderRecords'
 import { getCurrentUser, isAdmin, subscribeToAuth } from './auth'
 
 export const MAX_CART_QUANTITY = 99
@@ -186,6 +186,19 @@ export function getAdminOrderById(id) {
 
 export function subscribeToOrders(listener) {
   return subscribeToCart(listener)
+}
+
+export function updateOrderStatus(id, status) {
+  initializeCart()
+  if (!isAdmin(getCurrentUser())) throw new Error('Se requiere cuenta de administrador.')
+  if (!Number.isSafeInteger(id) || id < 1) throw new Error('El ID del pedido no es válido.')
+  if (!Object.hasOwn(deliveryStatuses, status)) throw new Error('Selecciona un estado de entrega válido.')
+  const order = orders.find((entry) => entry.id === id)
+  if (!order) throw new Error('El pedido ya no existe.')
+  if (status !== 'Pendiente' && order.paymentStatus !== 'paid') throw new Error('Solo se pueden enviar o completar pedidos con pago realizado.')
+  const updated = normalizeOrder({ ...order, status }, MAX_CART_QUANTITY)
+  saveCart(items, orders.map((entry) => entry.id === id ? updated : entry))
+  return normalizeOrder(updated, MAX_CART_QUANTITY)
 }
 
 export function confirmOrder(customer, paymentStatus) {

@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { getProducts, subscribeToProducts } from '../data/products'
-import { getUsers, subscribeToAuth } from '../data/auth'
+import { getCurrentUser, getUsers, isAdmin, subscribeToAuth } from '../data/auth'
 import { routes } from '../navigation/routes'
 
 class AdminPage extends Component {
@@ -18,7 +18,9 @@ class AdminPage extends Component {
     this.unsubscribeUsers?.()
   }
 
-  refreshData = () => this.setState({ products: getProducts(), users: getUsers() })
+  refreshData = () => {
+    if (isAdmin(getCurrentUser())) this.setState({ products: getProducts(), users: getUsers() })
+  }
 
   render() {
     const { products, users } = this.state
@@ -43,6 +45,7 @@ class AdminPage extends Component {
           <div className="col-md-6"><section className="card h-100"><div className="card-body">
             <h2 className="h4">Usuarios</h2><p>Consulta las cuentas y modifica sus datos, roles y estados.</p>
             <Link className="btn btn-outline-dark" to={routes.users}>Gestionar usuarios</Link>
+            <Link className="btn btn-dark ms-2" to={routes.userNew}>Crear usuario</Link>
           </div></section></div>
           <div className="col-md-6"><section className="card h-100"><div className="card-body">
             <h2 className="h4">Órdenes / Boletas</h2><p>Consulta los pedidos de clientes e invitados y muestra las boletas de las compras pagadas.</p>
@@ -51,6 +54,14 @@ class AdminPage extends Component {
           <div className="col-md-6"><section className="card h-100"><div className="card-body">
             <h2 className="h4">Reportes</h2><p>Resume ingresos, productos más vendidos, clientes y cuentas del catálogo local.</p>
             <Link className="btn btn-outline-dark" to={routes.adminReports}>Ver reportes</Link>
+          </div></section></div>
+          <div className="col-md-6"><section className="card h-100"><div className="card-body">
+            <h2 className="h4">Contacto</h2><p>Consulta y marca como leídos los mensajes recibidos en el formulario local.</p>
+            <Link className="btn btn-outline-dark" to={routes.adminMessages}>Ver mensajes</Link>
+          </div></section></div>
+          <div className="col-md-6"><section className="card h-100"><div className="card-body">
+            <h2 className="h4">Suscriptores</h2><p>Consulta las suscripciones de novedades y gestiona las bajas locales.</p>
+            <Link className="btn btn-outline-dark" to={routes.adminSubscribers}>Ver suscriptores</Link>
           </div></section></div>
         </div>
       </section>

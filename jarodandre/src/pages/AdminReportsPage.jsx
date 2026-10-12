@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import { getAdminOrders, subscribeToOrders } from '../data/cart'
-import { getUsers, subscribeToAuth } from '../data/auth'
+import { getCurrentUser, getUsers, isAdmin, subscribeToAuth } from '../data/auth'
 import { getProducts, subscribeToProducts } from '../data/products'
 import { paymentStatuses } from '../data/orderRecords'
 import { formatPrice } from '../utils/formatPrice'
@@ -43,7 +43,7 @@ function buildReport(orders, products, users) {
     featuredCount: products.filter((product) => product.featured).length,
     userCount: users.length,
     activeUserCount: users.filter((user) => user.status === 'active').length,
-    adminCount: users.filter((user) => user.role === 'admin').length,
+    adminCount: users.filter(isAdmin).length,
   }
 }
 
@@ -62,7 +62,9 @@ class AdminReportsPage extends Component {
     this.unsubscribeProducts?.()
   }
 
-  refreshReport = () => this.setState({ report: buildReport(getAdminOrders(), getProducts(), getUsers()) })
+  refreshReport = () => {
+    if (isAdmin(getCurrentUser())) this.setState({ report: buildReport(getAdminOrders(), getProducts(), getUsers()) })
+  }
 
   render() {
     const { report } = this.state
@@ -139,7 +141,7 @@ class AdminReportsPage extends Component {
           <h2 className="h4">Cuentas</h2>
           <ul className="list-group list-group-flush">
             <li className="list-group-item d-flex justify-content-between align-items-center px-0"><span>Cuentas activas</span><span>{report.activeUserCount}</span></li>
-            <li className="list-group-item d-flex justify-content-between align-items-center px-0"><span>Administradores</span><span>{report.adminCount}</span></li>
+            <li className="list-group-item d-flex justify-content-between align-items-center px-0"><span>Cuentas con perfil administrativo (rol o dominio)</span><span>{report.adminCount}</span></li>
             <li className="list-group-item d-flex justify-content-between align-items-center px-0"><span>Productos destacados</span><span>{report.featuredCount}</span></li>
           </ul>
         </div></section>

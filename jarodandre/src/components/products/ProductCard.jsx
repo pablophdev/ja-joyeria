@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { getProductDetailsPath } from '../../navigation/routes'
 import { formatPrice } from '../../utils/formatPrice'
 import ProductRating from './ProductRating'
+import QuickAddButton from './QuickAddButton'
 import './ProductCard.css'
 
 function ProductCard({ product }) {
@@ -33,6 +34,7 @@ function ProductCard({ product }) {
         </p>
         <p className="fw-bold fs-5">{formatPrice(product.price)}</p>
         <Link className="btn btn-outline-dark mt-auto" to={detailsPath}>Ver detalle</Link>
+        <QuickAddButton product={product} />
       </div>
     </article>
   )

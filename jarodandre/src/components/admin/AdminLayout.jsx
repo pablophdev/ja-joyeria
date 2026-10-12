@@ -6,8 +6,11 @@ const links = [
   { to: routes.adminProducts, label: 'Gestionar productos' },
   { to: routes.adminProductNew, label: 'Nuevo producto' },
   { to: routes.users, label: 'Gestionar usuarios' },
+  { to: routes.userNew, label: 'Crear usuario' },
   { to: routes.adminOrders, label: 'Órdenes / Boletas' },
   { to: routes.adminReports, label: 'Reportes' },
+  { to: routes.adminMessages, label: 'Mensajes de contacto' },
+  { to: routes.adminSubscribers, label: 'Suscriptores' },
   { to: routes.shop, label: 'Ver tienda' },
 ]
 

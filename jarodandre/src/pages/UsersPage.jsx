@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { getUsers, subscribeToAuth } from '../data/auth'
+import { getCurrentUser, getUsers, isAdmin, subscribeToAuth } from '../data/auth'
 import { userRoles, userStatuses } from '../data/userOptions'
 import { getUserEditPath, routes } from '../navigation/routes'
 
@@ -18,7 +18,7 @@ class UsersPage extends Component {
 
   componentWillUnmount() { this.unsubscribe?.() }
 
-  refreshUsers = () => this.setState({ users: getUsers() })
+  refreshUsers = () => this.setState({ users: isAdmin(getCurrentUser()) ? getUsers() : [] })
 
   render() {
     const { users, query } = this.state
@@ -27,12 +27,13 @@ class UsersPage extends Component {
     const metrics = [
       { label: 'Total de cuentas', count: users.length },
       { label: 'Cuentas activas', count: users.filter((user) => user.status === 'active').length },
-      { label: 'Administradores', count: users.filter((user) => user.role === 'admin').length },
+      { label: 'Cuentas con perfil administrativo', count: users.filter(isAdmin).length },
       { label: 'Pendientes o bloqueadas', count: users.filter((user) => user.status !== 'active').length },
     ]
     return (
       <section className="container py-5">
         <h1>Gestión de usuarios</h1>
+        <Link className="btn btn-dark mb-3" to={routes.userNew}>Crear usuario</Link>
         <p>Cuentas registradas en la aplicación local.</p>
         <div className="row g-3 mb-4">
           {metrics.map(({ label, count }) => <div className="col-sm-6 col-lg-3" key={label}><div className="border rounded p-3 h-100"><h2 className="h6">{label}</h2><p className="fs-3 mb-0">{count}</p></div></div>)}
@@ -47,7 +48,7 @@ class UsersPage extends Component {
               <thead><tr><th scope="col">ID</th><th scope="col">Usuario / RUT</th><th scope="col">Correo</th><th scope="col">Rol</th><th scope="col">Registro</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
               <tbody>{visibleUsers.map((user) => (
                 <tr key={user.id}><td>{user.id}</td><th scope="row">{user.name}<span className="d-block fw-normal">{user.rut}</span></th><td>{user.email}</td>
-                  <td>{userRoles.find((role) => role.value === user.role)?.label}</td><td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-CL') : 'Sin registro de fecha'}</td>
+                  <td>{userRoles.find((role) => role.value === user.role)?.label}{isAdmin(user) && user.role !== 'admin' && <span className="d-block small text-secondary">Acceso administrativo por dominio</span>}</td><td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-CL') : 'Sin registro de fecha'}</td>
                   <td>{userStatuses.find((status) => status.value === user.status)?.label}</td><td><Link className="btn btn-outline-dark btn-sm" to={getUserEditPath(user.id)} aria-label={`Editar a ${user.name}`}>Editar</Link></td>
                 </tr>
               ))}</tbody>

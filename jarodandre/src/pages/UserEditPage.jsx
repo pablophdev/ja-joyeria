@@ -16,7 +16,7 @@ function formValues(user) {
 }
 
 class UserEditPage extends Component {
-  state = { user: findUser(this.props.userId), values: formValues(findUser(this.props.userId)), busy: false, error: '', message: '', deleted: false }
+  state = { user: findUser(this.props.userId), values: formValues(findUser(this.props.userId)), busy: false, error: '', message: this.props.created ? 'Usuario creado correctamente.' : '', deleted: false }
   mounted = false
   submitting = false
 

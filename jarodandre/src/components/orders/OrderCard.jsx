@@ -1,4 +1,4 @@
-import { formatOrderId, paymentStatuses } from '../../data/orderRecords'
+import { deliveryStatuses, formatOrderId, paymentStatuses } from '../../data/orderRecords'
 import { formatPrice } from '../../utils/formatPrice'
 
 const dateFormatter = new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' })
@@ -10,7 +10,7 @@ function OrderCard({ order }) {
       <div className="card-body">
         <div className="d-flex flex-wrap justify-content-between gap-2">
           <h2 className="h5">{formatOrderId(order.id)}</h2>
-          <span className="badge text-bg-warning align-self-start">{order.status}</span>
+          <span className={`badge ${deliveryStatuses[order.status].badge} align-self-start`}>Entrega: {order.status}</span>
         </div>
         <p className="text-secondary"><time dateTime={order.createdAt}>{dateFormatter.format(new Date(order.createdAt))}</time></p>
         <p className="fw-bold">Total: {formatPrice(order.total)}</p>

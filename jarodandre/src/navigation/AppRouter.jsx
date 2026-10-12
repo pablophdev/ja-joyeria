@@ -25,6 +25,9 @@ import PaymentResultPage from '../pages/PaymentResultPage'
 import AdminOrdersPage from '../pages/AdminOrdersPage'
 import AdminReceiptPage from '../pages/AdminReceiptPage'
 import AdminReportsPage from '../pages/AdminReportsPage'
+import UserCreatePage from '../pages/UserCreatePage'
+import AdminMessagesPage from '../pages/AdminMessagesPage'
+import AdminSubscribersPage from '../pages/AdminSubscribersPage'
 
 function AppRouter() {
   return (
@@ -44,6 +47,7 @@ function AppRouter() {
           <Route path={routes.login} element={<AuthPage key="login" mode="login" />} />
           <Route path={routes.register} element={<AuthPage key="register" mode="register" />} />
           <Route path={routes.users} element={<AdminRoute><UsersPage /></AdminRoute>} />
+          <Route path={routes.userNew} element={<AdminRoute><UserCreatePage /></AdminRoute>} />
           <Route path={routes.userEdit} element={<AdminRoute><UserEditRoute /></AdminRoute>} />
           <Route path={routes.productDetails} element={<ProductDetailsRoute />} />
           <Route path={routes.admin} element={<AdminRoute><AdminLayout /></AdminRoute>}>
@@ -51,6 +55,8 @@ function AppRouter() {
             <Route path={routes.adminOrders} element={<AdminOrdersPage />} />
             <Route path={routes.adminReceipt} element={<AdminReceiptPage />} />
             <Route path={routes.adminReports} element={<AdminReportsPage />} />
+            <Route path={routes.adminMessages} element={<AdminMessagesPage />} />
+            <Route path={routes.adminSubscribers} element={<AdminSubscribersPage />} />
             <Route path={routes.adminProducts} element={<AdminProductsPage />} />
             <Route path={routes.adminProductNew} element={<AdminProductEditorPage key="new" />} />
             <Route path={routes.adminProductEdit} element={<AdminProductEditRoute />} />

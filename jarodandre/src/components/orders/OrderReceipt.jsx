@@ -29,6 +29,7 @@ function OrderReceipt({ order }) {
         <section className="col-sm-5" aria-labelledby="receipt-payment-title">
           <h2 className="h6" id="receipt-payment-title">Estado del pago</h2>
           <p><span className={`badge ${payment.badge}`}>{payment.label}</span></p>
+          <p>Estado de entrega: {order.status}</p>
           <p className="small mb-0">{paid ? 'Compra registrada en el checkout local.' : 'Esta orden no tiene una boleta de pago realizado.'}</p>
         </section>
       </div>

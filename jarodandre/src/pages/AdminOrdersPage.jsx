@@ -1,8 +1,9 @@
 import { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { getAdminOrders, subscribeToOrders } from '../data/cart'
+import { getAdminOrders, subscribeToOrders, updateOrderStatus } from '../data/cart'
 import { subscribeToAuth } from '../data/auth'
-import { formatOrderId, formatReceiptId, paymentStatuses } from '../data/orderRecords'
+import { deliveryStatuses, formatOrderId, formatReceiptId, paymentStatuses } from '../data/orderRecords'
+import OrderStatusForm from '../components/orders/OrderStatusForm'
 import { getAdminReceiptPath } from '../navigation/routes'
 import { formatPrice } from '../utils/formatPrice'
 
@@ -13,7 +14,7 @@ function normalizeSearch(value) {
 }
 
 class AdminOrdersPage extends Component {
-  state = { orders: getAdminOrders(), query: '', paymentStatus: 'all' }
+  state = { orders: getAdminOrders(), query: '', paymentStatus: 'all', deliveryStatus: 'all', error: '', message: '' }
 
   componentDidMount() {
     this.unsubscribe = subscribeToOrders(this.refreshOrders)
@@ -28,11 +29,21 @@ class AdminOrdersPage extends Component {
 
   refreshOrders = () => this.setState({ orders: getAdminOrders() })
 
+  handleStatus = (id, status) => {
+    try {
+      updateOrderStatus(id, status)
+      this.setState({ error: '', message: `${formatOrderId(id)}: entrega actualizada a ${status.toLowerCase()}.` })
+    } catch (error) {
+      this.setState({ error: error.message, message: '' })
+    }
+  }
+
   render() {
-    const { orders, query, paymentStatus } = this.state
+    const { orders, query, paymentStatus, deliveryStatus, error, message } = this.state
     const search = normalizeSearch(query)
     const visibleOrders = orders.filter((order) => (
       (paymentStatus === 'all' || order.paymentStatus === paymentStatus)
+      && (deliveryStatus === 'all' || order.status === deliveryStatus)
       && normalizeSearch([formatOrderId(order.id), order.paymentStatus === 'paid' ? formatReceiptId(order.id) : '', order.customer.name, order.customer.email].join(' ')).includes(search)
     ))
     const paidOrders = orders.filter((order) => order.paymentStatus === 'paid')
@@ -47,6 +58,8 @@ class AdminOrdersPage extends Component {
       <section>
         <h1>Órdenes / Boletas</h1>
         <p>Pedidos de todos los clientes e invitados guardados en este navegador.</p>
+        {error && <p className="alert alert-danger" role="alert">{error}</p>}
+        <p className="text-success" role="status">{message}</p>
         <div className="row g-3 mb-4">
           {metrics.map(({ label, value }) => (
             <div className="col-sm-6 col-xl-3" key={label}>
@@ -66,7 +79,14 @@ class AdminOrdersPage extends Component {
               {Object.entries(paymentStatuses).map(([value, { label }]) => <option key={value} value={value}>{label}</option>)}
             </select>
           </div>
-          <div className="col-12"><button className="btn btn-outline-dark btn-sm" type="button" onClick={() => this.setState({ query: '', paymentStatus: 'all' })}>Restablecer filtros</button></div>
+          <div className="col-md-5">
+            <label className="form-label" htmlFor="admin-order-delivery">Estado de entrega</label>
+            <select className="form-select" id="admin-order-delivery" value={deliveryStatus} onChange={(event) => this.setState({ deliveryStatus: event.target.value })} aria-controls="admin-orders-list">
+              <option value="all">Todos los estados</option>
+              {Object.keys(deliveryStatuses).map((status) => <option key={status} value={status}>{status}</option>)}
+            </select>
+          </div>
+          <div className="col-12"><button className="btn btn-outline-dark btn-sm" type="button" onClick={() => this.setState({ query: '', paymentStatus: 'all', deliveryStatus: 'all' })}>Restablecer filtros</button></div>
         </form>
         <p className="text-secondary" role="status">Mostrando {visibleOrders.length} de {orders.length} órdenes</p>
         <div id="admin-orders-list">
@@ -76,7 +96,7 @@ class AdminOrdersPage extends Component {
             <div className="table-responsive">
               <table className="table align-middle">
                 <caption>Órdenes y boletas del catálogo local</caption>
-                <thead><tr><th scope="col">Orden / Boleta</th><th scope="col">Cliente</th><th scope="col">Fecha</th><th scope="col">Total</th><th scope="col">Pago</th><th scope="col">Acciones</th></tr></thead>
+                <thead><tr><th scope="col">Orden / Boleta</th><th scope="col">Cliente</th><th scope="col">Fecha</th><th scope="col">Total</th><th scope="col">Pago</th><th scope="col">Entrega</th><th scope="col">Acciones</th></tr></thead>
                 <tbody>
                   {visibleOrders.map((order) => {
                     const payment = paymentStatuses[order.paymentStatus]
@@ -88,6 +108,7 @@ class AdminOrdersPage extends Component {
                         <td><time dateTime={order.createdAt}>{dateFormatter.format(new Date(order.createdAt))}</time></td>
                         <td className="text-nowrap">{formatPrice(order.total)}</td>
                         <td><span className={`badge ${payment.badge}`}>{payment.label}</span></td>
+                        <td><span className={`badge ${deliveryStatuses[order.status].badge}`}>{order.status}</span><OrderStatusForm key={`${order.id}-${order.status}`} order={order} onSave={this.handleStatus} /></td>
                         <td><Link className="btn btn-outline-dark btn-sm" to={getAdminReceiptPath(order.id)} aria-label={`${paid ? 'Mostrar boleta' : 'Ver orden'} ${formatOrderId(order.id)}`}>{paid ? 'Mostrar boleta' : 'Ver orden'}</Link></td>
                       </tr>
                     )

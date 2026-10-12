@@ -4,6 +4,12 @@ export const paymentStatuses = {
   failed: { label: 'Pago no realizado', badge: 'text-bg-danger' },
 }
 
+export const deliveryStatuses = {
+  Pendiente: { badge: 'text-bg-warning' },
+  Enviado: { badge: 'text-bg-info' },
+  Completado: { badge: 'text-bg-success' },
+}
+
 export function normalizeCustomer(customer) {
   if (!customer || typeof customer !== 'object') throw new Error('Completa los datos de contacto y entrega.')
   const fields = { name: 120, email: 254, address: 250, city: 100 }
@@ -22,7 +28,7 @@ export function normalizeCustomer(customer) {
 export function normalizeOrder(order, maxQuantity) {
   if (!order || !Number.isSafeInteger(order.id) || order.id < 1
     || typeof order.createdAt !== 'string' || !Number.isFinite(Date.parse(order.createdAt))
-    || order.status !== 'Pendiente' || !Array.isArray(order.items) || !order.items.length) {
+    || !Object.hasOwn(deliveryStatuses, order.status) || !Array.isArray(order.items) || !order.items.length) {
     throw new Error('El pedido guardado no es válido.')
   }
   const userId = order.userId ?? null

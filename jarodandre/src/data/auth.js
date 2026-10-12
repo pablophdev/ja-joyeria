@@ -114,18 +114,31 @@ export function subscribeToAuth(listener) {
 }
 
 export async function registerUser(data) {
+  return createAccount(data, false)
+}
+
+export async function createUser(data) {
+  return createAccount(data, true)
+}
+
+async function createAccount(data, administrative) {
   initializeAuth()
+  if (administrative) requireAdmin()
   const profile = normalizeUserProfile(data)
-  if (profile.email !== normalizeEmail(data.confirmEmail)) throw new Error('Los correos no coinciden.')
+  if (!administrative && profile.email !== normalizeEmail(data.confirmEmail)) throw new Error('Los correos no coinciden.')
+  const role = administrative ? data.role : 'user'
+  const status = administrative ? data.status : 'active'
+  validateAccount(role, status)
   validatePassword(data.password)
   if (data.password !== data.confirmPassword) throw new Error('Las contraseñas no coinciden.')
   checkDuplicates(profile)
   const salt = toHex(crypto.getRandomValues(new Uint8Array(16)))
   const passwordHash = await hashPassword(data.password, salt)
+  if (administrative) requireAdmin()
   // Volver a comprobar tras la operación asíncrona evita registros simultáneos duplicados.
   checkDuplicates(profile)
   if (nextId >= Number.MAX_SAFE_INTEGER) throw new Error('No hay más IDs de usuario disponibles.')
-  const user = { ...profile, id: nextId, role: 'user', status: 'active', createdAt: new Date().toISOString(), salt, passwordHash }
+  const user = { ...profile, id: nextId, role, status, createdAt: new Date().toISOString(), salt, passwordHash }
   saveAuth([...users, user], currentUserId, nextId + 1)
   return publicUser(user)
 }
@@ -178,6 +191,7 @@ export async function updateUser(id, changes) {
     passwordHash = await hashPassword(password, salt)
   }
   // No sobrescribir una eliminación o edición realizada durante el cálculo de la contraseña.
+  requireAdmin()
   if (users.find((item) => item.id === id) !== user) throw new Error('La cuenta cambió durante la edición. Vuelve a cargar sus datos.')
   checkDuplicates(profile, id)
   const updatedUser = { ...user, ...profile, role: values.role, status: values.status, salt, passwordHash }

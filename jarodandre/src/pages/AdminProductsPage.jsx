@@ -20,7 +20,7 @@ class AdminProductsPage extends Component {
   handleDelete = (product) => {
     try {
       deleteProduct(product.id)
-      this.setState({ error: '', message: `${product.name} se eliminó temporalmente del catálogo. Volverá a aparecer al recargar la página.` })
+      this.setState({ error: '', message: `${product.name} se eliminó del catálogo local. Los pedidos anteriores conservan sus datos.` })
     } catch (error) { this.setState({ error: error.message, message: '' }) }
   }
 

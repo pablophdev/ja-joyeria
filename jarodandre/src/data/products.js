@@ -35,13 +35,11 @@ let products = [
 ].map((product) => ({ ...product, ...normalizeProduct({ ...initialProductDetails[product.id], ...product }) }))
 
 const initialProducts = products.map((product) => ({ ...product }))
-// Las eliminaciones afectan solo a esta carga de la aplicación.
-const deletedProductIds = new Set()
 let nextId = Math.max(...products.map((product) => product.id)) + 1
 let initialized = false
 const listeners = new Set()
 const storageKey = 'jarodandre.products'
-const storageVersion = 4
+const storageVersion = 5
 let currentStorageVersion = storageVersion
 
 // Guardar referencias estables evita persistir las URLs con hash generadas por Vite.
@@ -70,7 +68,7 @@ function initializeProducts() {
   if (stored === null) return
 
   try {
-    if (![1, 2, 3, storageVersion].includes(stored.version) || !Array.isArray(stored.products)) {
+    if (![1, 2, 3, 4, storageVersion].includes(stored.version) || !Array.isArray(stored.products)) {
       throw new Error('El formato de los productos guardados no es compatible.')
     }
 
@@ -87,6 +85,14 @@ function initializeProducts() {
         const original = products.find((item) => item.id === id && item.name === values.name)
         if (original) values.category = original.category
       }
+      if (stored.version < 5) {
+        const original = initialProducts.find((item) => item.id === id && item.name === values.name)
+        if (original) {
+          for (const field of ['description', 'tags', 'availability']) {
+            if (!values[field]) values[field] = original[field]
+          }
+        }
+      }
       return { id, ...normalizeProduct({ ...initialProductDetails[id], ...values, image: restoreImage(values.image) }) }
     })
 
@@ -100,9 +106,12 @@ function initializeProducts() {
     currentStorageVersion = stored.version
 
     if (stored.version < storageVersion) {
-      // Recuperar productos originales eliminados con la persistencia anterior,
-      // sin reemplazar productos editados ni IDs usados por productos personalizados.
-      const additions = initialProducts.filter((original) => !products.some((product) => product.id === original.id || product.name === original.name))
+      // Solo la versión 1 carecía de los seis productos adicionales del catálogo.
+      // Las demás migraciones conservan las eliminaciones y las colecciones vacías.
+      const additions = stored.version === 1 && products.length
+        ? initialProducts.filter((original) => original.id > 8 && !products.some((product) => product.name === original.name))
+          .map((product, index) => ({ ...product, id: nextId + index }))
+        : []
       try {
         const updatedNextId = Math.max(nextId, ...additions.map((product) => product.id + 1))
         validateId(updatedNextId)
@@ -225,7 +234,7 @@ function normalizeProduct(data) {
 // Se devuelven copias: modificar un resultado no altera la base simulada.
 export function getProducts() {
   initializeProducts()
-  return products.filter((product) => !deletedProductIds.has(product.id)).map((product) => ({ ...product }))
+  return products.map((product) => ({ ...product }))
 }
 
 export function getFeaturedProducts() {
@@ -235,7 +244,6 @@ export function getFeaturedProducts() {
 export function getProductById(id) {
   initializeProducts()
   validateId(id)
-  if (deletedProductIds.has(id)) return null
   const product = products.find((item) => item.id === id)
   return product ? { ...product } : null
 }
@@ -262,7 +270,7 @@ export function updateProduct(id, changes) {
   validateInput(changes)
   const index = products.findIndex((product) => product.id === id)
 
-  if (index === -1 || deletedProductIds.has(id)) return null
+  if (index === -1) return null
 
   // Validar antes de reemplazar evita actualizaciones parciales ante un error.
   const values = normalizeProduct({ ...products[index], ...changes })
@@ -276,9 +284,7 @@ export function deleteProduct(id) {
   validateId(id)
   const product = products.find((item) => item.id === id)
 
-  if (!product || deletedProductIds.has(id)) return null
-
-  deletedProductIds.add(id)
-  notifyProducts()
+  if (!product) return null
+  saveProducts(products.filter((item) => item.id !== id))
   return { ...product }
 }
