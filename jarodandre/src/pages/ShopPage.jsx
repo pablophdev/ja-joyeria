@@ -23,16 +23,24 @@ class ShopPage extends Component {
   refreshProducts = () => {
     const products = getProducts()
     const categories = getProductCategories(products)
-    this.setState(({ filters }) => ({
-      products,
-      filters: filters.category === 'all' || categories.some((category) => category.value === filters.category)
-        ? filters
-        : { ...filters, category: 'all' },
-    }))
+    this.setState((previousState) => {
+      const filters = { ...previousState.filters }
+      const categoryExists = categories.some((category) => category.value === filters.category)
+
+      if (!categoryExists) {
+        filters.category = 'all'
+      }
+
+      return { products, filters }
+    })
   }
 
   handleFilterChange = (name, value) => {
-    this.setState(({ filters }) => ({ filters: { ...filters, [name]: value } }))
+    this.setState((previousState) => {
+      const filters = { ...previousState.filters }
+      filters[name] = value
+      return { filters }
+    })
   }
 
   resetFilters = () => {
@@ -79,7 +87,7 @@ class ShopPage extends Component {
               <div id="catalog-results">
                 <ProductGrid
                   products={visibleProducts}
-                  columnClass="col-6 col-xl-4"
+                  columnClass="col-12 col-sm-6 col-xl-4"
                   emptyMessage={products.length === 0
                     ? 'No hay productos disponibles.'
                     : 'No encontramos productos con estos criterios. Prueba otra búsqueda o restablece los filtros.'}

@@ -9,7 +9,7 @@ function ContactPage() {
     <>
       <PageHeading title="Contacto" />
       <div className="container py-5">
-        <div className="row g-5">
+        <div className="row g-4 g-lg-5">
           <section className="col-lg-5" aria-labelledby="contact-info-title">
             <p className="text-secondary">Información</p>
             <h2 id="contact-info-title">Contáctanos</h2>

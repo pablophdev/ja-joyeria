@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
 
-function HeroSlide({ slide, position, total, isActive, direction }) {
-  const [mainTitle, ...rest] = slide.title.split(' - ')
-  const subtitle = rest.join(' - ')
+function HeroSlide({ slide, position, total, isActive }) {
+  const titleParts = slide.title.split(' - ')
+  const mainTitle = titleParts[0]
+  const subtitle = titleParts.slice(1).join(' - ')
 
   return (
     <div
@@ -11,7 +12,7 @@ function HeroSlide({ slide, position, total, isActive, direction }) {
       aria-roledescription="diapositiva"
       aria-label={`${position} de ${total}: ${slide.category}`}
       aria-hidden={isActive ? undefined : true}
-      data-direction={direction > 0 ? 'next' : 'prev'}
+      inert={!isActive}
     >
       <div className="hero-slide__media">
         <img

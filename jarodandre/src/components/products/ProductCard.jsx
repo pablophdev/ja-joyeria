@@ -8,7 +8,7 @@ import './ProductCard.css'
 function ProductCard({ product }) {
   const detailsPath = getProductDetailsPath(product.id)
   return (
-    <article className="card h-100 border-0">
+    <article className="product-card card h-100 border-0">
       <div className="position-relative">
         <Link to={detailsPath} aria-label={`Ver ${product.name}`}>
           <img

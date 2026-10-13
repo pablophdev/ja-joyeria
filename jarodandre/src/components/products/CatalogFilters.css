@@ -12,3 +12,24 @@
   letter-spacing: 0.28em;
   text-transform: uppercase;
 }
+
+@media (min-width: 576px) and (max-width: 991px) {
+  .catalog-filters {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+  }
+
+  .catalog-filters__title,
+  .catalog-filters__search,
+  .catalog-filters > button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 575px) {
+  .catalog-filters {
+    position: static;
+  }
+}

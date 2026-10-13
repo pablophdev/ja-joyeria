@@ -6,3 +6,17 @@
   object-fit: cover;
   background-color: #111111;
 }
+
+.product-card .btn,
+.product-card .card-body > div {
+  width: 100%;
+}
+
+.product-card .btn {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.product-card h3 {
+  overflow-wrap: anywhere;
+}

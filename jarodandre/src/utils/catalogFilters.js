@@ -1,13 +1,13 @@
 import { getProductCategoryKey } from './productCategories'
 
-export const defaultCatalogFilters = Object.freeze({
+export const defaultCatalogFilters = {
   query: '',
   category: 'all',
   group: 'all',
   badge: 'all',
   priceRange: 'all',
   sort: 'default',
-})
+}
 
 export const catalogFilterOptions = {
   group: [
@@ -35,42 +35,42 @@ export const catalogFilterOptions = {
   ],
 }
 
-const nameCollator = new Intl.Collator('es', { sensitivity: 'base', numeric: true })
-
-const priceRanges = {
-  all: () => true,
-  'under-100000': (price) => price < 100000,
-  '100000-200000': (price) => price >= 100000 && price <= 200000,
-  'over-200000': (price) => price > 200000,
-}
-
-const sortComparators = {
-  'price-asc': (first, second) => first.price - second.price,
-  'price-desc': (first, second) => second.price - first.price,
-  'name-asc': (first, second) => nameCollator.compare(first.name, second.name),
-  'name-desc': (first, second) => nameCollator.compare(second.name, first.name),
-}
-
 function normalizeSearch(value) {
-  return value.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLocaleLowerCase('es').trim()
+  // Quitar las tildes permite encontrar "anillo" aunque se escriba con acento.
+  const withoutAccents = value.normalize('NFD').replace(/\p{Diacritic}/gu, '')
+  return withoutAccents.toLocaleLowerCase('es').trim()
 }
 
 export function filterCatalogProducts(products, filters = defaultCatalogFilters) {
-  const { query, category, group, badge, priceRange, sort } = { ...defaultCatalogFilters, ...filters }
-  const terms = normalizeSearch(query).split(/\s+/u).filter(Boolean)
-  const matchesPrice = priceRanges[priceRange] ?? priceRanges.all
+  const selected = { ...defaultCatalogFilters, ...filters }
+  const terms = normalizeSearch(selected.query).split(/\s+/u)
 
   // filter crea una nueva lista: ordenar la vista no modifica la fuente de datos.
   const visibleProducts = products.filter((product) => {
     const name = normalizeSearch(product.name)
-    return terms.every((term) => name.includes(term))
-      && (category === 'all' || getProductCategoryKey(product) === category)
-      && (group === 'all' || product.group === group)
-      && (badge === 'all' || product.badge === badge)
-      && matchesPrice(product.price)
+    for (const term of terms) {
+      if (!name.includes(term)) return false
+    }
+
+    if (selected.category !== 'all' && getProductCategoryKey(product) !== selected.category) return false
+    if (selected.group !== 'all' && product.group !== selected.group) return false
+    if (selected.badge !== 'all' && product.badge !== selected.badge) return false
+    if (selected.priceRange === 'under-100000' && product.price >= 100000) return false
+    if (selected.priceRange === '100000-200000' && (product.price < 100000 || product.price > 200000)) return false
+    if (selected.priceRange === 'over-200000' && product.price <= 200000) return false
+
+    return true
   })
 
-  const compare = sortComparators[sort]
-  if (compare) visibleProducts.sort(compare)
+  if (selected.sort === 'price-asc') {
+    visibleProducts.sort((first, second) => first.price - second.price)
+  } else if (selected.sort === 'price-desc') {
+    visibleProducts.sort((first, second) => second.price - first.price)
+  } else if (selected.sort === 'name-asc') {
+    visibleProducts.sort((first, second) => first.name.localeCompare(second.name, 'es', { sensitivity: 'base', numeric: true }))
+  } else if (selected.sort === 'name-desc') {
+    visibleProducts.sort((first, second) => second.name.localeCompare(first.name, 'es', { sensitivity: 'base', numeric: true }))
+  }
+
   return visibleProducts
 }

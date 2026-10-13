@@ -12,7 +12,7 @@ function CatalogFilters({ filters, onFilterChange, onReset }) {
   return (
     <form className="catalog-filters bg-light border rounded p-3 p-md-4" aria-label="Buscar y filtrar productos" onSubmit={(event) => event.preventDefault()}>
       <h3 className="catalog-filters__title">Filtros</h3>
-      <div className="mb-3">
+      <div className="catalog-filters__search mb-3">
         <label className="form-label" htmlFor="catalog-query">Buscar por nombre</label>
         <input
           className="form-control"
@@ -27,19 +27,19 @@ function CatalogFilters({ filters, onFilterChange, onReset }) {
         />
         <p className="form-text mb-0" id="catalog-search-help">Los resultados se actualizan al escribir. Puedes combinar los filtros.</p>
       </div>
-      {selectFields.map(({ name, label }) => (
-        <div className="mb-3" key={name}>
-          <label className="form-label" htmlFor={`catalog-${name}`}>{label}</label>
+      {selectFields.map((field) => (
+        <div className="mb-3" key={field.name}>
+          <label className="form-label" htmlFor={`catalog-${field.name}`}>{field.label}</label>
           <select
             className="form-select"
-            id={`catalog-${name}`}
-            name={name}
-            value={filters[name]}
+            id={`catalog-${field.name}`}
+            name={field.name}
+            value={filters[field.name]}
             onChange={(event) => onFilterChange(event.target.name, event.target.value)}
             aria-controls="catalog-results"
           >
-            {catalogFilterOptions[name].map(({ value, label: optionLabel }) => (
-              <option key={value} value={value}>{optionLabel}</option>
+            {catalogFilterOptions[field.name].map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
             ))}
           </select>
         </div>

@@ -122,17 +122,25 @@ export function subscribeToCart(listener) {
 
 export function getCart() {
   initializeCart()
-  const products = new Map(getProducts().map((product) => [product.id, product]))
-  const cartItems = items.map((item) => {
-    const product = products.get(item.productId) ?? null
+  const products = getProducts()
+  const cartItems = []
+  let totalQuantity = 0
+  let total = 0
+
+  for (const item of items) {
+    const product = products.find((product) => product.id === item.productId) ?? null
     const available = isProductAvailable(product)
-    return { ...item, product, available, subtotal: available ? product.price * item.quantity : 0 }
-  })
-  return {
-    items: cartItems,
-    totalQuantity: cartItems.reduce((total, item) => total + item.quantity, 0),
-    total: cartItems.reduce((total, item) => total + item.subtotal, 0),
+    let subtotal = 0
+    if (available) {
+      subtotal = product.price * item.quantity
+    }
+
+    cartItems.push({ ...item, product, available, subtotal })
+    totalQuantity += item.quantity
+    total += subtotal
   }
+
+  return { items: cartItems, totalQuantity, total }
 }
 
 export function addToCart(productId, quantity = 1) {
@@ -141,11 +149,20 @@ export function addToCart(productId, quantity = 1) {
   validateQuantity(quantity)
   if (!isProductAvailable(getProductById(productId))) throw new Error('Este producto no está disponible.')
   const existing = items.find((item) => item.productId === productId)
-  const updatedQuantity = (existing?.quantity ?? 0) + quantity
+  if (!existing) {
+    saveCart([...items, { productId, quantity }])
+    return
+  }
+
+  const updatedQuantity = existing.quantity + quantity
   validateQuantity(updatedQuantity)
-  saveCart(existing
-    ? items.map((item) => item.productId === productId ? { ...item, quantity: updatedQuantity } : item)
-    : [...items, { productId, quantity }])
+  const updatedItems = items.map((item) => {
+    if (item.productId === productId) {
+      return { ...item, quantity: updatedQuantity }
+    }
+    return item
+  })
+  saveCart(updatedItems)
 }
 
 export function updateCartQuantity(productId, quantity) {

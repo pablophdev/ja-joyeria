@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import { Component, createRef } from 'react'
 import { Link } from 'react-router-dom'
 import wordmark from '../../assets/jarodandre-blanco-transparente.webp'
 import { routes } from '../../navigation/routes'
@@ -16,27 +16,34 @@ const menuItems = [
 
 class Header extends Component {
   state = { menuOpen: false }
+  menuRef = createRef()
 
   componentDidMount() {
-    document.addEventListener('keydown', this.handleEscape)
-  }
-
-  componentDidUpdate(_prevProps, prevState) {
-    if (prevState.menuOpen !== this.state.menuOpen) {
-      document.body.classList.toggle('menu-open', this.state.menuOpen)
-    }
+    window.addEventListener('resize', this.handleResize)
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keydown', this.handleEscape)
+    window.removeEventListener('resize', this.handleResize)
     document.body.classList.remove('menu-open')
   }
 
-  handleEscape = (event) => {
-    if (event.key === 'Escape') this.setState({ menuOpen: false })
+  handleResize = () => {
+    if (window.innerWidth >= 1200 && this.state.menuOpen) {
+      this.closeMenu()
+    }
   }
 
-  closeMenu = () => this.setState({ menuOpen: false })
+  openMenu = () => {
+    this.menuRef.current.showModal()
+    document.body.classList.add('menu-open')
+    this.setState({ menuOpen: true })
+  }
+
+  closeMenu = () => {
+    this.menuRef.current.close()
+    document.body.classList.remove('menu-open')
+    this.setState({ menuOpen: false })
+  }
 
   render() {
     const { menuOpen } = this.state
@@ -47,7 +54,7 @@ class Header extends Component {
           <Link className="d-flex align-items-center text-decoration-none" to={routes.home} aria-label="jarodandre, ir al inicio">
             <img className="brand-wordmark" src={wordmark} alt="jarodandre" width="168" height="56" />
           </Link>
-          <nav className="ms-auto d-none d-lg-block" aria-label="Navegación principal">
+          <nav className="ms-auto d-none d-xl-block" aria-label="Navegación principal">
             <ul className="nav align-items-center">
               {menuItems.map(({ to, label }) => (
                 <li className="nav-item" key={to}>
@@ -59,12 +66,12 @@ class Header extends Component {
             </ul>
           </nav>
           <button
-            className="site-header__burger d-lg-none ms-auto"
+            className="site-header__burger d-xl-none ms-auto"
             type="button"
             aria-label="Abrir menú"
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
-            onClick={() => this.setState({ menuOpen: true })}
+            onClick={this.openMenu}
           >
             <span aria-hidden="true" />
             <span aria-hidden="true" />
@@ -72,9 +79,17 @@ class Header extends Component {
           </button>
         </div>
 
-        <div className={`mobile-menu${menuOpen ? ' is-open' : ''}`} id="mobile-menu" aria-hidden={!menuOpen}>
-          <div className="mobile-menu__backdrop" onClick={this.closeMenu} aria-hidden="true" />
-          <div className="mobile-menu__panel" role="dialog" aria-modal="true" aria-label="Menú de navegación">
+        <dialog
+          ref={this.menuRef}
+          className="mobile-menu"
+          id="mobile-menu"
+          aria-label="Menú de navegación"
+          onCancel={this.closeMenu}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) this.closeMenu()
+          }}
+        >
+          <div className="mobile-menu__panel">
             <div className="mobile-menu__head">
               <img className="brand-wordmark" src={wordmark} alt="" width="140" height="47" />
               <button className="mobile-menu__close" type="button" aria-label="Cerrar menú" onClick={this.closeMenu}>
@@ -86,13 +101,13 @@ class Header extends Component {
             </div>
             <nav aria-label="Navegación móvil">
               <ul className="mobile-menu__list">
-                {menuItems.map(({ to, label }, index) => (
-                  <li key={to} style={{ '--menu-delay': `${index * 50}ms` }}>
-                    <Link className="mobile-menu__link" to={to} onClick={this.closeMenu} tabIndex={menuOpen ? 0 : -1}>{label}</Link>
+                {menuItems.map((item) => (
+                  <li key={item.to}>
+                    <Link className="mobile-menu__link" to={item.to} onClick={this.closeMenu}>{item.label}</Link>
                   </li>
                 ))}
-                <li style={{ '--menu-delay': `${menuItems.length * 50}ms` }}>
-                  <CartLink onNavigate={this.closeMenu} tabIndex={menuOpen ? 0 : -1} />
+                <li>
+                  <CartLink onNavigate={this.closeMenu} />
                 </li>
               </ul>
             </nav>
@@ -100,7 +115,7 @@ class Header extends Component {
               <AuthLinks onNavigate={this.closeMenu} variant="text" />
             </div>
           </div>
-        </div>
+        </dialog>
       </header>
     )
   }
