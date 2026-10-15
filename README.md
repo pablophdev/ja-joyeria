@@ -10,7 +10,7 @@ El proyecto nació como un sitio HTML y fue migrado a una aplicación **React** 
 
 ## Cómo funciona
 
-La lógica que simula el backend está escrita en **JavaScript**, dentro de `jarodandre/src/data/`. Los datos se guardan en **`localStorage`** y se conservan al recargar la página.
+La lógica que simula el backend está escrita en **JavaScript**, dentro de `jarodandre/src/datos/`. Los datos se guardan en **`localStorage`** y se conservan al recargar la página.
 
 No requiere backend real, una base de datos externa ni claves de servicios. Los pagos y las boletas son simulados; contacto y newsletter guardan información localmente, sin enviar correos.
 
@@ -169,11 +169,11 @@ El rol Empleado/Ventas no concede por sí solo acceso al panel. Los permisos adm
     ├── public/             # Iconos y videos públicos
     ├── src/
     │   ├── assets/         # Banner, imágenes y recursos importados
-    │   ├── components/     # Componentes reutilizables
-    │   ├── data/           # Backend simulado en JS y persistencia local
+    │   ├── componentes/    # Formularios y elementos compartidos, con nombres en español
+    │   ├── datos/          # Backend simulado en JS y persistencia local
     │   ├── navigation/     # Rutas y acceso a administración
-    │   ├── pages/          # Pantallas de la aplicación
-    │   ├── utils/          # Validaciones, filtros y formateadores
+    │   ├── paginas/        # Pantallas con su contenido fijo escrito directamente en JSX
+    │   ├── utilidades/     # Validaciones, filtros y formateadores
     │   ├── App.jsx
     │   ├── main.jsx
     │   └── index.css

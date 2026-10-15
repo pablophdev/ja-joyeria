@@ -1,11 +1,11 @@
-import AppRouter from './navigation/AppRouter'
-import Preloader from './components/common/Preloader'
+import Rutas from './navigation/Rutas'
+import PantallaCarga from './componentes/estructura/PantallaCarga'
 
 function App() {
   return (
     <>
-      <Preloader />
-      <AppRouter />
+      <PantallaCarga />
+      <Rutas />
     </>
   )
 }

@@ -1,0 +1,23 @@
+import { MAX_CART_QUANTITY } from '../../datos/cart'
+
+function ControlCantidad({ id, quantity, onChange, label = 'Cantidad', disabled = false }) {
+  const quantities = []
+  for (let value = 1; value <= MAX_CART_QUANTITY; value += 1) {
+    quantities.push(value)
+  }
+
+  return (
+    <div>
+      <label className="form-label" htmlFor={id}>{label}</label>
+      <div className="input-group flex-nowrap quantity-control">
+        <button className="btn btn-outline-dark" type="button" aria-label={`Reducir ${label.toLowerCase()}`} disabled={disabled || quantity <= 1} onClick={() => onChange(quantity - 1)}>−</button>
+        <select className="form-select" id={id} value={quantity} disabled={disabled} onChange={(event) => onChange(Number(event.target.value))}>
+          {quantities.map((value) => <option key={value} value={value}>{value}</option>)}
+        </select>
+        <button className="btn btn-outline-dark" type="button" aria-label={`Aumentar ${label.toLowerCase()}`} disabled={disabled || quantity >= MAX_CART_QUANTITY} onClick={() => onChange(quantity + 1)}>+</button>
+      </div>
+    </div>
+  )
+}
+
+export default ControlCantidad

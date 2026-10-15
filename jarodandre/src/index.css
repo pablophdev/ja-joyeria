@@ -43,7 +43,6 @@ video {
   max-width: 100%;
 }
 
-/* Evita que textos largos ensanchen las columnas de Bootstrap. */
 .row > *,
 .d-flex > * {
   min-width: 0;
