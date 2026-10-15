@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { formatPrice } from '../utilidades/formatPrice'
 
-// El formato exacto lo define Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' })
-// en runtime: símbolo "$" pegado al número y "." como separador de miles, sin decimales.
+
 describe('formatPrice', () => {
   it('formatea un número como peso chileno', () => {
     expect(formatPrice(100000)).toBe('$100.000')
