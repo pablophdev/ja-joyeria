@@ -81,13 +81,13 @@ class Acceso extends Component {
                 </div>}
                 <div className="mb-3">
                   <label className="form-label" htmlFor="auth-password">Contraseña</label>
-                  <input className="form-control" id="auth-password" name="password" type="password" autoComplete={isRegister ? 'new-password' : 'current-password'} required minLength={6} maxLength={128} value={values.password} onChange={this.handleChange} />
+                  <input className="form-control" id="auth-password" name="password" type="password" autoComplete={isRegister ? 'new-password' : 'current-password'} required minLength={6} maxLength={80} value={values.password} onChange={this.handleChange} />
                 </div>
                 {isRegister && <div className="mb-3">
                   <label className="form-label" htmlFor="auth-confirmPassword">Confirmar contraseña</label>
-                  <input className="form-control" id="auth-confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" required minLength={6} maxLength={128} value={values.confirmPassword} onChange={this.handleChange} />
+                  <input className="form-control" id="auth-confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" required minLength={6} maxLength={80} value={values.confirmPassword} onChange={this.handleChange} />
                 </div>}
-                {isRegister && <p className="small text-secondary">Correos admitidos: @gmail.com, @duoc.cl y @profesor.duoc.cl. Contraseña de 6 a 128 caracteres.</p>}
+                {isRegister && <p className="small text-secondary">Correos admitidos: @gmail.com, @duoc.cl y @profesor.duoc.cl. Contraseña de 6 a 80 caracteres con al menos un número.</p>}
                 <button className="btn btn-dark w-100" type="submit">{busy ? 'Procesando…' : isRegister ? 'Crear cuenta' : 'Iniciar sesión'}</button>
               </fieldset>
             </form>

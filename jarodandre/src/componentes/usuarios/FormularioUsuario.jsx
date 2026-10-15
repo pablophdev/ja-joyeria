@@ -13,13 +13,13 @@ function FormularioUsuario({ values, busy, onChange, onSubmit, onDelete, creatin
         <div className="row g-3 mb-4">
           <div className="col-sm-6">
             <label className="form-label" htmlFor="edit-password">{creating ? 'Contraseña inicial' : 'Nueva contraseña (opcional)'}</label>
-            <input className="form-control" id="edit-password" name="password" type="password" autoComplete="new-password" minLength={6} maxLength={128} required={creating} value={values.password} onChange={onChange} aria-describedby="password-help" />
+            <input className="form-control" id="edit-password" name="password" type="password" autoComplete="new-password" minLength={6} maxLength={80} required={creating} value={values.password} onChange={onChange} aria-describedby="password-help" />
           </div>
           <div className="col-sm-6">
             <label className="form-label" htmlFor="edit-confirm-password">Confirmar nueva contraseña</label>
-            <input className="form-control" id="edit-confirm-password" name="confirmPassword" type="password" autoComplete="new-password" minLength={6} maxLength={128} value={values.confirmPassword} onChange={onChange} required={Boolean(values.password)} />
+            <input className="form-control" id="edit-confirm-password" name="confirmPassword" type="password" autoComplete="new-password" minLength={6} maxLength={80} value={values.confirmPassword} onChange={onChange} required={Boolean(values.password)} />
           </div>
-          <p className="small text-secondary mb-0" id="password-help">{creating ? 'Ingresa y confirma una contraseña de al menos 6 caracteres.' : 'Deja ambas contraseñas vacías para conservar la actual.'}</p>
+          <p className="small text-secondary mb-0" id="password-help">{creating ? 'Ingresa y confirma una contraseña de 6 a 80 caracteres con al menos un número.' : 'Deja ambas contraseñas vacías para conservar la actual.'}</p>
           {[{ name: 'role', label: 'Rol', options: userRoles }, { name: 'status', label: 'Estado', options: userStatuses }].map(({ name, label, options }) => (
             <div className="col-sm-6" key={name}>
               <label className="form-label" htmlFor={`edit-${name}`}>{label}</label>

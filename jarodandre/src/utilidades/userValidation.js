@@ -24,8 +24,8 @@ function normalizeRut(value) {
 }
 
 export function validatePassword(password) {
-  if (typeof password !== 'string' || password.trim().length < 6 || password.length > 128) {
-    throw new Error('La contraseña debe tener entre 6 y 128 caracteres.')
+  if (typeof password !== 'string' || password.trim().length < 6 || password.length > 80 || !/\d/.test(password)) {
+    throw new Error('La contraseña debe tener entre 6 y 80 caracteres e incluir al menos un número.')
   }
 }
 
