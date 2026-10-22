@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { getCurrentUser, getUsers, isAdmin, subscribeToAuth } from '../datos/auth'
-import { userRoles, userStatuses } from '../datos/userOptions'
+import { userStatuses } from '../datos/userOptions'
 import { getUserEditPath, routes } from '../navigation/routes'
 
 function normalizeSearch(value) {
@@ -48,7 +48,7 @@ class Usuarios extends Component {
               <thead><tr><th scope="col">ID</th><th scope="col">Usuario / RUT</th><th scope="col">Correo</th><th scope="col">Rol</th><th scope="col">Registro</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
               <tbody>{visibleUsers.map((user) => (
                 <tr key={user.id}><td>{user.id}</td><th scope="row">{user.name}<span className="d-block fw-normal">{user.rut}</span></th><td>{user.email}</td>
-                  <td>{userRoles.find((role) => role.value === user.role)?.label}{isAdmin(user) && user.role !== 'admin' && <span className="d-block small text-secondary">Acceso administrativo por dominio</span>}</td><td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-CL') : 'Sin registro de fecha'}</td>
+                  <td>{isAdmin(user) ? 'Administrador' : 'Cliente'}</td><td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-CL') : 'Sin registro de fecha'}</td>
                   <td>{userStatuses.find((status) => status.value === user.status)?.label}</td><td><Link className="btn btn-outline-dark btn-sm" to={getUserEditPath(user.id)} aria-label={`Editar a ${user.name}`}>Editar</Link></td>
                 </tr>
               ))}</tbody>
