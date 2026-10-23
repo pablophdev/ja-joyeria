@@ -36,4 +36,5 @@ describe('validatePassword', () => {
     expect(() => validatePassword(undefined)).toThrow()
     expect(() => validatePassword(123456)).toThrow()
   })
+
 })
