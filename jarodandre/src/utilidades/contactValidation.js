@@ -8,3 +8,4 @@ export function normalizeContactMessage(data) {
   if (!message || message.length > 2000) throw new Error('Escribe un mensaje de entre 1 y 2000 caracteres.')
   return { name, email, message }
 }
+z
