@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom'
+import BotonVolverAdmin from './BotonVolverAdmin'
 import Cabecera from './Cabecera'
 import PiePagina from './PiePagina'
 
@@ -11,6 +12,7 @@ function PlantillaSitio() {
         <Outlet />
       </main>
       <PiePagina />
+      <BotonVolverAdmin />
     </div>
   )
 }
