@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { confirmOrder, getCart, subscribeToCart } from '../datos/cart'
+import { clearRecoveredCheckoutId, confirmOrder, getCart, getRecoveredCheckoutId, pendingCustomer, subscribeToCart } from '../datos/cart'
 import FormularioEntrega from '../componentes/pedidos/FormularioEntrega'
 import PagoPedido from '../componentes/pedidos/PagoPedido'
 import { normalizeCustomer } from '../datos/orderRecords'
@@ -8,10 +8,11 @@ import { getPaymentResultPath, routes } from '../navigation/routes'
 import { formatPrice } from '../utilidades/formatPrice'
 
 class FinalizarCompra extends Component {
-  state = { cart: getCart(), error: '', orderId: null, step: 'delivery', customer: null }
+  state = { cart: getCart(), error: '', orderId: getRecoveredCheckoutId(), step: pendingCustomer() ? 'payment' : 'delivery', customer: pendingCustomer(), busy: false }
   submitting = false
 
   componentDidMount() {
+    clearRecoveredCheckoutId()
     this.unsubscribe = subscribeToCart(this.refreshCart)
     this.refreshCart()
   }
@@ -37,16 +38,17 @@ class FinalizarCompra extends Component {
 
   handleCancel = () => this.completeCheckout('failed')
 
-  completeCheckout = (paymentStatus) => {
+  completeCheckout = async (paymentStatus) => {
     if (this.submitting || this.state.orderId) return
     this.submitting = true
+    this.setState({ busy: true })
     try {
-      const order = confirmOrder(this.state.customer, paymentStatus)
+      const order = await confirmOrder(this.state.customer, paymentStatus)
       this.setState({ orderId: order.id, error: '' })
     } catch (error) {
       this.submitting = false
       this.setState({ error: `Pago no realizado. ${error.message} Puedes volver a intentarlo.` })
-    }
+    } finally { this.setState({ busy: false }) }
   }
 
   render() {
@@ -106,7 +108,7 @@ class FinalizarCompra extends Component {
                 <PagoPedido
                   customer={customer}
                   total={cart.total}
-                  disabled={unavailable}
+                  disabled={unavailable || this.state.busy}
                   onPay={this.handlePay}
                   onCancel={this.handleCancel}
                   onEdit={() => this.setState({ step: 'delivery', error: '' })}

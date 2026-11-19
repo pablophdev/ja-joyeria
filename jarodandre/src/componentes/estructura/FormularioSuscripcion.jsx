@@ -2,16 +2,20 @@ import { Component } from 'react'
 import { subscribeNewsletter } from '../../datos/newsletter'
 
 class FormularioSuscripcion extends Component {
-  state = { email: '', message: '', error: '' }
+  state = { email: '', message: '', error: '', busy: false }
+  submitting = false
 
-  handleSubmit = (event) => {
+  handleSubmit = async (event) => {
     event.preventDefault()
+    if (this.submitting) return
+    this.submitting = true
+    this.setState({ busy: true })
     try {
-      const created = subscribeNewsletter(this.state.email)
-      this.setState({ email: '', error: '', message: created ? 'Suscripción guardada en este navegador. ¡Gracias por tu interés!' : 'Este correo ya está suscrito en este navegador.' })
+      const created = await subscribeNewsletter(this.state.email)
+      this.setState({ email: '', error: '', message: created ? 'Suscripción registrada. ¡Gracias por tu interés!' : 'Este correo ya está suscrito.' })
     } catch (error) {
       this.setState({ error: error.message, message: '' })
-    }
+    } finally { this.submitting = false; this.setState({ busy: false }) }
   }
 
   render() {
@@ -32,9 +36,9 @@ class FormularioSuscripcion extends Component {
             aria-describedby="newsletter-note"
             onChange={(event) => this.setState({ email: event.target.value, message: '', error: '' })}
           />
-          <button className="btn btn-outline-light" type="submit">Suscribirme</button>
+          <button className="btn btn-outline-light" type="submit" disabled={this.state.busy}>{this.state.busy ? 'Enviando…' : 'Suscribirme'}</button>
         </div>
-        <p className="small mt-2 mb-0" id="newsletter-note">Suscripción local de demostración: el correo se guarda en este navegador. No se envían novedades por correo.</p>
+        <p className="small mt-2 mb-0" id="newsletter-note">Tu correo se registrará en la lista de suscriptores de la tienda.</p>
         <p className="small mt-2 mb-0" role="status">
           {this.state.message}
         </p>

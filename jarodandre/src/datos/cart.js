@@ -1,238 +1,191 @@
-import { getProductById, getProducts, subscribeToProducts } from './products'
-import { readStoredData, writeStoredData } from './persistence'
-import { deliveryStatuses, normalizeCustomer, normalizeOrder } from './orderRecords'
-import { getCurrentUser, isAdmin, subscribeToAuth } from './auth'
+import { allPages, observable, request } from './api'
+import { getCurrentUser, isAdmin } from './auth'
+import { getProductById } from './products'
+import { normalizeCustomer } from './orderRecords'
 
 export const MAX_CART_QUANTITY = 99
-const storageKey = 'jarodandre.cart'
-let items = []
+const events = observable()
+let cart = { items: [], totalQuantity: 0, total: 0 }
 let orders = []
-let nextOrderId = 1
-let initialized = false
-const listeners = new Set()
-let unsubscribeProducts
-
-function validateQuantity(quantity) {
-  if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_CART_QUANTITY) {
-    throw new Error(`La cantidad debe ser un entero entre 1 y ${MAX_CART_QUANTITY}.`)
-  }
+let adminOrders = []
+let recoveredCheckoutId = null
+let queue = Promise.resolve()
+const tokenKey = 'ja.carrito.token'
+const guestKey = 'ja.pedidos.tokens'
+const checkoutKey = 'ja.checkout'
+const paymentStates = { PENDIENTE: 'pending', PAGADO: 'paid', FALLIDO: 'failed', CANCELADO: 'failed' }
+const deliveryStates = { PENDIENTE: 'Pendiente', ENVIADO: 'Enviado', COMPLETADO: 'Completado' }
+const stored = (key, fallback) => JSON.parse(sessionStorage.getItem(key) || JSON.stringify(fallback))
+const guestTokens = () => stored(guestKey, {})
+const headers = () => {
+  const token = sessionStorage.getItem(tokenKey)
+  return !getCurrentUser() && token ? { 'X-Carrito-Token': token } : {}
 }
+const orderHeaders = (id) => ({ ...(guestTokens()[id] ? { 'X-Pedido-Token': guestTokens()[id] } : {}) })
+const orderRequest = (path, options = {}) => request('orders', path, { ...options, authenticated: Boolean(getCurrentUser()) })
 
-function validateId(productId) {
-  if (!Number.isSafeInteger(productId) || productId < 1) throw new Error('El ID del producto no es válido.')
+export function mapOrder(item) {
+  return { id: item.id, userId: item.usuarioId, createdAt: item.creadoEn, status: deliveryStates[item.estadoEntrega],
+    paymentStatus: paymentStates[item.estadoPago], total: item.totalClp,
+    customer: { name: item.entrega.nombre, email: item.entrega.correo, address: item.entrega.direccion, city: item.entrega.ciudad },
+    items: item.items.map((line) => ({ productId: line.productoId, name: line.nombre, price: line.precioUnitarioClp, quantity: line.cantidad, subtotal: line.subtotalClp })) }
 }
 
 export function isProductAvailable(product) {
-  const availability = product?.availability?.trim().toLocaleLowerCase('es')
-  return Boolean(product) && !['agotado', 'sin stock', 'no disponible'].includes(availability)
+  return Boolean(product) && (product.availabilityCode ? product.availabilityCode !== 'AGOTADO' : !['agotado', 'sin stock', 'no disponible'].includes(product.availability?.toLowerCase()))
+}
+export const subscribeToCart = events.subscribe
+export const subscribeToOrders = events.subscribe
+export function getCart() { return cart }
+export function getOrders() { return [...orders] }
+export function getAdminOrders() { return isAdmin(getCurrentUser()) ? [...adminOrders] : [] }
+export function getAdminOrderById(id) { return getAdminOrders().find((order) => order.id === id) || null }
+
+export async function refreshCart() {
+  const data = await orderRequest('/v1/carrito', { headers: headers() })
+  cart = { id: data.id, pendingOrderId: data.pedidoPendienteId, total: data.totalClp,
+    totalQuantity: data.items.reduce((sum, line) => sum + line.cantidad, 0),
+    items: data.items.map((line) => {
+      const product = getProductById(line.productoId)
+      return { productId: line.productoId, quantity: line.cantidad, subtotal: line.subtotalClp,
+        available: line.disponibilidad !== 'AGOTADO' && line.precioClp !== null,
+        product: { ...product, id: line.productoId, name: line.nombre, price: line.precioClp } }
+    }) }
+  events.notify()
 }
 
-let unsubscribeAuth
-
-function normalizeEmail(value) {
-  return value.trim().toLocaleLowerCase('es')
-}
-
-function tryClaimGuestOrders() {
+export async function loadOrders() {
   const user = getCurrentUser()
-  if (!user) return
-  const email = normalizeEmail(user.email)
-  let changed = false
-  const claimed = orders.map((order) => {
-    if (order.userId !== null || normalizeEmail(order.customer.email) !== email) return order
-    changed = true
-    return { ...order, userId: user.id }
+  if (user) {
+    // Vincular solo mediante prueba de posesión y correo verificado, nunca por correo local.
+    for (const [id, token] of Object.entries(guestTokens())) {
+      try {
+        await orderRequest(`/v1/pedidos/${id}/vincular`, { method: 'POST', headers: { 'X-Pedido-Token': token } })
+        const tokens = guestTokens(); delete tokens[id]; sessionStorage.setItem(guestKey, JSON.stringify(tokens))
+      } catch (error) {
+        if (![403, 404, 409].includes(error.status)) throw error
+      }
+    }
+    const summaries = await allPages('orders', isAdmin(user) ? '/v1/admin/pedidos' : '/v1/mis-pedidos')
+    const details = await Promise.all(summaries.map((item) => orderRequest(`/v1/pedidos/${item.id}`).then(mapOrder)))
+    adminOrders = isAdmin(user) ? details : []
+    orders = details.filter((order) => order.userId === user.id)
+  } else {
+    const details = await Promise.all(Object.keys(guestTokens()).map(async (id) => {
+      try { return mapOrder(await orderRequest(`/v1/pedidos/${id}`, { headers: orderHeaders(id) })) }
+      catch (error) { if (error.status === 404) return null; throw error }
+    }))
+    orders = details.filter(Boolean)
+  }
+  orders.sort((a, b) => b.id - a.id)
+  events.notify()
+}
+
+export async function loadCart() {
+  let session
+  try { session = await orderRequest('/v1/carrito', { method: 'POST', headers: headers() }) }
+  catch (error) {
+    if (error.status !== 401 || getCurrentUser()) throw error
+    sessionStorage.removeItem(tokenKey)
+    sessionStorage.removeItem(checkoutKey)
+    session = await orderRequest('/v1/carrito', { method: 'POST' })
+  }
+  if (session.tokenInvitado) sessionStorage.setItem(tokenKey, session.tokenInvitado)
+  await refreshCart()
+  await loadOrders()
+  const checkout = stored(checkoutKey, null)
+  const resolved = [...orders, ...adminOrders].find((order) => order.id === checkout?.orderId && order.paymentStatus !== 'pending')
+  if (resolved) {
+    recoveredCheckoutId = resolved.id
+    sessionStorage.removeItem(checkoutKey)
+  }
+}
+
+function serialize(action) {
+  const operation = queue.then(action)
+  queue = operation.catch(() => {})
+  return operation
+}
+
+async function setQuantity(id, quantity) {
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_CART_QUANTITY) throw new Error('La cantidad debe estar entre 1 y 99.')
+  await orderRequest(`/v1/carrito/items/${id}`, { method: 'PUT', headers: headers(), body: { cantidad: quantity } })
+  sessionStorage.removeItem(checkoutKey)
+  await refreshCart()
+}
+export function addToCart(id, quantity = 1) {
+  return serialize(() => setQuantity(id, (cart.items.find((item) => item.productId === id)?.quantity || 0) + quantity))
+}
+export function updateCartQuantity(id, quantity) { return serialize(() => setQuantity(id, quantity)) }
+export function removeFromCart(id) {
+  return serialize(async () => {
+    await orderRequest(`/v1/carrito/items/${id}`, { method: 'DELETE', headers: headers() })
+    sessionStorage.removeItem(checkoutKey)
+    await refreshCart()
   })
-  if (changed) saveCart(items, claimed, nextOrderId)
 }
-
-function initializeCart() {
-  if (initialized) return
-  initialized = true
-  const stored = readStoredData(storageKey)
-  if (stored === null) {
-    if (!unsubscribeAuth) unsubscribeAuth = subscribeToAuth(tryClaimGuestOrders)
-    return
-  }
-
-  try {
-    if (![1, 2].includes(stored.version) || !Array.isArray(stored.items)) throw new Error('Formato de carrito no válido.')
-    const ids = new Set()
-    const restored = stored.items.map(({ productId, quantity }) => {
-      validateId(productId)
-      validateQuantity(quantity)
-      if (ids.has(productId)) throw new Error('El carrito contiene productos duplicados.')
-      ids.add(productId)
-      return { productId, quantity }
-    })
-    let restoredOrders = []
-    let restoredNextId = 1
-    if (stored.version === 2) {
-      if (!Array.isArray(stored.orders)) throw new Error('El historial de pedidos no es válido.')
-      restoredOrders = stored.orders.map((order) => normalizeOrder(order, MAX_CART_QUANTITY))
-      const orderIds = new Set(restoredOrders.map((order) => order.id))
-      restoredNextId = stored.nextOrderId
-      if (orderIds.size !== restoredOrders.length || !Number.isSafeInteger(restoredNextId) || restoredNextId < 1
-        || restoredOrders.some((order) => order.id >= restoredNextId)) throw new Error('Los IDs de pedidos no son válidos.')
-    }
-    items = restored
-    orders = restoredOrders
-    nextOrderId = restoredNextId
-  } catch (error) {
-    console.warn('No se pudieron restaurar el carrito y sus pedidos. Se mostrarán vacíos.', error)
-  }
-  if (!unsubscribeAuth) unsubscribeAuth = subscribeToAuth(tryClaimGuestOrders)
-  try { tryClaimGuestOrders() } catch (error) { console.warn('No se pudieron asociar pedidos de invitado a la sesión actual.', error) }
-}
-
-function notifyCart() {
-  for (const listener of listeners) {
-    try {
-      listener()
-    } catch (error) {
-      console.error('No se pudo actualizar un componente del carrito.', error)
-    }
-  }
-}
-
-function saveCart(updatedItems, updatedOrders = orders, updatedNextOrderId = nextOrderId) {
-  writeStoredData(storageKey, { version: 2, items: updatedItems, orders: updatedOrders, nextOrderId: updatedNextOrderId })
-  items = updatedItems
-  orders = updatedOrders
-  nextOrderId = updatedNextOrderId
-  notifyCart()
-}
-
-export function subscribeToCart(listener) {
-  if (typeof listener !== 'function') throw new Error('La suscripción debe recibir una función.')
-  initializeCart()
-  if (!listeners.size) unsubscribeProducts = subscribeToProducts(notifyCart)
-  listeners.add(listener)
-  return () => {
-    listeners.delete(listener)
-    if (!listeners.size) {
-      unsubscribeProducts?.()
-      unsubscribeProducts = undefined
-    }
-  }
-}
-
-export function getCart() {
-  initializeCart()
-  const products = getProducts()
-  const cartItems = []
-  let totalQuantity = 0
-  let total = 0
-
-  for (const item of items) {
-    const product = products.find((product) => product.id === item.productId) ?? null
-    const available = isProductAvailable(product)
-    let subtotal = 0
-    if (available) {
-      subtotal = product.price * item.quantity
-    }
-
-    cartItems.push({ ...item, product, available, subtotal })
-    totalQuantity += item.quantity
-    total += subtotal
-  }
-
-  return { items: cartItems, totalQuantity, total }
-}
-
-export function addToCart(productId, quantity = 1) {
-  initializeCart()
-  validateId(productId)
-  validateQuantity(quantity)
-  if (!isProductAvailable(getProductById(productId))) throw new Error('Este producto no está disponible.')
-  const existing = items.find((item) => item.productId === productId)
-  if (!existing) {
-    saveCart([...items, { productId, quantity }])
-    return
-  }
-
-  const updatedQuantity = existing.quantity + quantity
-  validateQuantity(updatedQuantity)
-  const updatedItems = items.map((item) => {
-    if (item.productId === productId) {
-      return { ...item, quantity: updatedQuantity }
-    }
-    return item
-  })
-  saveCart(updatedItems)
-}
-
-export function updateCartQuantity(productId, quantity) {
-  initializeCart()
-  validateId(productId)
-  validateQuantity(quantity)
-  if (!items.some((item) => item.productId === productId)) throw new Error('El producto no está en el carrito.')
-  if (!isProductAvailable(getProductById(productId))) throw new Error('Este producto no está disponible.')
-  saveCart(items.map((item) => item.productId === productId ? { ...item, quantity } : item))
-}
-
-export function removeFromCart(productId) {
-  initializeCart()
-  validateId(productId)
-  saveCart(items.filter((item) => item.productId !== productId))
-}
-
 export function clearCart() {
-  initializeCart()
-  saveCart([])
+  return serialize(async () => {
+    // No existe un borrado masivo: cada cambio se confirma en el servidor.
+    try {
+      for (const item of cart.items) await orderRequest(`/v1/carrito/items/${item.productId}`, { method: 'DELETE', headers: headers() })
+      sessionStorage.removeItem(checkoutKey)
+    } finally { await refreshCart() }
+  })
 }
 
-export function getOrders() {
-  initializeCart()
-  const userId = getCurrentUser()?.id ?? null
-  return orders.filter((order) => order.userId === userId).map((order) => normalizeOrder(order, MAX_CART_QUANTITY)).sort((first, second) => second.id - first.id)
-}
-
-export function getAdminOrders() {
-  initializeCart()
-  if (!isAdmin(getCurrentUser())) return []
-  return orders.map((order) => normalizeOrder(order, MAX_CART_QUANTITY)).sort((first, second) => second.id - first.id)
-}
-
-export function getAdminOrderById(id) {
-  return getAdminOrders().find((order) => order.id === id) ?? null
-}
-
-export function subscribeToOrders(listener) {
-  return subscribeToCart(listener)
-}
-
-export function updateOrderStatus(id, status) {
-  initializeCart()
-  if (!isAdmin(getCurrentUser())) throw new Error('Se requiere cuenta de administrador.')
-  if (!Number.isSafeInteger(id) || id < 1) throw new Error('El ID del pedido no es válido.')
-  if (!Object.hasOwn(deliveryStatuses, status)) throw new Error('Selecciona un estado de entrega válido.')
-  const order = orders.find((entry) => entry.id === id)
-  if (!order) throw new Error('El pedido ya no existe.')
-  if (status !== 'Pendiente' && order.paymentStatus !== 'paid') throw new Error('Solo se pueden enviar o completar pedidos con pago realizado.')
-  const updated = normalizeOrder({ ...order, status }, MAX_CART_QUANTITY)
-  saveCart(items, orders.map((entry) => entry.id === id ? updated : entry))
-  return normalizeOrder(updated, MAX_CART_QUANTITY)
+export async function updateOrderStatus(id, status) {
+  await orderRequest(`/v1/admin/pedidos/${id}/entrega`, { method: 'PATCH', body: { estado: Object.keys(deliveryStates).find((key) => deliveryStates[key] === status) } })
+  await loadOrders()
 }
 
 export function confirmOrder(customer, paymentStatus) {
-  if (!['paid', 'failed'].includes(paymentStatus)) throw new Error('No se pudo determinar el resultado del pago.')
-  const normalizedCustomer = normalizeCustomer(customer)
-  const cart = getCart()
-  if (!cart.items.length) throw new Error('El carrito está vacío.')
-  if (cart.items.some((item) => !item.available)) throw new Error('Quita los productos no disponibles antes de confirmar el pedido.')
-  if (nextOrderId >= Number.MAX_SAFE_INTEGER) throw new Error('No hay más IDs de pedido disponibles.')
-
-  const order = normalizeOrder({
-    id: nextOrderId,
-    userId: getCurrentUser()?.id ?? null,
-    createdAt: new Date().toISOString(),
-    status: 'Pendiente',
-    paymentStatus,
-    customer: normalizedCustomer,
-    items: cart.items.map(({ product, quantity, subtotal }) => ({ productId: product.id, name: product.name, price: product.price, quantity, subtotal })),
-    total: cart.total,
-  }, MAX_CART_QUANTITY)
-  saveCart(paymentStatus === 'paid' ? [] : items, [...orders, order], nextOrderId + 1)
-  return normalizeOrder(order, MAX_CART_QUANTITY)
+  return serialize(async () => {
+    if (!['paid', 'failed'].includes(paymentStatus)) throw new Error('Resultado de pago no válido.')
+    const delivery = normalizeCustomer(customer)
+    let checkout = stored(checkoutKey, null)
+    if (checkout && checkout.cartId !== cart.id) { checkout = null; sessionStorage.removeItem(checkoutKey) }
+    if (!checkout) {
+      checkout = { key: crypto.randomUUID(), cartId: cart.id, customer: delivery, total: cart.total }
+      sessionStorage.setItem(checkoutKey, JSON.stringify(checkout))
+    } else if (JSON.stringify(checkout.customer) !== JSON.stringify(delivery)) {
+      throw new Error('Hay un checkout iniciado con otros datos. Conserva los datos originales para resolverlo.')
+    }
+    if (!checkout.orderId) {
+      let result
+      try { result = await orderRequest('/v1/checkout', { method: 'POST',
+        headers: { ...headers(), 'Idempotency-Key': checkout.key },
+        body: { entrega: { nombre: delivery.name, correo: delivery.email, direccion: delivery.address, ciudad: delivery.city }, totalEsperadoClp: checkout.total },
+      }) } catch (error) {
+        if ([400, 409].includes(error.status)) {
+          await refreshCart()
+          if (!cart.pendingOrderId) sessionStorage.removeItem(checkoutKey)
+        }
+        throw error
+      }
+      checkout.orderId = result.pedido.id
+      sessionStorage.setItem(checkoutKey, JSON.stringify(checkout))
+      if (result.tokenConsulta) sessionStorage.setItem(guestKey, JSON.stringify({ ...guestTokens(), [checkout.orderId]: result.tokenConsulta }))
+    }
+    let result
+    try { result = await orderRequest(`/v1/pedidos/${checkout.orderId}/pago-simulado`, { method: 'POST', headers: headers(), body: { accion: paymentStatus === 'paid' ? 'CONFIRMAR' : 'CANCELAR' } }) }
+    catch (error) {
+      if (error.status !== 409) throw error
+      result = await orderRequest(`/v1/pedidos/${checkout.orderId}`, { headers: orderHeaders(checkout.orderId) })
+      if (result.estadoPago === 'PENDIENTE') throw error
+    }
+    const order = mapOrder(result)
+    orders = [order, ...orders.filter((item) => item.id !== order.id)]
+    await refreshCart()
+    sessionStorage.removeItem(checkoutKey)
+    events.notify()
+    return order
+  })
 }
+
+export function pendingCustomer() {
+  const checkout = stored(checkoutKey, null)
+  return checkout?.cartId === cart.id ? checkout.customer : null
+}
+export function getRecoveredCheckoutId() { return recoveredCheckoutId }
+export function clearRecoveredCheckoutId() { recoveredCheckoutId = null }

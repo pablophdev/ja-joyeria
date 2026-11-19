@@ -29,9 +29,9 @@ class PedidosAdmin extends Component {
 
   refreshOrders = () => this.setState({ orders: getAdminOrders() })
 
-  handleStatus = (id, status) => {
+  handleStatus = async (id, status) => {
     try {
-      updateOrderStatus(id, status)
+      await updateOrderStatus(id, status)
       this.setState({ error: '', message: `${formatOrderId(id)}: entrega actualizada a ${status.toLowerCase()}.` })
     } catch (error) {
       this.setState({ error: error.message, message: '' })
@@ -51,13 +51,13 @@ class PedidosAdmin extends Component {
       { label: 'Órdenes registradas', value: orders.length },
       { label: 'Boletas / Pagadas', value: paidOrders.length },
       { label: 'Sin pago realizado', value: orders.length - paidOrders.length },
-      { label: 'Total pagado (local)', value: formatPrice(paidOrders.reduce((total, order) => total + order.total, 0)) },
+      { label: 'Total pagado', value: formatPrice(paidOrders.reduce((total, order) => total + order.total, 0)) },
     ]
 
     return (
       <section>
         <h1>Órdenes / Boletas</h1>
-        <p>Pedidos de todos los clientes e invitados guardados en este navegador.</p>
+        <p>Pedidos de todos los clientes e invitados obtenidos del servidor.</p>
         {error && <p className="alert alert-danger" role="alert">{error}</p>}
         <p className="text-success" role="status">{message}</p>
         <div className="row g-3 mb-4">
@@ -95,7 +95,7 @@ class PedidosAdmin extends Component {
           ) : (
             <div className="table-responsive">
               <table className="table align-middle">
-                <caption>Órdenes y boletas del catálogo local</caption>
+                <caption>Órdenes y comprobantes de la tienda</caption>
                 <thead><tr><th scope="col">Orden / Boleta</th><th scope="col">Cliente</th><th scope="col">Fecha</th><th scope="col">Total</th><th scope="col">Pago</th><th scope="col">Entrega</th><th scope="col">Acciones</th></tr></thead>
                 <tbody>
                   {visibleOrders.map((order) => {

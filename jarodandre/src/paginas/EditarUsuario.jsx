@@ -1,12 +1,11 @@
 import { Component } from 'react'
-import { Link, Navigate } from 'react-router-dom'
-import { deleteUser, getUserById, subscribeToAuth, updateUser } from '../datos/auth'
+import { Link } from 'react-router-dom'
+import { getUserById, subscribeToAuth, updateUser } from '../datos/auth'
 import FormularioUsuario from '../componentes/usuarios/FormularioUsuario'
 import { routes } from '../navigation/routes'
 
 function findUser(value) {
-  const id = Number(value)
-  return /^[1-9]\d*$/.test(value) && Number.isSafeInteger(id) ? getUserById(id) : null
+  return getUserById(value)
 }
 
 function formValues(user) {
@@ -44,7 +43,7 @@ class EditarUsuario extends Component {
     this.submitting = true
     this.setState({ busy: true, error: '', message: '' })
     try {
-      const user = await updateUser(Number(this.props.userId), this.state.values)
+      const user = await updateUser(this.props.userId, this.state.values)
       if (!user) throw new Error('El usuario ya no existe.')
       if (this.mounted) this.setState({ user, values: formValues(user), message: 'Cambios guardados correctamente.' })
     } catch (error) {
@@ -55,17 +54,8 @@ class EditarUsuario extends Component {
     }
   }
 
-  handleDelete = () => {
-    if (this.submitting) return
-    try {
-      deleteUser(Number(this.props.userId))
-      this.setState({ deleted: true })
-    } catch (error) { this.setState({ error: error.message, message: '' }) }
-  }
-
   render() {
-    const { user, values, busy, error, message, deleted } = this.state
-    if (deleted) return <Navigate to={routes.users} replace />
+    const { user, values, busy, error, message } = this.state
     if (!user) return <section className="container py-5"><h1>Usuario no encontrado</h1><p>La cuenta no existe o fue eliminada.</p><Link className="btn btn-dark" to={routes.users}>Volver a usuarios</Link></section>
     return (
       <section className="container py-5">
@@ -74,7 +64,7 @@ class EditarUsuario extends Component {
           <Link className="d-inline-block mb-4" to={routes.users}>Volver a usuarios</Link>
           {error && <p className="alert alert-danger" role="alert">{error}</p>}
           <p className="text-success" role="status">{message}</p>
-          <FormularioUsuario values={values} busy={busy} onChange={this.handleChange} onSubmit={this.handleSubmit} onDelete={this.handleDelete} />
+          <FormularioUsuario values={values} busy={busy} onChange={this.handleChange} onSubmit={this.handleSubmit} />
         </div></div>
       </section>
     )

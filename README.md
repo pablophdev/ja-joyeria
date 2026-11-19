@@ -4,6 +4,8 @@
 
 # Jarodandre · Joyería urbana
 
+> **Actualización: frontend integrado con el backend Spring Boot.** Consulta [INTEGRACION.md](./INTEGRACION.md) para ejecutarlo, configurar Cognito y probar las APIs. La descripción de simulación local que sigue corresponde a la versión anterior y no al funcionamiento actual.
+
 Aplicación web de una tienda de joyería urbana dedicada a **anillos, cadenas, collares y grillz**. Permite explorar el catálogo, gestionar un carrito, completar una compra simulada y administrar productos, usuarios y pedidos.
 
 El proyecto nació como un sitio HTML y fue migrado a una aplicación **React** con navegación sin recargas completas, componentes reutilizables y diseño adaptable a móviles y escritorio.

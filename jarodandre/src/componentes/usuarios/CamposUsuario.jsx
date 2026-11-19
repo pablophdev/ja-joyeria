@@ -1,9 +1,8 @@
-import { registrationRegions } from '../../datos/registrationOptions'
+import { registrationRegions } from '../../datos/auth'
 
 const profileFields = [
   { name: 'name', label: 'Nombre completo', type: 'text', autoComplete: 'name', maxLength: 120 },
   { name: 'rut', label: 'RUT / RUN', type: 'text', placeholder: '12345678-5', maxLength: 12 },
-  { name: 'email', label: 'Correo electrónico', type: 'email', autoComplete: 'email', maxLength: 254 },
   { name: 'phone', label: 'Teléfono (opcional)', type: 'tel', autoComplete: 'tel', maxLength: 12 },
 ]
 
@@ -28,7 +27,7 @@ function CamposUsuario({ values, onChange }) {
         <label className="form-label" htmlFor="profile-commune">Comuna</label>
         <select className="form-select" id="profile-commune" name="commune" required disabled={!values.region} value={values.commune} onChange={onChange}>
           <option value="">Selecciona la comuna</option>
-          {communes.map((commune) => <option key={commune} value={commune}>{commune}</option>)}
+          {communes.map((commune) => <option key={commune.id} value={commune.id}>{commune.nombre}</option>)}
         </select>
       </div>
     </div>

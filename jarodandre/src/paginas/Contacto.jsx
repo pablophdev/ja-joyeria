@@ -5,21 +5,25 @@ import { saveContactMessage } from '../datos/contactMessages'
 import { routes } from '../navigation/routes'
 
 class Contacto extends Component {
-  state = { values: { name: '', email: '', message: '' }, error: '', confirmation: '' }
+  state = { values: { name: '', email: '', message: '' }, error: '', confirmation: '', busy: false }
+  submitting = false
 
   handleChange = (event) => {
     const { name, value } = event.target
     this.setState(({ values }) => ({ values: { ...values, [name]: value }, error: '', confirmation: '' }))
   }
 
-  handleSubmit = (event) => {
+  handleSubmit = async (event) => {
     event.preventDefault()
+    if (this.submitting) return
+    this.submitting = true
+    this.setState({ busy: true })
     try {
-      const message = saveContactMessage(this.state.values)
-      this.setState({ values: { name: '', email: '', message: '' }, error: '', confirmation: `Mensaje #${message.id} guardado en este navegador. No se ha enviado ningún correo.` })
+      await saveContactMessage(this.state.values)
+      this.setState({ values: { name: '', email: '', message: '' }, error: '', confirmation: 'Mensaje recibido por la tienda.' })
     } catch (error) {
       this.setState({ error: error.message, confirmation: '' })
-    }
+    } finally { this.submitting = false; this.setState({ busy: false }) }
   }
 
   render() {
@@ -59,10 +63,10 @@ class Contacto extends Component {
                     <p className="form-text" id="contact-message-limit">{values.message.length} / 2000 caracteres</p>
                   </div>
                 </div>
-                <p className="small text-secondary" id="contact-form-note">Formulario de demostración: el mensaje se guarda localmente. Para contactar directamente, utiliza los teléfonos de la tienda.</p>
+                <p className="small text-secondary" id="contact-form-note">Tu mensaje se enviará a la bandeja de la tienda. Este formulario no envía correos automáticos.</p>
                 {error && <p className="alert alert-danger" role="alert">{error}</p>}
                 <p className="text-success" role="status">{confirmation}</p>
-                <button className="btn btn-dark" type="submit">Guardar mensaje</button>
+                <button className="btn btn-dark" type="submit" disabled={this.state.busy}>{this.state.busy ? 'Enviando…' : 'Enviar mensaje'}</button>
               </form>
             </section>
           </div>

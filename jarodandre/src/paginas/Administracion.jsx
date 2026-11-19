@@ -33,7 +33,7 @@ class Administracion extends Component {
     return (
       <section>
         <h1>Panel de administración</h1>
-        <p>Gestiona los productos, las cuentas y las órdenes guardadas en este navegador.</p>
+        <p>Gestiona los productos, los permisos de las cuentas y las órdenes del servidor.</p>
         <div className="row g-3 mb-4">
           {metrics.map(({ label, value }) => <div className="col-sm-6 col-xl-3" key={label}><div className="border rounded p-3 h-100"><h2 className="h6">{label}</h2><p className="fs-3 mb-0">{value}</p></div></div>)}
         </div>
@@ -52,15 +52,15 @@ class Administracion extends Component {
             <Link className="btn btn-outline-dark" to={routes.adminOrders}>Ver órdenes y boletas</Link>
           </div></section></div>
           <div className="col-md-6"><section className="card h-100"><div className="card-body">
-            <h2 className="h4">Reportes</h2><p>Resume ingresos, productos más vendidos, clientes y cuentas del catálogo local.</p>
+            <h2 className="h4">Reportes</h2><p>Resume ingresos, productos más vendidos, clientes y cuentas del servidor.</p>
             <Link className="btn btn-outline-dark" to={routes.adminReports}>Ver reportes</Link>
           </div></section></div>
           <div className="col-md-6"><section className="card h-100"><div className="card-body">
-            <h2 className="h4">Contacto</h2><p>Consulta y marca como leídos los mensajes recibidos en el formulario local.</p>
+            <h2 className="h4">Contacto</h2><p>Consulta y marca como leídos los mensajes recibidos por la tienda.</p>
             <Link className="btn btn-outline-dark" to={routes.adminMessages}>Ver mensajes</Link>
           </div></section></div>
           <div className="col-md-6"><section className="card h-100"><div className="card-body">
-            <h2 className="h4">Suscriptores</h2><p>Consulta las suscripciones de novedades y gestiona las bajas locales.</p>
+            <h2 className="h4">Suscriptores</h2><p>Consulta las suscripciones de novedades y gestiona las bajas.</p>
             <Link className="btn btn-outline-dark" to={routes.adminSubscribers}>Ver suscriptores</Link>
           </div></section></div>
         </div>

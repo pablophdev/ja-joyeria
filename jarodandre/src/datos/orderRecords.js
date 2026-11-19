@@ -33,7 +33,7 @@ export function normalizeOrder(order, maxQuantity) {
   const userId = order.userId ?? null
   const paymentStatus = order.paymentStatus ?? 'pending'
   if (!Object.hasOwn(paymentStatuses, paymentStatus)) throw new Error('El estado del pago no es válido.')
-  if (userId !== null && (!Number.isSafeInteger(userId) || userId < 1)) throw new Error('El usuario del pedido no es válido.')
+  if (userId !== null && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) throw new Error('El usuario del pedido no es válido.')
   const ids = new Set()
   const items = order.items.map((item) => {
     if (!item || !Number.isSafeInteger(item.productId) || item.productId < 1 || ids.has(item.productId)

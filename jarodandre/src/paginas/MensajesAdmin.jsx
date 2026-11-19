@@ -17,10 +17,10 @@ class MensajesAdmin extends Component {
     this.setState({ messages: isAdmin(getCurrentUser()) ? getContactMessages() : [] })
   }
 
-  handleAction = (entry, remove = false) => {
+  handleAction = async (entry, remove = false) => {
     try {
-      if (remove) deleteContactMessage(entry.id)
-      else setContactMessageRead(entry.id, !entry.read)
+      if (remove) await deleteContactMessage(entry.id)
+      else await setContactMessageRead(entry.id, !entry.read)
       this.setState({ error: '', message: remove ? 'Mensaje eliminado.' : `Mensaje marcado como ${entry.read ? 'no leído' : 'leído'}.` })
     } catch (error) {
       this.setState({ error: error.message, message: '' })
@@ -36,7 +36,7 @@ class MensajesAdmin extends Component {
     return (
       <section>
         <h1>Mensajes de contacto</h1>
-        <p>Bandeja local: {messages.filter((entry) => !entry.read).length} sin leer de {messages.length} mensajes. No se envían respuestas por correo desde esta demo.</p>
+        <p>Bandeja de la tienda: {messages.filter((entry) => !entry.read).length} sin leer de {messages.length} mensajes. Este panel no envía respuestas por correo.</p>
         {error && <p className="alert alert-danger" role="alert">{error}</p>}
         <p className="text-success" role="status">{message}</p>
         <div className="row g-3 mb-4">

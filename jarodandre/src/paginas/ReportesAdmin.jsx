@@ -78,7 +78,7 @@ class ReportesAdmin extends Component {
     return (
       <section>
         <h1>Reportes</h1>
-        <p>Resumen de ventas, productos y cuentas guardados en este navegador.</p>
+        <p>Resumen de ventas, productos y cuentas obtenidos del servidor.</p>
         <div className="row g-3 mb-4">
           {summary.map(({ label, value }) => (
             <div className="col-sm-6 col-xl-3" key={label}>
@@ -141,7 +141,7 @@ class ReportesAdmin extends Component {
           <h2 className="h4">Cuentas</h2>
           <ul className="list-group list-group-flush">
             <li className="list-group-item d-flex justify-content-between align-items-center px-0"><span>Cuentas activas</span><span>{report.activeUserCount}</span></li>
-            <li className="list-group-item d-flex justify-content-between align-items-center px-0"><span>Cuentas con perfil administrativo (rol o dominio)</span><span>{report.adminCount}</span></li>
+            <li className="list-group-item d-flex justify-content-between align-items-center px-0"><span>Administradores activos</span><span>{report.adminCount}</span></li>
             <li className="list-group-item d-flex justify-content-between align-items-center px-0"><span>Productos destacados</span><span>{report.featuredCount}</span></li>
           </ul>
         </div></section>

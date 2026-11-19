@@ -17,10 +17,10 @@ class ProductosAdmin extends Component {
 
   refreshProducts = () => this.setState({ products: getProducts() })
 
-  handleDelete = (product) => {
+  handleDelete = async (product) => {
     try {
-      deleteProduct(product.id)
-      this.setState({ error: '', message: `${product.name} se eliminó del catálogo local. Los pedidos anteriores conservan sus datos.` })
+      await deleteProduct(product.id)
+      this.setState({ error: '', message: `${product.name} se archivó en el catálogo. Los pedidos anteriores conservan sus datos.` })
     } catch (error) { this.setState({ error: error.message, message: '' }) }
   }
 
@@ -38,7 +38,7 @@ class ProductosAdmin extends Component {
         <div id="admin-product-list">
           {!visibleProducts.length ? <p className="bg-light p-4 rounded">{products.length ? 'No hay coincidencias con esta búsqueda.' : 'Todavía no hay productos. Crea el primero desde Nuevo producto.'}</p> : (
             <div className="table-responsive"><table className="table align-middle">
-              <caption>Productos guardados en el catálogo local</caption>
+              <caption>Productos del catálogo del servidor</caption>
               <thead><tr><th scope="col">Producto</th><th scope="col">Precio</th><th scope="col">Disponibilidad</th><th scope="col">Destacado</th><th scope="col">Acciones</th></tr></thead>
               <tbody>{visibleProducts.map((product) => (
                 <tr key={product.id}>

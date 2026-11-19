@@ -52,13 +52,13 @@ class EditarProducto extends Component {
     }
   }
 
-  handleSubmit = (event) => {
+  handleSubmit = async (event) => {
     event.preventDefault()
     if (this.saving || this.state.createdId || this.state.imageLoading || this.state.imageError) return
     this.saving = true
     try {
       const data = getProductFormData(this.state.values)
-      const product = this.props.productId ? updateProduct(Number(this.props.productId), data) : createProduct(data)
+      const product = this.props.productId ? await updateProduct(Number(this.props.productId), data) : await createProduct(data)
       if (!product) throw new Error('El producto ya no existe.')
       this.setState({ product, values: getProductFormValues(product), error: '', message: this.props.productId ? 'Cambios guardados correctamente.' : 'Producto creado correctamente.', createdId: this.props.productId ? null : product.id })
     } catch (error) { this.setState({ error: error.message, message: '' }) }

@@ -33,8 +33,8 @@ class Usuarios extends Component {
     return (
       <section className="container py-5">
         <h1>Gestión de usuarios</h1>
-        <Link className="btn btn-dark mb-3" to={routes.userNew}>Crear usuario</Link>
-        <p>Cuentas registradas en la aplicación local.</p>
+        <Link className="btn btn-dark mb-3" to={routes.userNew}>Información de registro</Link>
+        <p>Perfiles registrados en el servidor. Solo un ADMIN activo puede gestionar los permisos.</p>
         <div className="row g-3 mb-4">
           {metrics.map(({ label, count }) => <div className="col-sm-6 col-lg-3" key={label}><div className="border rounded p-3 h-100"><h2 className="h6">{label}</h2><p className="fs-3 mb-0">{count}</p></div></div>)}
         </div>
@@ -44,11 +44,11 @@ class Usuarios extends Component {
         <div id="users-list">
           {!visibleUsers.length ? <p className="bg-light p-4 rounded">{users.length ? 'No hay usuarios que coincidan con la búsqueda.' : 'Todavía no hay usuarios registrados.'}</p> : (
             <div className="table-responsive"><table className="table align-middle">
-              <caption>Usuarios guardados en este navegador</caption>
+              <caption>Perfiles de usuarios</caption>
               <thead><tr><th scope="col">ID</th><th scope="col">Usuario / RUT</th><th scope="col">Correo</th><th scope="col">Rol</th><th scope="col">Registro</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
               <tbody>{visibleUsers.map((user) => (
                 <tr key={user.id}><td>{user.id}</td><th scope="row">{user.name}<span className="d-block fw-normal">{user.rut}</span></th><td>{user.email}</td>
-                  <td>{isAdmin(user) ? 'Administrador' : 'Cliente'}</td><td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-CL') : 'Sin registro de fecha'}</td>
+                  <td>{user.role === 'admin' ? 'Administrador' : user.role === 'employee' ? 'Empleado / Ventas' : 'Cliente'}</td><td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-CL') : 'No disponible en la API'}</td>
                   <td>{userStatuses.find((status) => status.value === user.status)?.label}</td><td><Link className="btn btn-outline-dark btn-sm" to={getUserEditPath(user.id)} aria-label={`Editar a ${user.name}`}>Editar</Link></td>
                 </tr>
               ))}</tbody>

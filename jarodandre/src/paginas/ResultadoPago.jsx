@@ -45,7 +45,7 @@ class DetallePago extends Component {
               ? 'El proceso de pago se canceló. Conservamos los productos en el carrito para que puedas volver a intentarlo.'
               : 'Este pedido todavía no tiene un pago registrado.'}
         </p>
-        <p className="text-secondary">Resultado de demostración guardado en este navegador. No se realizó ningún cobro real.</p>
+        <p className="text-secondary">Pago simulado registrado en el servidor. No se realizó ningún cobro real.</p>
         <TarjetaPedido order={order} />
         <div className="d-flex flex-wrap gap-2">
           {order.paymentStatus === 'failed' && <Link className="btn btn-dark" to={routes.checkout}>Volver a intentar con mi carrito</Link>}

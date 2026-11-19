@@ -29,10 +29,10 @@ class DetalleProducto extends Component {
     this.setState({ product: findProduct(this.props.productId), error: '', message: '' })
   }
 
-  handleAddToCart = (event) => {
+  handleAddToCart = async (event) => {
     event.preventDefault()
     try {
-      addToCart(Number(this.props.productId), this.state.quantity)
+      await addToCart(Number(this.props.productId), this.state.quantity)
       this.setState({ error: '', message: 'Producto añadido al carrito.' })
     } catch (error) {
       this.setState({ error: error.message, message: '' })

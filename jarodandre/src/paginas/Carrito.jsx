@@ -19,9 +19,9 @@ class Carrito extends Component {
 
   refreshCart = () => this.setState({ cart: getCart() })
 
-  performAction = (action, message) => {
+  performAction = async (action, message) => {
     try {
-      action()
+      await action()
       this.setState({ error: '', message })
     } catch (error) {
       this.setState({ error: error.message, message: '' })
