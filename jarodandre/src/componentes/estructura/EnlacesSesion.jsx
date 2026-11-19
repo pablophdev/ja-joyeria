@@ -16,8 +16,8 @@ class EnlacesSesion extends Component {
 
   refreshSession = () => this.setState({ user: getCurrentUser(), error: '' })
 
-  handleLogout = () => {
-    try { logout() } catch (error) { this.setState({ error: error.message }) }
+  handleLogout = async () => {
+    try { await logout() } catch (error) { this.setState({ error: error.message }) }
   }
 
   render() {

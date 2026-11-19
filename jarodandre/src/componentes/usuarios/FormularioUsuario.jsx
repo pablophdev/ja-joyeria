@@ -6,7 +6,7 @@ export default function FormularioUsuario({ values, busy, onChange, onSubmit }) 
   return <form onSubmit={onSubmit}><fieldset disabled={busy}>
     <legend className="h5">Permisos de acceso</legend>
     <p>{values.name} · {values.email} · {values.rut}</p>
-    <p>La API permite cambiar únicamente el rol y el estado. La identidad y la contraseña se gestionan en Cognito; los datos personales los modifica su titular.</p>
+    <p>La API permite cambiar únicamente el rol y el estado. La gestión de identidades y contraseñas está pendiente de configurar.</p>
     <div className="row g-3 mb-4">
       {[{ name: 'role', label: 'Rol', options: userRoles }, { name: 'status', label: 'Estado', options: userStatuses }].map(({ name, label, options }) => <div className="col-sm-6" key={name}>
         <label className="form-label" htmlFor={`edit-${name}`}>{label}</label>

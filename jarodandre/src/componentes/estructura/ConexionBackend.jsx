@@ -36,7 +36,7 @@ export default class ConexionBackend extends Component {
   }
   render() {
     if (this.state.loading) return <main className="container py-5" role="status">Conectando con la tienda…</main>
-    if (this.state.error) return <main className="container py-5"><h1>No se pudo cargar la tienda</h1><p className="alert alert-danger" role="alert">{this.state.error}</p><button className="btn btn-dark" onClick={this.load}>Reintentar</button><a className="btn btn-outline-dark ms-2" href="/login" onClick={() => sessionStorage.removeItem('ja.cognito.session')}>Volver sin sesión</a></main>
+    if (this.state.error) return <main className="container py-5"><h1>No se pudo cargar la tienda</h1><p className="alert alert-danger" role="alert">{this.state.error}</p><button className="btn btn-dark" onClick={this.load}>Reintentar</button></main>
     return <>{needsProfile && <p className="alert alert-info m-0">Tu identidad está verificada. <a href="/registro">Completa tu perfil</a> para usar tu cuenta.</p>}{this.props.children}{this.state.pending > 0 && <div className="position-fixed bottom-0 start-0 m-3 bg-dark text-white rounded px-3 py-2" style={{ zIndex: 2000 }} role="status">Procesando con el servidor…</div>}</>
   }
 }
