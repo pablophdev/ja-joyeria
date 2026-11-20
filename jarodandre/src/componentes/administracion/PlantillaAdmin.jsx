@@ -3,6 +3,7 @@ import { routes } from '../../navigation/routes'
 
 const links = [
   { to: routes.admin, label: 'Resumen' },
+  { to: routes.adminGrillz, label: 'Cotizaciones de grillz' },
   { to: routes.adminProducts, label: 'Gestionar productos' },
   { to: routes.adminProductNew, label: 'Nuevo producto' },
   { to: routes.users, label: 'Gestionar usuarios' },

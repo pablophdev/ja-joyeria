@@ -1,6 +1,8 @@
 export const routes = {
   home: '/',
   shop: '/productos',
+  grillz: '/grillz',
+  adminGrillz: '/admin/grillz',
   productDetails: '/productos/:productId',
   about: '/nosotros',
   cart: '/carrito',

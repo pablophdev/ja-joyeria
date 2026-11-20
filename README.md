@@ -136,3 +136,13 @@ npm run test -- --run
 | `/admin/ordenes`, `/admin/reportes`, `/admin/mensajes`, `/admin/suscriptores` | Pedidos, reportes, mensajes y lista de novedades. |
 
 Si la web no carga datos, comprueba que los servicios estén iniciados con `docker compose ps` desde la carpeta del backend. Para ver el motivo de un fallo, usa `docker compose logs --tail=100 nombre-del-servicio`.
+
+## Diseña tus grillz en 3D
+
+La nueva página `/grillz`, accesible desde el menú, permite elegir entre 16 dientes (8 superiores y 8 inferiores), girar y acercar el modelo, elegir dorado, plateado u oro rosado y añadir piedras. Puedes aplicar un acabado a todos los dientes cubiertos o combinar acabados al añadir dientes.
+
+La descarga JPG funciona sin iniciar sesión e incluye el diseño y una descripción. El borrador se conserva en la pestaña mientras inicias sesión. Con una cuenta puedes guardar diseños, volver a abrirlos y solicitar cotizaciones. El administrador las revisa en `/admin/grillz` y puede reconstruir la misma configuración en 3D.
+
+El modelo `arcada-v1` es una dentadura estilizada creada con geometría propia en Three.js. No requiere descargar modelos de terceros. El visor se carga únicamente al entrar a estas páginas. Si WebGL no está disponible, la selección mediante botones continúa disponible, aunque no es posible generar el JPG.
+
+Los importes son referencias de desarrollo que llegan del backend. El modelo representa la apariencia; la fabricación requiere confirmar el presupuesto, los materiales y el molde. No se realiza un pago al pedir una cotización.

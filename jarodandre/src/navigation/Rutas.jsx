@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import PlantillaSitio from '../componentes/estructura/PlantillaSitio'
 import PlantillaAdmin from '../componentes/administracion/PlantillaAdmin'
 import RutaAdmin from './RutaAdmin'
@@ -28,6 +29,9 @@ import MensajesAdmin from '../paginas/MensajesAdmin'
 import SuscriptoresAdmin from '../paginas/SuscriptoresAdmin'
 import NoEncontrada from '../paginas/NoEncontrada'
 
+const PersonalizadorGrillz = lazy(() => import('../paginas/PersonalizadorGrillz'))
+const CotizacionesGrillz = lazy(() => import('../paginas/CotizacionesGrillz'))
+
 function RutaProducto() {
   const { productId } = useParams()
   return <DetalleProducto key={productId} productId={productId} />
@@ -50,6 +54,7 @@ function Rutas() {
       <Routes>
         <Route element={<PlantillaSitio />}>
           <Route path={routes.home} element={<Inicio />} />
+          <Route path={routes.grillz} element={<Suspense fallback={<p role="status">Cargando personalizador…</p>}><PersonalizadorGrillz /></Suspense>} />
           <Route path={routes.shop} element={<Tienda />} />
           <Route path={routes.about} element={<Nosotros />} />
           <Route path={routes.contact} element={<Contacto />} />
@@ -67,6 +72,7 @@ function Rutas() {
           <Route path={routes.productDetails} element={<RutaProducto />} />
           <Route path={routes.admin} element={<RutaAdmin><PlantillaAdmin /></RutaAdmin>}>
             <Route index element={<Administracion />} />
+            <Route path={routes.adminGrillz} element={<Suspense fallback={<p role="status">Cargando cotizaciones…</p>}><CotizacionesGrillz /></Suspense>} />
             <Route path={routes.adminOrders} element={<PedidosAdmin />} />
             <Route path={routes.adminReceipt} element={<BoletaAdmin />} />
             <Route path={routes.adminReports} element={<ReportesAdmin />} />

@@ -9,6 +9,7 @@ import './Cabecera.css'
 const menuItems = [
   { to: routes.home, label: 'Inicio' },
   { to: routes.shop, label: 'Productos' },
+  { to: routes.grillz, label: 'Diseña tus grillz' },
   { to: routes.about, label: 'Sobre nosotros' },
   { to: routes.blog, label: 'Blog' },
   { to: routes.contact, label: 'Contacto' },
