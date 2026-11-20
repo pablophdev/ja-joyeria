@@ -61,6 +61,7 @@ function mapUser(user) {
     commune: String(user.comunaId),
     role: roles[user.rol],
     status: statuses[user.estado],
+    createdAt: user.creadoEn,
   }
 }
 
