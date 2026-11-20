@@ -11,12 +11,13 @@ function PantallaCarga() {
   useEffect(() => {
     const startedAt = performance.now()
     let finished = false
+    let timerId
 
     const leave = () => {
       if (finished) return
       finished = true
       const wait = Math.max(0, MIN_VISIBLE_MS - (performance.now() - startedAt))
-      window.setTimeout(() => setPhase('leaving'), wait)
+      timerId = window.setTimeout(() => setPhase('leaving'), wait)
     }
 
     if (document.readyState === 'complete') {
@@ -25,10 +26,14 @@ function PantallaCarga() {
       window.addEventListener('load', leave, { once: true })
     }
 
-    return () => window.removeEventListener('load', leave)
+    return () => {
+      window.clearTimeout(timerId)
+      window.removeEventListener('load', leave)
+    }
   }, [])
 
   useEffect(() => {
+    if (phase === 'gone') window.dispatchEvent(new Event('ja:intro-ready'))
     if (phase !== 'leaving') return undefined
     const timerId = window.setTimeout(() => setPhase('gone'), FADE_MS)
     return () => window.clearTimeout(timerId)

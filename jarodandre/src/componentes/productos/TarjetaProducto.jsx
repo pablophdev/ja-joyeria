@@ -1,4 +1,7 @@
+import { useRef } from 'react'
+import { useGSAP } from '@gsap/react'
 import { Link } from 'react-router-dom'
+import { productHover } from '../../utilidades/motion'
 import { getProductDetailsPath } from '../../navigation/routes'
 import { formatPrice } from '../../utilidades/formatPrice'
 import ValoracionProducto from './ValoracionProducto'
@@ -6,10 +9,12 @@ import BotonAgregar from './BotonAgregar'
 import './TarjetaProducto.css'
 
 function TarjetaProducto({ product }) {
+  const root = useRef(null)
+  useGSAP(() => productHover(root.current), { scope: root })
   const detailsPath = getProductDetailsPath(product.id)
   return (
-    <article className="product-card card h-100 border-0">
-      <div className="position-relative">
+    <article ref={root} className="product-card card h-100 border-0">
+      <div className="position-relative overflow-hidden">
         <Link to={detailsPath} aria-label={`Ver ${product.name}`}>
           <img
             className="card-img-top product-card__image"

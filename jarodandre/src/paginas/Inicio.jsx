@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { routes } from '../navigation/routes'
 import Carrusel from '../componentes/inicio/Carrusel'
 import TarjetaProducto from '../componentes/productos/TarjetaProducto'
+import RejillaAnimada from '../componentes/productos/RejillaAnimada'
 import instagram1 from '../assets/instagram/instagram-1.jpg'
 import instagram2 from '../assets/instagram/instagram-2.jpg'
 import instagram3 from '../assets/instagram/instagram-3.jpg'
@@ -70,9 +71,9 @@ class Inicio extends Component {
             <button className={`btn ${filtro === 'popular' ? 'btn-dark' : 'btn-outline-dark'}`} type="button" aria-pressed={filtro === 'popular'} onClick={() => this.setState({ filtro: 'popular' })}>Populares</button>
           </div>
           <p className="text-center text-secondary" role="status">{productos.length} productos</p>
-          <div className="row g-4">
-            {productos.map((producto) => <div className="col-sm-6 col-lg-3" key={producto.id}><TarjetaProducto product={producto} /></div>)}
-          </div>
+          <RejillaAnimada products={productos}>
+             {productos.map((producto) => <div className="col-sm-6 col-lg-3" key={producto.id}><TarjetaProducto product={producto} /></div>)}
+          </RejillaAnimada>
           {productos.length === 0 && <p className="text-center text-secondary py-4">No hay productos destacados para este filtro.</p>}
         </section>
         <section className="home-section bg-light">

@@ -56,6 +56,23 @@ video {
   max-width: 240px;
 }
 
+.checkout-progress {
+  height: 2px;
+  background: rgb(255 255 255 / 18%);
+  overflow: hidden;
+}
+
+.checkout-progress > span {
+  display: block;
+  height: 100%;
+  background: currentColor;
+  transform-origin: left center;
+}
+
+.payment-symbol {
+  width: fit-content;
+}
+
 .quantity-control .btn {
   width: 44px;
   min-height: 44px;

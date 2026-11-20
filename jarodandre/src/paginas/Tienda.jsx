@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import { Link } from 'react-router-dom'
 import TarjetaProducto from '../componentes/productos/TarjetaProducto'
+import RejillaAnimada from '../componentes/productos/RejillaAnimada'
 import FiltrosCatalogo from '../componentes/productos/FiltrosCatalogo'
 import CategoriasCatalogo from '../componentes/productos/CategoriasCatalogo'
 import { getProducts, subscribeToProducts } from '../datos/products'
@@ -78,16 +79,16 @@ class Tienda extends Component {
             <div className="col-lg-3">
               <FiltrosCatalogo filters={filters} onFilterChange={this.handleFilterChange} onReset={this.resetFilters} />
             </div>
-            <div className="col-lg-9" data-reveal="right">
+            <div className="col-lg-9">
               <h3 className="h4">{selectedCategory?.label || 'Todos los productos'}</h3>
               <p className="text-secondary mb-4" role="status" aria-atomic="true">
                 Mostrando {visibleProducts.length} de {selectedCategory?.count ?? products.length} productos
                 {selectedCategory && ` en ${selectedCategory.label}`}
               </p>
               <div id="catalog-results">
-                <div className="row g-4">
+                <RejillaAnimada products={visibleProducts}>
                   {visibleProducts.map((product) => <div className="col-12 col-sm-6 col-xl-4" key={product.id}><TarjetaProducto product={product} /></div>)}
-                </div>
+                </RejillaAnimada>
                 {visibleProducts.length === 0 && <p className="text-center text-secondary py-4">{products.length === 0 ? 'No hay productos disponibles.' : 'No encontramos productos con estos criterios. Prueba otra búsqueda o restablece los filtros.'}</p>}
               </div>
             </div>

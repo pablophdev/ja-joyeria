@@ -1,4 +1,5 @@
-import { Component } from 'react'
+import { Component, createRef } from 'react'
+import { heroEntrance } from '../../utilidades/motion'
 import { Link } from 'react-router-dom'
 import { routes } from '../../navigation/routes'
 import anillos from '../../assets/hero/hero-3.jpg'
@@ -10,27 +11,47 @@ const SWIPE_THRESHOLD = 50
 
 class Carrusel extends Component {
   state = { activeIndex: 0 }
+  root = createRef()
+  cleanupAnimation = () => {}
 
   timerId = null
   touchStartX = null
   touchStartY = null
 
   componentDidMount() {
-    this.startTimer()
+    this.motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)')
+    this.motionQuery?.addEventListener('change', this.restartTimer)
+    if (document.querySelector('.preloader')) {
+      window.addEventListener('ja:intro-ready', this.startIntro, { once: true })
+    } else this.startIntro()
   }
 
   componentDidUpdate(_prevProps, prevState) {
     if (prevState.activeIndex !== this.state.activeIndex) {
+      this.animateSlide()
       this.restartTimer()
     }
   }
 
   componentWillUnmount() {
     this.stopTimer()
+    this.cleanupAnimation()
+    this.motionQuery?.removeEventListener('change', this.restartTimer)
+    window.removeEventListener('ja:intro-ready', this.startIntro)
+  }
+
+  startIntro = () => {
+    this.animateSlide()
+    this.startTimer()
+  }
+
+  animateSlide = () => {
+    this.cleanupAnimation()
+    this.cleanupAnimation = heroEntrance(this.root.current?.querySelector('.is-active'))
   }
 
   startTimer = () => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     if (reducedMotion) return
     this.stopTimer()
     this.timerId = window.setInterval(() => {
@@ -93,6 +114,7 @@ class Carrusel extends Component {
 
     return (
       <section
+        ref={this.root}
         className="hero-carousel"
         aria-label="Colecciones destacadas"
         aria-roledescription="carrusel"

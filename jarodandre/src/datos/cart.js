@@ -5,6 +5,7 @@ import { normalizeCustomer } from './orderRecords'
 
 export const MAX_CART_QUANTITY = 99
 const events = observable()
+const additionEvents = observable()
 let cart = { items: [], totalQuantity: 0, total: 0 }
 let orders = []
 let adminOrders = []
@@ -35,6 +36,7 @@ export function isProductAvailable(product) {
   return Boolean(product) && (product.availabilityCode ? product.availabilityCode !== 'AGOTADO' : !['agotado', 'sin stock', 'no disponible'].includes(product.availability?.toLowerCase()))
 }
 export const subscribeToCart = events.subscribe
+export const subscribeToCartAdditions = additionEvents.subscribe
 export const subscribeToOrders = events.subscribe
 export function getCart() { return cart }
 export function getOrders() { return [...orders] }
@@ -114,7 +116,10 @@ async function setQuantity(id, quantity) {
   await refreshCart()
 }
 export function addToCart(id, quantity = 1) {
-  return serialize(() => setQuantity(id, (cart.items.find((item) => item.productId === id)?.quantity || 0) + quantity))
+  return serialize(async () => {
+    await setQuantity(id, (cart.items.find((item) => item.productId === id)?.quantity || 0) + quantity)
+    additionEvents.notify()
+  })
 }
 export function updateCartQuantity(id, quantity) { return serialize(() => setQuantity(id, quantity)) }
 export function removeFromCart(id) {

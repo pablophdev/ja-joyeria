@@ -1,23 +1,39 @@
-import { Component } from 'react'
+import { Component, createRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getOrders, subscribeToOrders } from '../datos/cart'
 import { subscribeToAuth } from '../datos/auth'
 import { paymentStatuses } from '../datos/orderRecords'
 import TarjetaPedido from '../componentes/pedidos/TarjetaPedido'
 import { routes } from '../navigation/routes'
+import { paymentEntrance } from '../utilidades/motion'
 
 class DetallePago extends Component {
   state = { orders: getOrders() }
+  root = createRef()
+  cleanupAnimation = () => {}
 
   componentDidMount() {
     this.unsubscribe = subscribeToOrders(this.refreshOrders)
     this.unsubscribeAuth = subscribeToAuth(this.refreshOrders)
     this.refreshOrders()
+    this.animateResult()
+  }
+
+  componentDidUpdate(previousProps, previousState) {
+    const previousOrder = previousState.orders.find((item) => String(item.id) === previousProps.orderId)
+    const order = this.state.orders.find((item) => String(item.id) === this.props.orderId)
+    if (previousProps.orderId !== this.props.orderId || previousOrder?.paymentStatus !== order?.paymentStatus) this.animateResult()
+  }
+
+  animateResult = () => {
+    this.cleanupAnimation()
+    this.cleanupAnimation = paymentEntrance(this.root.current)
   }
 
   componentWillUnmount() {
     this.unsubscribe?.()
     this.unsubscribeAuth?.()
+    this.cleanupAnimation()
   }
 
   refreshOrders = () => this.setState({ orders: getOrders() })
@@ -36,7 +52,13 @@ class DetallePago extends Component {
 
     const paid = order.paymentStatus === 'paid'
     return (
-      <section className="container py-5">
+      <section ref={this.root} className="container py-5">
+        <div className={`payment-symbol mb-3 ${paid ? 'text-success' : 'text-warning'}`} data-payment-symbol aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="56" height="56" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="24" cy="24" r="21" />
+            {paid ? <path d="m14 24 7 7 14-15" /> : <path d="M24 13v14m0 7h.01" />}
+          </svg>
+        </div>
         <h1>{paymentStatuses[order.paymentStatus].label}</h1>
         <p className={`alert ${paid ? 'alert-success' : 'alert-warning'}`} role="status">
           {paid

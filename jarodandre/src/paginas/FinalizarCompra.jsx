@@ -1,8 +1,10 @@
-import { Component } from 'react'
+import { Component, createRef } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { clearRecoveredCheckoutId, confirmOrder, getCart, getRecoveredCheckoutId, pendingCustomer, subscribeToCart } from '../datos/cart'
 import FormularioEntrega from '../componentes/pedidos/FormularioEntrega'
 import PagoPedido from '../componentes/pedidos/PagoPedido'
+import TransicionPaso from '../componentes/pedidos/TransicionPaso'
+import { checkoutProgress } from '../utilidades/motion'
 import { normalizeCustomer } from '../datos/orderRecords'
 import { getPaymentResultPath, routes } from '../navigation/routes'
 import { formatPrice } from '../utilidades/formatPrice'
@@ -10,14 +12,29 @@ import { formatPrice } from '../utilidades/formatPrice'
 class FinalizarCompra extends Component {
   state = { cart: getCart(), error: '', orderId: getRecoveredCheckoutId(), step: pendingCustomer() ? 'payment' : 'delivery', customer: pendingCustomer(), busy: false }
   submitting = false
+  progress = createRef()
+  cleanupProgress = () => {}
 
   componentDidMount() {
     clearRecoveredCheckoutId()
     this.unsubscribe = subscribeToCart(this.refreshCart)
     this.refreshCart()
+    this.animateProgress()
   }
 
-  componentWillUnmount() { this.unsubscribe?.() }
+  componentDidUpdate(_previousProps, previousState) {
+    if (previousState.step !== this.state.step) this.animateProgress(previousState.step)
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe?.()
+    this.cleanupProgress()
+  }
+
+  animateProgress = (previousStep) => {
+    this.cleanupProgress()
+    this.cleanupProgress = checkoutProgress(this.progress.current, this.state.step, previousStep)
+  }
 
   refreshCart = () => this.setState({ cart: getCart() })
 
@@ -66,11 +83,16 @@ class FinalizarCompra extends Component {
             <li className="breadcrumb-item active" aria-current="page">Checkout</li>
           </ol>
         </nav>
-        <ol className="list-unstyled d-flex flex-wrap gap-3 mt-4" aria-label="Pasos de la compra">
-          <li className={step === 'delivery' ? 'fw-bold' : 'text-secondary'} aria-current={step === 'delivery' ? 'step' : undefined}>1. Datos de entrega</li>
-          <li className={step === 'payment' ? 'fw-bold' : 'text-secondary'} aria-current={step === 'payment' ? 'step' : undefined}>2. Pago</li>
-          <li className="text-secondary">3. Resultado</li>
-        </ol>
+        <div ref={this.progress}>
+          <ol className="list-unstyled d-flex flex-wrap gap-3 mt-4" aria-label="Pasos de la compra">
+            <li className={step === 'delivery' ? 'fw-bold' : 'text-secondary'} aria-current={step === 'delivery' ? 'step' : undefined}>1. Datos de entrega</li>
+            <li className={step === 'payment' ? 'fw-bold' : 'text-secondary'} aria-current={step === 'payment' ? 'step' : undefined}>2. Pago</li>
+            <li className="text-secondary">3. Resultado</li>
+          </ol>
+          <div className="checkout-progress mb-4" aria-hidden="true">
+            <span data-checkout-progress style={{ transform: `scaleX(${step === 'payment' ? 1 : 0.5})` }} />
+          </div>
+        </div>
         {!cart.items.length ? (
           <div className="border rounded p-4 my-4">
             <h2 className="h4">Tu carrito está vacío</h2>
@@ -102,18 +124,20 @@ class FinalizarCompra extends Component {
             <div className="col-lg-5">
               {unavailable && <p className="alert alert-warning" role="alert">Vuelve al carrito y elimina los productos no disponibles para continuar.</p>}
               {error && <p className="alert alert-danger" role="alert">{error}</p>}
-              {step === 'delivery' ? (
-                <FormularioEntrega initialCustomer={customer} disabled={unavailable} onContinue={this.handleContinue} />
-              ) : (
-                <PagoPedido
-                  customer={customer}
-                  total={cart.total}
-                  disabled={unavailable || this.state.busy}
-                  onPay={this.handlePay}
-                  onCancel={this.handleCancel}
-                  onEdit={() => this.setState({ step: 'delivery', error: '' })}
-                />
-              )}
+              <TransicionPaso step={step}>
+                {(visibleStep) => visibleStep === 'delivery' ? (
+                  <FormularioEntrega initialCustomer={customer} disabled={unavailable} onContinue={this.handleContinue} />
+                ) : (
+                  <PagoPedido
+                    customer={customer}
+                    total={cart.total}
+                    disabled={unavailable || this.state.busy}
+                    onPay={this.handlePay}
+                    onCancel={this.handleCancel}
+                    onEdit={() => this.setState({ step: 'delivery', error: '' })}
+                  />
+                )}
+              </TransicionPaso>
             </div>
           </div>
         )}
