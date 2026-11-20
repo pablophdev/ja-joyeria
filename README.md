@@ -1,60 +1,52 @@
-# Jarodandre · Joyería urbana
+# Jarodandre: tienda en React
 
-Frontend de una tienda de anillos, cadenas, collares y grillz, con catálogo, blog, compra como invitado o cliente y panel administrativo. Los datos de negocio se consultan y actualizan mediante cuatro microservicios Spring Boot que persisten en MySQL.
+Este repositorio contiene la página de JA Joyería. Desde aquí se muestra el catálogo, se realizan las compras y se accede a la administración. Los datos de usuarios, productos, pedidos y mensajes se guardan en el backend, en MySQL.
 
-## Repositorios y arquitectura local
+## Cómo se conecta la tienda
 
-| Repositorio | Contenido |
-| --- | --- |
-| [ja-joyeria](https://github.com/pablophdev/ja-joyeria) | React, componentes, estilos, cliente HTTP, Dockerfile del frontend y Nginx. |
-| [jarodandre-backend](https://github.com/pablophdev/jarodandre-backend) | Cuatro microservicios, migraciones MySQL y Docker Compose de la tienda completa. |
+La web está hecha con React y se comunica con cuatro servicios Spring Boot: autenticación, catálogo, pedidos y comunicaciones. En el modo Docker, Nginx sirve la web y reenvía las solicitudes a cada servicio. Nginx también permite abrir directamente una página como `/productos/3` y recargar el navegador sin perder la ruta.
 
 ```mermaid
 flowchart LR
-    Navegador --> Frontend[React servido por Nginx]
-    Frontend --> Auth[ms-auth]
-    Frontend --> Catalogo[ms-catalogo]
-    Frontend --> Pedidos[ms-pedidos]
-    Frontend --> Comunicaciones[ms-comunicaciones]
+    Persona --> Web[React y Nginx]
+    Web --> Auth[ms-auth]
+    Web --> Catalogo[ms-catalogo]
+    Web --> Pedidos[ms-pedidos]
+    Web --> Comunicaciones[ms-comunicaciones]
     Pedidos --> Catalogo
     Catalogo --> Auth
     Pedidos --> Auth
     Comunicaciones --> Auth
-    Auth --> DB[(MySQL)]
-    Catalogo --> DB
-    Pedidos --> DB
-    Comunicaciones --> DB
 ```
 
-Nginx entrega los archivos de React, permite recargar rutas como `/productos/3` y dirige `/api/auth`, `/api/catalogo`, `/api/pedidos` y `/api/comunicaciones` al servicio correspondiente. MySQL contiene cuatro bases, una por microservicio. La guía operativa de la base y los servicios está en el README del backend.
+La guía para iniciar la base y los servicios está en el [README del backend](https://github.com/pablophdev/jarodandre-backend#jarodandre-backend-y-gu%C3%ADa-para-ejecutarlo).
 
-## Funcionalidades
+## Qué puedes hacer
 
-- Inicio con carrusel, videos, colecciones, destacados y filtros.
-- Catálogo con búsqueda, categorías, grupos, precios y ordenamiento. Fichas con imagen, descripción enriquecida, valoración y disponibilidad.
-- Registro, login, expiración de sesión y permisos de administrador. Las contraseñas se verifican en el backend.
-- Carrito persistido en el servidor, cantidades de 1 a 99 y checkout con datos de entrega y total verificado por pedidos.
-- Pago simulado, resultado, historial, comprobantes y seguimiento de entrega. Las compras de invitados usan tokens privados.
-- Administración de productos e imágenes, creación de usuarios, cambios de rol y estado, pedidos, reportes, mensajes y suscriptores.
-- Blog con artículos servidos por catálogo, formulario de contacto y newsletter.
+- Ver productos, buscar por nombre, filtrar categorías y revisar los detalles.
+- Crear una cuenta o iniciar sesión.
+- Añadir productos al carrito y completar una compra de prueba, como invitado o con una cuenta.
+- Consultar pedidos, comprobantes y estado de entrega.
+- Usar la administración para gestionar productos, usuarios, pedidos, mensajes y suscripciones.
+- Leer artículos del blog, enviar una consulta y registrarte para recibir novedades.
+- Publicar una reseña de un producto después de pagarlo. El administrador no asigna estrellas ni reseñas: el cliente elige su valoración desde la ficha del producto.
 
-La carga inicial incluye 14 productos y 9 artículos. El entorno local habilita pagos simulados. La integración de una pasarela real sigue pendiente. El inventario actual usa disponibilidad declarada; el modelo de reservas por unidades requiere una evolución posterior.
+En este entorno los pagos son simulados y el inventario utiliza la disponibilidad indicada para cada producto.
 
-## Tecnologías
+## Tecnologías principales
 
-| Tecnología | Uso |
+| Herramienta | Uso en la tienda |
 | --- | --- |
-| React 19, React Router 7, Vite 8 | Componentes, navegación SPA y compilación. |
-| Bootstrap 5.3 y CSS | Formularios, disposición adaptable y estilos. |
-| GSAP, ScrollTrigger y `@gsap/react` | Animaciones de la tienda y limpieza durante el ciclo de vida de React. |
-| TipTap y StarterKit | Editor de descripciones de productos. |
-| DOMPurify | Limpieza del HTML de las descripciones antes de enviarlo y al mostrarlo. |
-| Vitest, Testing Library y ESLint | Pruebas y revisión estática. |
-| Docker y Nginx | Construcción y ejecución del frontend local. |
+| React, React Router y Vite | Pantallas, navegación y desarrollo local. |
+| Bootstrap y CSS | Estilos y presentación adaptable a distintos tamaños. |
+| GSAP | Animaciones de la tienda. |
+| TipTap | Editor de texto enriquecido para descripciones de productos. |
+| DOMPurify | Limpia el HTML de las descripciones antes de mostrarlo. |
+| Docker y Nginx | Sirven la versión de producción local y conectan la web con las APIs. |
 
-## Ejecutar toda la tienda con Docker
+## Iniciar toda la tienda
 
-Se requiere Docker Desktop con el motor Linux activo y Docker Compose v2. Clonar ambos repositorios dentro de la misma carpeta para conservar el contexto relativo de construcción.
+Necesitas Docker Desktop con el motor Linux activo y Docker Compose v2. Clona este repositorio junto al backend y ejecuta Compose desde la carpeta `jarodandre-backend`:
 
 ```powershell
 git clone https://github.com/pablophdev/ja-joyeria.git
@@ -64,43 +56,23 @@ docker compose up -d --build
 docker compose ps
 ```
 
-La estructura esperada es:
-
-```text
-carpeta-de-trabajo/
-├── ja-joyeria/
-│   └── jarodandre/
-│       ├── Dockerfile
-│       └── nginx.conf
-└── jarodandre-backend/
-    └── docker-compose.yml
-```
-
-Abrir [la tienda local](http://localhost:5173). El primer arranque descarga las imágenes, compila los proyectos y aplica las migraciones. Compose espera a que los servicios necesarios estén saludables antes de iniciar el frontend.
-
-| Acceso de desarrollo | Valor |
-| --- | --- |
-| Administrador | `admin@jarodandre.local` |
-| Contraseña del administrador | `Admin123123` |
-| MySQL desde el equipo | `127.0.0.1:3307`, usuario `ja`, contraseña `123123` |
-
-La cuenta administrativa se crea al iniciar auth con `LOCAL_ADMIN_ENABLED=true` si ese correo aún no existe. Estas credenciales pertenecen al entorno local.
-
-Para reconstruir el frontend después de editarlo, ejecutar desde el backend:
-
-```powershell
-docker compose up -d --build frontend
-```
-
-Para detener la tienda y conservar sus volúmenes:
+Cuando los servicios estén listos, abre [http://localhost:5173](http://localhost:5173). Para detenerlos y conservar tus datos:
 
 ```powershell
 docker compose down
 ```
 
-## Desarrollar con Vite
+La cuenta administrativa local es `admin@jarodandre.local` y su contraseña es `Admin123123`. MySQL está disponible desde tu equipo en `127.0.0.1:3307`, con usuario `ja` y contraseña `123123`. Estas cuentas son solo para desarrollo.
 
-Se requiere Node.js 24 y npm. Primero iniciar MySQL y los cuatro microservicios siguiendo el README del backend. Desde este repositorio:
+Después de editar el frontend, puedes volver a construirlo desde la carpeta del backend:
+
+```powershell
+docker compose up -d --build frontend
+```
+
+## Trabajar en el frontend con Vite
+
+Para usar el servidor de desarrollo necesitas Node.js 24 y npm. Primero inicia MySQL y los cuatro servicios siguiendo la guía del backend. Después, desde este repositorio:
 
 ```powershell
 cd jarodandre
@@ -108,35 +80,41 @@ npm ci
 npm run dev -- --port 5173 --strictPort
 ```
 
-Usar `http://localhost:5173` para coincidir con el origen CORS configurado en las APIs. El archivo [`.env.example`](./jarodandre/.env.example) enumera las URLs. Si se necesitan valores propios, copiarlo a `.env.local` y reiniciar Vite.
+Abre `http://localhost:5173`. Si cambian las direcciones de las APIs, copia `.env.example` a `.env.local`, ajusta sus valores y reinicia Vite.
 
-| Variable | Valor directo para desarrollo |
+| Variable | Dirección local habitual |
 | --- | --- |
 | `VITE_AUTH_URL` | `http://localhost:8081` |
 | `VITE_CATALOGO_URL` | `http://localhost:8082` |
 | `VITE_PEDIDOS_URL` | `http://localhost:8083` |
 | `VITE_COMUNICACIONES_URL` | `http://localhost:8084` |
-| `VITE_MEDIA_URL` | Opcional. Por defecto, URL de catálogo seguida de `/media`. |
+| `VITE_MEDIA_URL` | Opcional. Por defecto usa el servicio de catálogo. |
 
-Dentro de la imagen Docker, las cuatro URLs se establecen como `/api/...` durante la compilación. Las variables `VITE_` son públicas y se incorporan al JavaScript generado. Los secretos de MySQL, las claves privadas y el token de comunicación interna pertenecen al backend.
+Las variables que comienzan con `VITE_` se incluyen en los archivos web. No pongas contraseñas ni claves privadas en ellas.
 
-## Animaciones, editor y HTML
+## Reseñas, descripciones y animaciones
 
-Los efectos de GSAP están en `src/utilidades/motion.js` y `src/utilidades/scrollReveal.js`. Cubren carrusel, tarjetas, colecciones, confirmación del carrito, checkout y resultado del pago. Respetan `prefers-reduced-motion` y limpian observadores, suscripciones y animaciones al desmontar o recargar los módulos.
+En la ficha de un producto aparecen las reseñas de clientes. Para publicar o actualizar una, la persona debe iniciar sesión con la cuenta asociada a una compra pagada del producto. El backend valida la compra y calcula el promedio que se muestra en la tienda.
 
-El formulario administrativo de productos carga TipTap cuando se utiliza el editor. Admite párrafos, títulos, subtítulos, negrita, cursiva, listas y deshacer o rehacer. Las descripciones anteriores en texto simple siguen siendo compatibles. El HTML se guarda en `descripcion` mediante la API existente.
+El formulario de administración permite elegir una categoría existente de la lista. Las reseñas y estrellas se gestionan desde la ficha por los compradores.
 
-`src/utilidades/descriptionHtml.js` centraliza DOMPurify con una lista de etiquetas de formato permitidas. Elimina scripts, imágenes incrustadas, enlaces y atributos del HTML enriquecido. La ficha vuelve a aplicar esa limpieza antes de renderizar la descripción.
+El editor TipTap se usa para escribir las descripciones. DOMPurify limpia el HTML antes de guardarlo y volver a mostrarlo, conservando el formato permitido. GSAP anima elementos de la tienda y respeta la preferencia del sistema para reducir el movimiento.
 
-## Sesión y datos
+## Dónde vive cada parte del frontend
 
-`src/datos/api.js` concentra las solicitudes, errores, tokens y paginación. `ConexionBackend` carga identidad, catálogo, artículos y carrito antes de montar las vistas. Los demás módulos de `src/datos` adaptan los DTO del servidor a las pantallas.
+| Carpeta | Qué contiene |
+| --- | --- |
+| `src/componentes` | Piezas reutilizables de las páginas, como formularios, tarjetas y navegación. |
+| `src/paginas` | Pantallas completas de la tienda. |
+| `src/datos` | Solicitudes al backend y adaptación de sus respuestas para la web. |
+| `src/utilidades` | Funciones compartidas, como formato, limpieza de HTML y animaciones. |
+| `public` y `src/assets` | Iconos e imágenes de la tienda. |
 
-La sesión y los secretos de invitado se conservan en `sessionStorage` del navegador. El carrito, las cuentas, compras, mensajes y suscripciones se guardan en MySQL a través de las APIs. Las fotografías nuevas se suben a catálogo; los recursos iniciales también forman parte del proyecto.
+El navegador guarda la sesión y algunos tokens temporales de compras de invitado. Los productos, cuentas, pedidos, mensajes y suscripciones se guardan en el backend.
 
-## Compilar y verificar
+## Comprobar cambios
 
-Ejecutar dentro de `jarodandre/`:
+Desde la carpeta `jarodandre`, puedes revisar el código y crear la versión lista para servir así:
 
 ```powershell
 npm run lint
@@ -144,23 +122,17 @@ npm run build
 npm run test -- --run
 ```
 
-`npm run preview` sirve la compilación de `dist/`. Para reproducir los endpoints `/api/...` configurados en la imagen, usar la ejecución de Nginx mediante Compose. Las pruebas cubren contratos HTTP, permisos de rutas, componentes, animaciones, editor y sanitización.
+`npm run preview` permite abrir la compilación de prueba. Para probar la misma conexión `/api/...` usada por la tienda Docker, ejecuta el frontend con Compose.
 
-## Rutas y documentación técnica
+## Páginas principales
 
-| Rutas | Pantallas |
+| Dirección | Página |
 | --- | --- |
-| `/`, `/productos`, `/productos/:productId` | Inicio, catálogo y ficha. |
+| `/`, `/productos`, `/productos/:productId` | Inicio, catálogo y detalle del producto. |
 | `/registro`, `/login` | Registro e inicio de sesión. |
-| `/carrito`, `/checkout`, `/checkout/resultado/:orderId`, `/pedidos` | Compra e historial. |
-| `/blog`, `/blog/:slug`, `/nosotros`, `/contacto` | Contenido y contacto. |
-| `/admin`, `/admin/productos`, `/usuarios` | Panel, productos y usuarios. |
-| `/admin/ordenes`, `/admin/reportes`, `/admin/mensajes`, `/admin/suscriptores` | Operación administrativa. |
+| `/carrito`, `/checkout`, `/pedidos` | Carrito, compra e historial. |
+| `/blog`, `/blog/:slug`, `/nosotros`, `/contacto` | Artículos, información y contacto. |
+| `/admin`, `/admin/productos`, `/usuarios` | Panel y gestión de la tienda. |
+| `/admin/ordenes`, `/admin/reportes`, `/admin/mensajes`, `/admin/suscriptores` | Pedidos, reportes, mensajes y lista de novedades. |
 
-La [guía técnica del frontend](./jarodandre/README.md) detalla su organización y los contratos de comunicación. Ante un error de carga, comprobar primero las URLs y el estado de los cuatro servicios con `docker compose ps` y `docker compose logs --tail=100` desde el backend.
-
-## Reseñas y formularios
-
-El administrador selecciona la categoría desde las opciones del backend. No puede asignar estrellas ni cantidades de reseñas al crear o editar productos. Los clientes con una compra pagada del producto pueden publicar o actualizar su valoración de 1 a 5 estrellas y un comentario opcional desde la ficha del producto. El backend verifica la compra y calcula el resumen de valoraciones.
-
-Los errores de formulario muestran el campo y una explicación en español. Para registrar una cuenta, la contraseña requiere entre 8 y 72 caracteres; el teléfono es opcional.
+Si la web no carga datos, comprueba que los servicios estén iniciados con `docker compose ps` desde la carpeta del backend. Para ver el motivo de un fallo, usa `docker compose logs --tail=100 nombre-del-servicio`.
