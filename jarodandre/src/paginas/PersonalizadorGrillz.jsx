@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getCurrentUser, subscribeToAuth } from '../datos/auth'
-import { estimateGrillz, getGrillzOptions, getMyGrillz, initialDesign, quoteGrillz, saveGrillz, toothIds, restoreGrillzDraft, storeGrillzDraft } from '../datos/grillz'
+import { MODEL, estimateGrillz, getGrillzOptions, getMyGrillz, initialDesign, quoteGrillz, saveGrillz, toothIds, restoreGrillzDraft, storeGrillzDraft } from '../datos/grillz'
 import { formatPrice } from '../utilidades/formatPrice'
 import './PersonalizadorGrillz.css'
 const Visor = lazy(() => import('../componentes/grillz/VisorGrillz'))
@@ -10,8 +10,8 @@ export default function PersonalizadorGrillz() {
   const [design, setDesign] = useState(restoreGrillzDraft)
   const [options, setOptions] = useState([])
   const [arch, setArch] = useState('ambas')
-  const [material, setMaterial] = useState('dorado')
-  const [style, setStyle] = useState('liso')
+  const [material, setMaterial] = useState(() => design.dientes[0]?.material || 'dorado')
+  const [style, setStyle] = useState(() => design.dientes[0]?.estilo || 'liso')
   const [estimate, setEstimate] = useState(null)
   const [user, setUser] = useState(getCurrentUser)
   const [saved, setSaved] = useState([])
@@ -66,7 +66,13 @@ export default function PersonalizadorGrillz() {
     catch (e) { setError(e.message) } finally { setBusy(false) }
   }
   const materials = options.filter((o) => o.tipo === 'MATERIAL')
-  const styles = options.filter((o) => o.tipo === 'ESTILO')
+  const styleOrder = ['liso','piedras','ventana','solitario','colmillo','rayas','corazon']
+  const styles = options.filter((o) => o.tipo === 'ESTILO').sort((a,b) => styleOrder.indexOf(a.codigo) - styleOrder.indexOf(b.codigo))
+  const styleIcons = { liso: '▰', piedras: '⠿', ventana: '▱', solitario: '◇', colmillo: '▽', rayas: '≋', corazon: '♥' }
+  function chooseStyle(code) {
+    setStyle(code)
+    change({ ...design, modelo: MODEL, dientes: design.dientes.map((d) => ({ ...d, estilo: code })) })
+  }
   const canSave = user && design.dientes.length > 0 && design.nombre.trim() && estimate !== null && !busy
   const summary = `${design.dientes.length} dientes · ${design.dientes.map((d) => `${d.id} ${d.material}/${d.estilo}`).join(', ')}`
   return <section className="grillz-studio container py-5">
@@ -84,17 +90,18 @@ export default function PersonalizadorGrillz() {
         {['S','I'].map((prefix) => <div key={prefix}><div className="grillz-row-label"><span>{prefix === 'S' ? 'Superior' : 'Inferior'} · de izquierda a derecha en pantalla</span><button onClick={() => selectArch(prefix)}>Todos</button></div><div className="grillz-tooth-grid">{toothIds.filter((id) => id.startsWith(prefix)).map((id) => <button key={id} aria-pressed={design.dientes.some((d) => d.id === id)} aria-label={`Diente ${id}`} onClick={() => toggle(id)}>{id}</button>)}</div></div>)}
         <h2><span>02</span> Define el acabado</h2>
         <div className="grillz-swatches">{materials.map((o) => <button key={o.codigo} aria-pressed={material === o.codigo} onClick={() => setMaterial(o.codigo)}><i style={{ background: o.color }} />{o.nombre}</button>)}</div>
-        <label htmlFor="grillz-style">Diseño</label><select id="grillz-style" value={style} onChange={(e) => setStyle(e.target.value)}>{styles.map((o) => <option key={o.codigo} value={o.codigo}>{o.nombre}</option>)}</select>
-        <p className="grillz-note">El acabado se usa en los dientes que añadas. También puedes aplicarlo a todos los que ya cubriste.</p>
+        <p className="grillz-note">Diseño para los dientes cubiertos</p><div className="grillz-design-grid" role="group" aria-label="Diseños de grillz">{styles.map((o) => <button key={o.codigo} aria-pressed={style === o.codigo} onClick={() => chooseStyle(o.codigo)}><span aria-hidden="true">{styleIcons[o.codigo] || '◇'}</span><strong>{o.nombre}</strong><small>{o.precioClp ? `+ ${formatPrice(o.precioClp)} por diente` : 'Sin recargo de diseño'}</small></button>)}</div>
+        <p className="grillz-note">El diseño se aplica a los dientes cubiertos. El material elegido se usa en los dientes que añadas; para cambiarlo en todos, usa el botón de abajo.</p>
         <button className="grillz-secondary" disabled={!design.dientes.length || !options.length} onClick={() => change({ ...design, dientes: design.dientes.map((d) => ({ ...d, material, estilo: style })) })}>Aplicar a los dientes cubiertos</button>
         <div className="grillz-price"><span>Estimado de diseño</span><strong>{!design.dientes.length ? formatPrice(0) : estimate === null ? 'Calculando…' : formatPrice(estimate)}</strong><small>CLP · El precio final y el ajuste se confirman con cotización y molde. Acabados de referencia.</small></div>
         <button className="grillz-primary" disabled={!design.dientes.length} onClick={() => { if (!api.current) { setError('La vista 3D no está disponible para exportar.'); return } api.current.jpg(design.nombre || 'Mis grillz', summary) }}>Descargar diseño JPG ↓</button>
         {user ? <><button className="grillz-secondary" disabled={!canSave} onClick={() => persist(false)}>{busy ? 'Guardando…' : 'Guardar en mi cuenta'}</button><button className="grillz-secondary" disabled={!canSave} onClick={() => persist(true)}>Solicitar cotización</button></> : <p className="grillz-note"><Link to="/login">Inicia sesión</Link> para guardar tu diseño o solicitar una cotización. Puedes descargar el JPG sin una cuenta.</p>}
-        <button className="grillz-reset" onClick={() => { change(initialDesign()); setArch('ambas'); api.current?.reset() }}>Restablecer diseño</button>
+        <button className="grillz-reset" onClick={() => { change(initialDesign()); setStyle('liso'); setMaterial('dorado'); setArch('ambas'); api.current?.reset() }}>Restablecer diseño</button>
       </aside>
     </div>
     <p role="status" className="mt-3">{message}</p>
-    <p className="grillz-disclaimer">Modelo 3D estilizado para explorar el diseño. La fabricación requiere confirmar materiales, medidas y molde.</p>
-    {user && <section className="mt-5"><h2>Mis diseños</h2>{!saved.length ? <p>Aquí aparecerán los diseños que guardes.</p> : <div className="grillz-saved">{saved.map((item) => <article key={item.id}><p className="grillz-eyebrow">{item.estado === 'SOLICITADO' ? 'COTIZACIÓN SOLICITADA' : 'GUARDADO'}</p><h3>{item.nombre}</h3><p>{item.configuracion.dientes.length} dientes · {formatPrice(item.estimadoClp)}</p><button className="grillz-secondary" onClick={() => { persisted.current = { id: item.id, signature: JSON.stringify(item.configuracion) }; change(item.configuracion); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Abrir diseño</button>{item.estado !== 'SOLICITADO' && <button className="grillz-secondary" disabled={busy} onClick={() => requestSaved(item.id)}>Pedir cotización</button>}</article>)}</div>}</section>}
+    {design.modelo === 'arcada-v1' && <p className="grillz-note">Este diseño usa el modelo anterior. <button className="grillz-secondary" onClick={() => change({ ...design, modelo: MODEL })}>Actualizar al modelo con encías</button></p>}
+    <p className="grillz-disclaimer">Vista 3D de referencia para explorar el diseño. La fabricación requiere confirmar materiales, medidas y molde.</p>
+    {user && <section className="mt-5"><h2>Mis diseños</h2>{!saved.length ? <p>Aquí aparecerán los diseños que guardes.</p> : <div className="grillz-saved">{saved.map((item) => <article key={item.id}><p className="grillz-eyebrow">{item.estado === 'SOLICITADO' ? 'COTIZACIÓN SOLICITADA' : 'GUARDADO'}</p><h3>{item.nombre}</h3><p>{item.configuracion.dientes.length} dientes · {formatPrice(item.estimadoClp)}</p><button className="grillz-secondary" onClick={() => { persisted.current = { id: item.id, signature: JSON.stringify(item.configuracion) }; setStyle(item.configuracion.dientes[0]?.estilo || 'liso'); setMaterial(item.configuracion.dientes[0]?.material || 'dorado'); change(item.configuracion); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Abrir diseño</button>{item.estado !== 'SOLICITADO' && <button className="grillz-secondary" disabled={busy} onClick={() => requestSaved(item.id)}>Pedir cotización</button>}</article>)}</div>}</section>}
   </section>
 }

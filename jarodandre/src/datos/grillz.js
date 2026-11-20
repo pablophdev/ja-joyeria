@@ -1,5 +1,5 @@
 import { allPages, request } from './api'
-export const MODEL = 'arcada-v1'
+export const MODEL = 'arcada-v2'
 export const toothIds = Array.from({ length: 8 }, (_, i) => `S${i + 1}`).concat(Array.from({ length: 8 }, (_, i) => `I${i + 1}`))
 export const initialDesign = () => ({ nombre: 'Mis grillz', modelo: MODEL, dientes: ['S3','S4','S5','S6'].map((id) => ({ id, material: 'dorado', estilo: 'liso' })) })
 export const getGrillzOptions = () => request('catalog', '/v1/grillz/opciones', { authenticated: false })
@@ -13,9 +13,9 @@ const draftKey = 'ja.grillz.draft.v1'
 export function restoreGrillzDraft() {
   try {
     const draft = JSON.parse(sessionStorage.getItem(draftKey))
-    if (draft?.modelo === MODEL && typeof draft.nombre === 'string' && draft.nombre.length <= 100
+    if (['arcada-v1', MODEL].includes(draft?.modelo) && typeof draft.nombre === 'string' && draft.nombre.length <= 100
       && Array.isArray(draft.dientes) && draft.dientes.length <= 16
-      && draft.dientes.every((d) => d && toothIds.includes(d.id) && ['dorado','plata','rosa'].includes(d.material) && ['liso','piedras'].includes(d.estilo))) return draft
+      && draft.dientes.every((d) => d && toothIds.includes(d.id) && ['dorado','plata','rosa'].includes(d.material) && ['liso','piedras','ventana','solitario','colmillo','rayas','corazon'].includes(d.estilo))) return { ...draft, modelo: MODEL }
   } catch { /* Un borrador local inválido se reemplaza por el diseño inicial. */ }
   return initialDesign()
 }

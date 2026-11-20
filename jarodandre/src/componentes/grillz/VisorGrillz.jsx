@@ -2,32 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
-import { toothIds } from '../../datos/grillz'
-
-// Modelo original paramétrico: coronas independientes, identificadas y versionadas.
-function crownGeometry() {
-  const shape = new THREE.Shape()
-  shape.moveTo(-0.26, 0.42)
-  shape.bezierCurveTo(-0.38, 0.38, -0.36, -0.25, -0.26, -0.41)
-  shape.quadraticCurveTo(0, -0.49, 0.26, -0.41)
-  shape.bezierCurveTo(0.36, -0.25, 0.38, 0.38, 0.26, 0.42)
-  shape.quadraticCurveTo(0, 0.5, -0.26, 0.42)
-  const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.27, bevelEnabled: true, bevelSegments: 5, steps: 1, bevelSize: 0.07, bevelThickness: 0.08, curveSegments: 18 })
-  geometry.center()
-  return geometry
-}
-
-function updateTeeth(teeth, design, options, arch) {
-    for (const t of teeth) {
-      const selected = design.dientes.find((d) => d.id === t.id)
-      const color = options.find((o) => o.codigo === selected?.material)?.color || '#d9ac52'
-      t.mesh.material.color.set(selected ? color : '#ece6d9')
-      t.mesh.material.metalness = selected ? 1 : 0
-      t.mesh.material.roughness = selected ? 0.2 : 0.3
-      t.stones.visible = selected?.estilo === 'piedras'
-      t.group.visible = arch === 'ambas' || (arch === 'superior' ? t.id.startsWith('S') : t.id.startsWith('I'))
-    }
-}
+import { createDentalModel } from './modeloDental'
 
 export default function VisorGrillz({ design, options, arch = 'ambas', onTooth, apiRef, compact = false }) {
   const mount = useRef(null)
@@ -42,7 +17,7 @@ export default function VisorGrillz({ design, options, arch = 'ambas', onTooth, 
     catch { queueMicrotask(() => setError('Tu navegador no pudo iniciar la vista 3D. Puedes personalizar con los botones de dientes.')); return }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5))
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.4
+    renderer.toneMappingExposure = 1.05
     host.appendChild(renderer.domElement)
     renderer.domElement.setAttribute('aria-label', 'Dentadura 3D. Arrastra para girar; usa los botones para seleccionar dientes.')
     renderer.domElement.setAttribute('role', 'img')
@@ -61,35 +36,11 @@ export default function VisorGrillz({ design, options, arch = 'ambas', onTooth, 
     const environment = pmrem.fromScene(room)
     scene.environment = environment.texture
     room.dispose(); pmrem.dispose()
-    scene.add(new THREE.HemisphereLight(0xe4edff, 0x30231a, 3))
-    const light = new THREE.DirectionalLight(0xffe5bf, 4)
+    scene.add(new THREE.HemisphereLight(0xe4edff, 0x30231a, 1.6))
+    const light = new THREE.DirectionalLight(0xffe5bf, 2.5)
     light.position.set(3, 4, 6); scene.add(light)
-    const geometry = crownGeometry()
-    const stoneGeometry = new THREE.IcosahedronGeometry(0.055, 0)
-    const teeth = []
-    for (const id of toothIds) {
-      const index = Number(id.slice(1)) - 1
-      const angle = (index - 3.5) * 0.245
-      const upper = id.startsWith('S')
-      const group = new THREE.Group()
-      group.position.set(Math.sin(angle) * 3.05, upper ? 0.62 : -0.62, Math.cos(angle) * 2.25 - 2.4)
-      group.rotation.y = angle
-      group.rotation.z = upper ? 0 : Math.PI
-      const central = index === 3 || index === 4
-      group.scale.set(central ? 1.08 : 0.96, upper ? 1 : 0.82, 1)
-      const material = new THREE.MeshStandardMaterial({ color: '#ece6d9', roughness: 0.28 })
-      const mesh = new THREE.Mesh(geometry, material)
-      mesh.userData.id = id; group.add(mesh)
-      const stones = new THREE.Group()
-      const stoneMaterial = new THREE.MeshPhysicalMaterial({ color: '#f2faff', metalness: 0.15, roughness: 0.08, clearcoat: 1 })
-      for (let row = 0; row < 5; row++) for (let col = 0; col < 4; col++) {
-        const stone = new THREE.Mesh(stoneGeometry, stoneMaterial)
-        stone.position.set((col - 1.5) * 0.13, (row - 2) * 0.14, 0.23)
-        stone.rotation.z = (row + col) * 0.7; stones.add(stone)
-      }
-      group.add(stones); scene.add(group)
-      teeth.push({ id, group, mesh, stones, stoneMaterial })
-    }
+    const model = createDentalModel(scene, design.modelo)
+    const teeth = model.teeth
     const raycaster = new THREE.Raycaster()
     let down = null
     const pointers = new Set()
@@ -104,7 +55,7 @@ export default function VisorGrillz({ design, options, arch = 'ambas', onTooth, 
       if (!start || pointers.size || Math.hypot(event.clientX - start[0], event.clientY - start[1]) > 6) return
       const rect = renderer.domElement.getBoundingClientRect()
       raycaster.setFromCamera(new THREE.Vector2((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1), camera)
-      const hits = raycaster.intersectObjects(teeth.filter((t) => t.group.visible).map((t) => t.mesh))
+      const hits = raycaster.intersectObjects(teeth.filter((t) => t.group.visible).map((t) => t.group), true)
       if (hits[0]) action.current?.(hits[0].object.userData.id)
     }
     renderer.domElement.addEventListener('pointerdown', pointerDown)
@@ -117,7 +68,7 @@ export default function VisorGrillz({ design, options, arch = 'ambas', onTooth, 
     })
     observer.observe(host)
     renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera) })
-    sceneRef.current = { update: (design, options, arch) => updateTeeth(teeth, design, options, arch) }
+    sceneRef.current = model
     const api = {
       reset: () => { camera.position.set(0, 1, 12); controls.target.set(0, 0, -0.5); controls.update() },
       jpg: (name, description) => {
@@ -151,11 +102,10 @@ export default function VisorGrillz({ design, options, arch = 'ambas', onTooth, 
       sceneRef.current = null; observer.disconnect(); renderer.setAnimationLoop(null); controls.dispose()
       renderer.domElement.removeEventListener('pointerdown', pointerDown); renderer.domElement.removeEventListener('pointerup', pointerUp)
       renderer.domElement.removeEventListener('pointercancel', pointerCancel)
-      geometry.dispose(); stoneGeometry.dispose()
-      for (const t of teeth) { t.mesh.material.dispose(); t.stoneMaterial.dispose() }
+      model.dispose()
       environment.dispose(); renderer.dispose(); host.replaceChildren()
     }
-  }, [apiRef])
+  }, [apiRef, design.modelo])
   useEffect(() => {
     sceneRef.current?.update(design, options, arch)
   }, [design, options, arch])

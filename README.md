@@ -143,6 +143,8 @@ La nueva página `/grillz`, accesible desde el menú, permite elegir entre 16 di
 
 La descarga JPG funciona sin iniciar sesión e incluye el diseño y una descripción. El borrador se conserva en la pestaña mientras inicias sesión. Con una cuenta puedes guardar diseños, volver a abrirlos y solicitar cotizaciones. El administrador las revisa en `/admin/grillz` y puede reconstruir la misma configuración en 3D.
 
-El modelo `arcada-v1` es una dentadura estilizada creada con geometría propia en Three.js. No requiere descargar modelos de terceros. El visor se carga únicamente al entrar a estas páginas. Si WebGL no está disponible, la selección mediante botones continúa disponible, aunque no es posible generar el JPG.
+El modelo actual `arcada-v2` usa geometría propia en Three.js: encías curvas, esmalte con variación de tono y formas distintas para incisivos, caninos y premolares. Los diseños anteriores conservan `arcada-v1` hasta que el cliente decide actualizarlos. No requiere descargar modelos de terceros. El visor se carga únicamente al entrar a estas páginas. Si WebGL no está disponible, la selección mediante botones continúa disponible, aunque no es posible generar el JPG.
 
 Los importes son referencias de desarrollo que llegan del backend. El modelo representa la apariencia; la fabricación requiere confirmar el presupuesto, los materiales y el molde. No se realiza un pago al pedir una cotización.
+
+La galería incluye siete estilos: liso, piedras, marco abierto, piedra central, colmillo, rayas grabadas y corazón. Seleccionar un estilo lo aplica a los dientes cubiertos. Todos los estilos se guardan por diente, se recuperan en administración y aparecen en el JPG. El borrador local se actualiza al modelo nuevo; los diseños guardados mantienen su versión y ofrecen un botón para actualizarla.
