@@ -33,7 +33,7 @@ class Usuarios extends Component {
     return (
       <section className="container py-5">
         <h1>Gestión de usuarios</h1>
-        <Link className="btn btn-dark mb-3" to={routes.userNew}>Información de registro</Link>
+        <Link className="btn btn-dark mb-3" to={routes.userNew}>Crear usuario</Link>
         <p>Perfiles registrados en el servidor. Solo un ADMIN activo puede gestionar los permisos.</p>
         <div className="row g-3 mb-4">
           {metrics.map(({ label, count }) => <div className="col-sm-6 col-lg-3" key={label}><div className="border rounded p-3 h-100"><h2 className="h6">{label}</h2><p className="fs-3 mb-0">{count}</p></div></div>)}

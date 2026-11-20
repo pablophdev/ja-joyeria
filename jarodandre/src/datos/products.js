@@ -23,7 +23,7 @@ export function mapProduct(item) {
 
 export async function loadProducts() {
   const [items, groups] = await Promise.all([
-    allPages('catalog', '/v1/productos', { authenticated: false }),
+    allPages('catalog', '/v1/productos', { authenticated: false }, { page: 'pagina', size: 'tamano' }),
     request('catalog', '/v1/categorias', { authenticated: false }),
   ])
   products = items.map(mapProduct)

@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { isAdmin, login, registerUser } from '../datos/auth'
+import { createUser, isAdmin, login, registerUser } from '../datos/auth'
 import CamposUsuario from '../componentes/usuarios/CamposUsuario'
-import { routes } from '../navigation/routes'
+import { userRoles, userStatuses } from '../datos/userOptions'
+import { getUserEditPath, routes } from '../navigation/routes'
 
 export default function Acceso({ mode = 'login' }) {
-  const registering = mode === 'register'
+  const creating = mode === 'admin-create'
+  const registering = mode === 'register' || creating
   const [values, setValues] = useState({
     email: '',
     password: '',
@@ -14,7 +16,7 @@ export default function Acceso({ mode = 'login' }) {
     rut: '',
     phone: '',
     region: '',
-    commune: '',
+    commune: '', role: 'user', status: 'active',
   })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -42,6 +44,11 @@ export default function Acceso({ mode = 'login' }) {
     setError('')
 
     try {
+      if (creating) {
+        const user = await createUser(values)
+        window.location.assign(getUserEditPath(user.id))
+        return
+      }
       const user = registering
         ? await registerUser(values)
         : await login(values.email, values.password)
@@ -67,6 +74,13 @@ export default function Acceso({ mode = 'login' }) {
                 <CamposUsuario values={values} onChange={change} />
               )}
 
+              {creating && <div className="row mb-3">
+                {[{ name: 'role', label: 'Rol', options: userRoles }, { name: 'status', label: 'Estado', options: userStatuses }].map((field) => (
+                  <div className="col-sm-6" key={field.name}><label className="form-label" htmlFor={field.name}>{field.label}</label>
+                    <select className="form-select" id={field.name} name={field.name} value={values[field.name]} onChange={change}>
+                      {field.options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                    </select></div>))}
+              </div>}
               <div className="mb-3">
                 <label className="form-label" htmlFor="access-email">Correo</label>
                 <input

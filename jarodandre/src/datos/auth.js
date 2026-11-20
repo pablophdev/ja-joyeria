@@ -106,20 +106,27 @@ export async function login(email, password) {
   return saveSession(result)
 }
 
+function registrationPayload(data) {
+  return { correo: data.email, password: data.password, rut: data.rut, nombre: data.name,
+    telefono: data.phone?.trim() || null, comunaId: Number(data.commune) }
+}
+
 export async function registerUser(data) {
-  const result = await request('auth', '/v1/auth/registro', {
-    method: 'POST',
-    authenticated: false,
-    body: {
-      correo: data.email,
-      password: data.password,
-      rut: data.rut,
-      nombre: data.name,
-      telefono: data.phone?.trim() || null,
-      comunaId: Number(data.commune),
-    },
-  })
-  return saveSession(result)
+  return saveSession(await request('auth', '/v1/auth/registro', {
+    method: 'POST', authenticated: false, body: registrationPayload(data),
+  }))
+}
+
+export async function createUser(data) {
+  const result = await request('auth', '/v1/admin/usuarios', { method: 'POST', body: {
+    registro: registrationPayload(data),
+    rol: Object.keys(roles).find((key) => roles[key] === data.role),
+    estado: Object.keys(statuses).find((key) => statuses[key] === data.status),
+  } })
+  const user = mapUser(result)
+  users = [...users, user]
+  events.notify()
+  return user
 }
 
 export async function updateUser(id, changes) {
