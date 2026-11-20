@@ -158,3 +158,9 @@ npm run test -- --run
 | `/admin/ordenes`, `/admin/reportes`, `/admin/mensajes`, `/admin/suscriptores` | Operación administrativa. |
 
 La [guía técnica del frontend](./jarodandre/README.md) detalla su organización y los contratos de comunicación. Ante un error de carga, comprobar primero las URLs y el estado de los cuatro servicios con `docker compose ps` y `docker compose logs --tail=100` desde el backend.
+
+## Reseñas y formularios
+
+El administrador selecciona la categoría desde las opciones del backend. No puede asignar estrellas ni cantidades de reseñas al crear o editar productos. Los clientes con una compra pagada del producto pueden publicar o actualizar su valoración de 1 a 5 estrellas y un comentario opcional desde la ficha del producto. El backend verifica la compra y calcula el resumen de valoraciones.
+
+Los errores de formulario muestran el campo y una explicación en español. Para registrar una cuenta, la contraseña requiere entre 8 y 72 caracteres; el teléfono es opcional.

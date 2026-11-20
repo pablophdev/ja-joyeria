@@ -111,7 +111,9 @@ export default function Acceso({ mode = 'login' }) {
                   value={values.password}
                   onChange={change}
                   required
+                  aria-describedby={registering ? 'access-password-help' : undefined}
                 />
+                {registering && <p className="form-text" id="access-password-help">Usa entre 8 y 72 caracteres.</p>}
               </div>
 
               {registering && (

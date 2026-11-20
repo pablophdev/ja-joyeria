@@ -1,13 +1,13 @@
 import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { routes } from '../../navigation/routes'
+import { getProductCategories } from '../../datos/products'
 import VistaPreviaImagen from './VistaPreviaImagen'
 
 const EditorDescripcion = lazy(() => import('./EditorDescripcion'))
 
 const textFields = [
   { name: 'name', label: 'Nombre', required: true },
-  { name: 'category', label: 'Categoría (anillos, cadenas, collares o grillz)', required: true },
   { name: 'tags', label: 'Etiquetas (separadas por comas)' },
 ]
 
@@ -16,12 +16,16 @@ function FormularioProducto({ values, onChange, onImageChange, imageLoading, ima
     <form onSubmit={onSubmit}>
       <div className="row g-3">
         {textFields.map(({ name, label, required }) => <div className={name === 'name' ? 'col-12' : 'col-md-6'} key={name}><label className="form-label" htmlFor={`product-${name}`}>{label}</label><input className="form-control" id={`product-${name}`} name={name} required={required} value={values[name]} onChange={onChange} /></div>)}
+        <div className="col-md-6"><label className="form-label" htmlFor="product-category">Categoría</label>
+          <select className="form-select" id="product-category" name="category" required value={values.category} onChange={onChange}>
+            <option value="">Selecciona una categoría</option>
+            {getProductCategories().map((category) => <option key={category.id} value={category.slug}>{category.nombre}</option>)}
+          </select>
+        </div>
         <div className="col-md-6"><label className="form-label" htmlFor="product-price">Precio (CLP)</label><input className="form-control" id="product-price" name="price" type="number" min="0" max={Number.MAX_SAFE_INTEGER} step="1" required value={values.price} onChange={onChange} /></div>
         <div className="col-md-6"><label className="form-label" htmlFor="product-availability">Disponibilidad</label><select className="form-select" id="product-availability" name="availability" required value={values.availability} onChange={onChange}><option value="">Selecciona disponibilidad</option><option value="Disponible">Disponible</option><option value="Agotado">Agotado</option><option value="Consultar disponibilidad">Consultar disponibilidad</option></select></div>
         <div className="col-md-6"><label className="form-label" htmlFor="product-group">Grupo</label><select className="form-select" id="product-group" name="group" value={values.group} onChange={onChange}><option value="new">Nuevos</option><option value="popular">Populares</option></select></div>
         <div className="col-md-6"><label className="form-label" htmlFor="product-badge">Etiqueta de promoción</label><select className="form-select" id="product-badge" name="badge" value={values.badge} onChange={onChange}><option value="">Sin etiqueta</option><option value="Nuevo">Nuevo</option><option value="Oferta">Oferta</option></select></div>
-        <div className="col-md-6"><label className="form-label" htmlFor="product-rating">Valoración (0–5)</label><input className="form-control" id="product-rating" name="rating" type="number" min="0" max="5" step="1" required value={values.rating} onChange={onChange} /></div>
-        <div className="col-md-6"><label className="form-label" htmlFor="product-reviewCount">Cantidad de reseñas</label><input className="form-control" id="product-reviewCount" name="reviewCount" type="number" min="0" max={Number.MAX_SAFE_INTEGER} step="1" required value={values.reviewCount} onChange={onChange} /></div>
         <div className="col-12"><label className="form-label" id="product-description-label" htmlFor="product-description">Descripción</label><Suspense fallback={<p role="status">Cargando editor…</p>}><EditorDescripcion value={values.description} onChange={onChange} /></Suspense></div>
         <div className="col-md-6">
           <label className="form-label" htmlFor="product-image">Imagen del producto</label>

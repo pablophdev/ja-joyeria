@@ -8,6 +8,7 @@ let categories = []
 const availability = { DISPONIBLE: 'Disponible', AGOTADO: 'Agotado', CONSULTAR: 'Consultar disponibilidad' }
 export const subscribeToProducts = events.subscribe
 export const getProductImageOptions = productImageOptions
+export function getProductCategories() { return [...categories] }
 export function getProducts() { return [...products] }
 export function getFeaturedProducts() { return products.filter((product) => product.featured) }
 export function getProductById(id) { return products.find((product) => product.id === Number(id)) || null }
@@ -38,8 +39,7 @@ function payload(data) {
   if (!code) throw new Error('Disponibilidad válida: Disponible, Agotado o Consultar disponibilidad.')
   return { categoriaId: category.id, nombre: data.name, descripcion: sanitizeDescription(data.description),
     precioClp: data.price, imagenKey: imageKey(data.image), etiquetas: data.tags.split(',').map((tag) => tag.trim()).filter(Boolean),
-    grupo: data.group, insignia: data.badge, destacado: data.featured, valoracion: data.rating,
-    cantidadResenas: data.reviewCount, disponibilidad: code }
+    grupo: data.group, insignia: data.badge, destacado: data.featured, disponibilidad: code }
 }
 
 export async function createProduct(data) {
@@ -58,4 +58,11 @@ export async function deleteProduct(id) {
   await request('catalog', `/v1/admin/productos/${id}`, { method: 'DELETE' })
   products = products.filter((item) => item.id !== id)
   events.notify()
+}
+
+export async function refreshProduct(id) {
+  const product = mapProduct(await request('catalog', `/v1/productos/${id}`, { authenticated: false }))
+  products = products.map((item) => item.id === product.id ? product : item)
+  events.notify()
+  return product
 }

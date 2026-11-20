@@ -2,6 +2,7 @@ import { sanitizeDescription } from '../utilidades/descriptionHtml'
 import { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { getProductById, subscribeToProducts } from '../datos/products'
+import ResenasProducto from '../componentes/productos/ResenasProducto'
 import ValoracionProducto from '../componentes/productos/ValoracionProducto'
 import { formatPrice } from '../utilidades/formatPrice'
 import { routes } from '../navigation/routes'
@@ -97,6 +98,7 @@ class DetalleProducto extends Component {
               </div>
             </div>
           </div>
+          <ResenasProducto key={product.id} productId={product.id} />
         </article>
       </>
     )
