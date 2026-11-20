@@ -12,4 +12,5 @@ createRoot(document.getElementById('root')).render(
   </StrictMode>,
 )
 
-initScrollReveal()
+const disposeScrollReveal = initScrollReveal()
+if (import.meta.hot) import.meta.hot.dispose(disposeScrollReveal)

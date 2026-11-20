@@ -1,6 +1,9 @@
+import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { routes } from '../../navigation/routes'
 import VistaPreviaImagen from './VistaPreviaImagen'
+
+const EditorDescripcion = lazy(() => import('./EditorDescripcion'))
 
 const textFields = [
   { name: 'name', label: 'Nombre', required: true },
@@ -19,7 +22,7 @@ function FormularioProducto({ values, onChange, onImageChange, imageLoading, ima
         <div className="col-md-6"><label className="form-label" htmlFor="product-badge">Etiqueta de promoción</label><select className="form-select" id="product-badge" name="badge" value={values.badge} onChange={onChange}><option value="">Sin etiqueta</option><option value="Nuevo">Nuevo</option><option value="Oferta">Oferta</option></select></div>
         <div className="col-md-6"><label className="form-label" htmlFor="product-rating">Valoración (0–5)</label><input className="form-control" id="product-rating" name="rating" type="number" min="0" max="5" step="1" required value={values.rating} onChange={onChange} /></div>
         <div className="col-md-6"><label className="form-label" htmlFor="product-reviewCount">Cantidad de reseñas</label><input className="form-control" id="product-reviewCount" name="reviewCount" type="number" min="0" max={Number.MAX_SAFE_INTEGER} step="1" required value={values.reviewCount} onChange={onChange} /></div>
-        <div className="col-12"><label className="form-label" htmlFor="product-description">Descripción</label><textarea className="form-control" id="product-description" name="description" rows="4" value={values.description} onChange={onChange} /></div>
+        <div className="col-12"><label className="form-label" id="product-description-label" htmlFor="product-description">Descripción</label><Suspense fallback={<p role="status">Cargando editor…</p>}><EditorDescripcion value={values.description} onChange={onChange} /></Suspense></div>
         <div className="col-md-6">
           <label className="form-label" htmlFor="product-image">Imagen del producto</label>
           <input className="form-control" id="product-image" name="imageFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required={!values.image} onChange={onImageChange} aria-invalid={Boolean(imageError)} aria-describedby="product-image-help product-image-status" />

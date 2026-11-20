@@ -1,3 +1,4 @@
+import { sanitizeDescription } from '../utilidades/descriptionHtml'
 import { allPages, observable, request } from './api'
 import { imageKey, productImageOptions, resolveImage } from './media'
 
@@ -35,7 +36,7 @@ function payload(data) {
   if (!category) throw new Error('Selecciona una categoría del catálogo.')
   const code = Object.keys(availability).find((key) => availability[key].toLowerCase() === data.availability.toLowerCase())
   if (!code) throw new Error('Disponibilidad válida: Disponible, Agotado o Consultar disponibilidad.')
-  return { categoriaId: category.id, nombre: data.name, descripcion: data.description,
+  return { categoriaId: category.id, nombre: data.name, descripcion: sanitizeDescription(data.description),
     precioClp: data.price, imagenKey: imageKey(data.image), etiquetas: data.tags.split(',').map((tag) => tag.trim()).filter(Boolean),
     grupo: data.group, insignia: data.badge, destacado: data.featured, valoracion: data.rating,
     cantidadResenas: data.reviewCount, disponibilidad: code }

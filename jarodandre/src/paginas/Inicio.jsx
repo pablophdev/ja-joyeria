@@ -40,21 +40,21 @@ class Inicio extends Component {
         <section className="home-section container">
           <h2 className="text-center mb-5">Nuestras colecciones</h2>
           <div className="row g-4">
-            <article className="col-md-6 col-lg-4">
+            <article className="col-md-6 col-lg-4" data-reveal>
               <video className="collection-video border rounded" autoPlay loop muted playsInline preload="metadata" aria-label="Colección de grillz">
                 <source src={`${import.meta.env.BASE_URL}videos/jarod.mp4`} type="video/mp4" />
               </video>
               <h3 className="h4 mt-3">Grillz Colecciones 2026</h3>
               <Link className="text-dark" to={routes.shop}>Explorar productos</Link>
             </article>
-            <article className="col-md-6 col-lg-4">
+            <article className="col-md-6 col-lg-4" data-reveal>
               <video className="collection-video border rounded" autoPlay loop muted playsInline preload="metadata" aria-label="Colección de anillos">
                 <source src={`${import.meta.env.BASE_URL}videos/jarod2.mp4`} type="video/mp4" />
               </video>
               <h3 className="h4 mt-3">Anillos</h3>
               <Link className="text-dark" to={routes.shop}>Explorar productos</Link>
             </article>
-            <article className="col-md-6 col-lg-4">
+            <article className="col-md-6 col-lg-4" data-reveal>
               <video className="collection-video border rounded" autoPlay loop muted playsInline preload="metadata" aria-label="Colección de cadenas y collares">
                 <source src={`${import.meta.env.BASE_URL}videos/video2joya.mp4`} type="video/mp4" />
               </video>

@@ -1,3 +1,4 @@
+import { sanitizeDescription } from '../utilidades/descriptionHtml'
 import { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { getProductById, subscribeToProducts } from '../datos/products'
@@ -76,7 +77,7 @@ class DetalleProducto extends Component {
                 {product.reviewCount > 0 && <span> · {product.reviewCount} {product.reviewCount === 1 ? 'reseña' : 'reseñas'}</span>}
               </p>
               <p className="fs-3 fw-bold">{formatPrice(product.price)}</p>
-              <p>{product.description || 'Este producto todavía no tiene una descripción detallada.'}</p>
+              {product.description ? <div className="product-description" dangerouslySetInnerHTML={{ __html: sanitizeDescription(product.description) }} /> : <p>Este producto todavía no tiene una descripción detallada.</p>}
               <dl className="mt-4">
                 <dt>Disponibilidad</dt>
                 <dd>{product.availability || 'Consultar disponibilidad'}</dd>
