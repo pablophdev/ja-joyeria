@@ -4,11 +4,11 @@ Este repositorio contiene la página de JA Joyería. Desde aquí se muestra el c
 
 ## Cómo se conecta la tienda
 
-La web está hecha con React y se comunica con cuatro servicios Spring Boot: autenticación, catálogo, pedidos y comunicaciones. En el modo Docker, Nginx sirve la web y reenvía las solicitudes a cada servicio. Nginx también permite abrir directamente una página como `/productos/3` y recargar el navegador sin perder la ruta.
+La web está hecha con React y se comunica con cuatro servicios Spring Boot: autenticación, catálogo, pedidos y comunicaciones. El frontend se ejecuta fuera de Docker. En desarrollo usa Vite; para desplegarlo, publica `dist/` en un servidor web o hosting estático con fallback a `index.html` para las rutas de React Router.
 
 ```mermaid
 flowchart LR
-    Persona --> Web[React y Nginx]
+    Persona --> Web[React]
     Web --> Auth[ms-auth]
     Web --> Catalogo[ms-catalogo]
     Web --> Pedidos[ms-pedidos]
@@ -42,33 +42,17 @@ En este entorno los pagos son simulados y el inventario utiliza la disponibilida
 | GSAP | Animaciones de la tienda. |
 | TipTap | Editor de texto enriquecido para descripciones de productos. |
 | DOMPurify | Limpia el HTML de las descripciones antes de mostrarlo. |
-| Docker y Nginx | Sirven la versión de producción local y conectan la web con las APIs. |
+| Hosting estático o servidor web | Publica los archivos compilados de `dist/` sin Docker. |
 
-## Iniciar toda la tienda
+## Preparar el backend
 
-Necesitas Docker Desktop con el motor Linux activo y Docker Compose v2. Clona este repositorio junto al backend y ejecuta Compose desde la carpeta `jarodandre-backend`:
+Sigue la [guía del backend](https://github.com/pablophdev/jarodandre-backend#readme) para preparar MySQL externo y levantar los cuatro microservicios con Docker Compose. El frontend y MySQL no forman parte de Compose. Los repositorios pueden estar en carpetas o equipos distintos.
 
-```powershell
-git clone https://github.com/pablophdev/ja-joyeria.git
-git clone https://github.com/pablophdev/jarodandre-backend.git
-cd jarodandre-backend
-docker compose up -d --build
-docker compose ps
-```
+## Publicar sin Docker
 
-Cuando los servicios estén listos, abre [http://localhost:5173](http://localhost:5173). Para detenerlos y conservar tus datos:
+Desde `jarodandre`, configura las variables `VITE_*` antes de ejecutar `npm ci` y `npm run build`. Publica el contenido de `dist/` en tu EC2 con un servidor web, S3 + CloudFront u otro hosting estático. Configura el servidor para devolver `index.html` en las rutas de React Router.
 
-```powershell
-docker compose down
-```
-
-La cuenta administrativa local es `admin@jarodandre.local` y su contraseña es `Admin123123`. MySQL está disponible desde tu equipo en `127.0.0.1:3307`, con usuario `ja` y contraseña `123123`. Estas cuentas son solo para desarrollo.
-
-Después de editar el frontend, puedes volver a construirlo desde la carpeta del backend:
-
-```powershell
-docker compose up -d --build frontend
-```
+Las URLs de las APIs deben ser accesibles desde el navegador; no uses nombres internos de Docker. Para producción usa HTTPS y configura `FRONTEND_ORIGIN` en el backend con el origen exacto del sitio. Si usas rutas relativas `/api/...`, el servidor o balanceador debe reenviarlas a los microservicios. `npm run preview` es solo para comprobar la compilación.
 
 ## Trabajar en el frontend con Vite
 
@@ -122,7 +106,7 @@ npm run build
 npm run test -- --run
 ```
 
-`npm run preview` permite abrir la compilación de prueba. Para probar la misma conexión `/api/...` usada por la tienda Docker, ejecuta el frontend con Compose.
+`npm run preview` permite abrir la compilación de prueba. Las URLs de las APIs quedan incorporadas al compilar; vuelve a ejecutar `npm run build` si cambian.
 
 ## Páginas principales
 

@@ -1,6 +1,6 @@
 # Jarodandre · Guía técnica del frontend
 
-La [guía principal](../README.md) contiene la instalación, las credenciales de desarrollo y el uso de Docker. Esta carpeta contiene la aplicación React y su compilación de producción.
+La [guía principal](../README.md) contiene la instalación, la configuración del backend y la publicación sin Docker. Esta carpeta contiene la aplicación React y su compilación de producción.
 
 ## Organización
 
@@ -17,7 +17,7 @@ src/
 └── index.css        # Estilos compartidos
 ```
 
-`public/` contiene recursos estáticos como videos e iconos. Vite genera `dist/`. El Dockerfile compila con Node.js 24 y copia el resultado a Nginx, cuya configuración está en `nginx.conf`.
+`public/` contiene recursos estáticos como videos e iconos. Vite genera `dist/`. Compila con Node.js 24 y publica `dist/` fuera de Docker, con fallback a `index.html` para React Router.
 
 ## Servicios y contratos
 
@@ -64,6 +64,6 @@ npm run build
 npm run test -- --run
 ```
 
-Las direcciones se configuran con `VITE_AUTH_URL`, `VITE_CATALOGO_URL`, `VITE_PEDIDOS_URL`, `VITE_COMUNICACIONES_URL` y, opcionalmente, `VITE_MEDIA_URL`. Después de modificar un archivo `.env` hay que reiniciar Vite. Para cambiar la configuración de una imagen ya compilada, reconstruir el frontend.
+Las direcciones se configuran con `VITE_AUTH_URL`, `VITE_CATALOGO_URL`, `VITE_PEDIDOS_URL`, `VITE_COMUNICACIONES_URL` y, opcionalmente, `VITE_MEDIA_URL`. Después de modificar un archivo `.env` hay que reiniciar Vite. Para cambiar la configuración de una versión ya compilada, reconstruir el frontend.
 
 Las pruebas de sanitización comprueban etiquetas permitidas, contenido ejecutable y texto anterior. Las de TipTap comprueban carga y sincronización del contenido. La suite también incluye pruebas de animaciones, contratos HTTP y componentes de la tienda.
